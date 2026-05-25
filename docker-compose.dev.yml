@@ -1,0 +1,39 @@
+services:
+  # MongoDB Database (run locally for development testing only)
+  mongodb:
+    image: mongo:latest
+    container_name: mealplan_mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  # Node.js Express Backend
+  server:
+    build: ./server
+    container_name: mealplan_server
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./server:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/mealplan_mongodb
+      - PORT=3000
+    depends_on:
+      - mongodb
+
+  # Angular Frontend
+  client:
+    build: ./client
+    container_name: mealplan_client
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./client:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - server
+
+volumes:
+  mongo_data:
