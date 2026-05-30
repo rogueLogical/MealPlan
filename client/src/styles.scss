@@ -1,1 +1,47 @@
-/* You can add global styles to this file, and also import other style files */
+/* --- Global Theme Variables --- */
+:root {
+  /* Light Mode Palette (Default) */
+  --bg-app: #eae8b8;
+  --bg-sidebar: #415776;
+  --bg-card: #ffbe8f;
+  
+  --text-main: #111827;
+  --text-muted: #6b7280;
+  --text-sidebar: #0c0c0d;
+  --text-sidebar-hover: #ffffff;
+  
+  --accent-primary: #111f3d;
+  --border-color: #1a3746;
+  --shadow-sm: 2px 2px 3px rgba(0, 0, 0, 0.5);
+}
+
+html.dark-mode {
+  /* Dark Mode Palette Override */
+  --bg-app: #0f172a;
+  --bg-sidebar: #1e293b;
+  --bg-card: #1f2937;
+  
+  --text-main: #f9fafb;
+  --text-muted: #9ca3af;
+  --text-sidebar: #9ca3af;
+  --text-sidebar-hover: #f3f4f6;
+  
+  --accent-primary: #3b82f6;
+  --border-color: #374151;
+  --shadow-sm: 2px 2px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* --- Base Layout Resets --- */
+html, body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}

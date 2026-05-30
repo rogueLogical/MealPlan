@@ -1,0 +1,40 @@
+.workspace-header {
+  margin-bottom: 24px;
+}
+
+.title-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  
+  .header-icon {
+    font-size: 2.25rem;
+    line-height: 1;
+  }
+}
+
+.text-group {
+  h1 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+  
+  .breadcrumbs {
+    margin: 4px 0 0 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+.header-divider {
+  border: none;
+  height: 1px;
+  background-color: var(--border-color);
+  margin-top: 20px;
+  margin-bottom: 0;
+  transition: background-color 0.3s ease;
+}
