@@ -13,12 +13,16 @@ app.use(express.json()); // Parses incoming JSON request bodies
 // Falls back to the local Docker MongoDB container if process.env.MONGO_URI is not set
 const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/meandb';
 
-mongoose.connect(mongoURI)
-  .then(() => console.log('Database connected successfully'))
-  .catch(err => {
-    console.error('Database connection error:', err);
-    process.exit(1); // Stop the server if the database connection fails
+// Connect to the database (if not in test mode)
+if (process.env.NODE_ENV !== 'test') {
+  mongoose.connect(mongoURI)
+    .then(() => console.log('Database connected successfully'))
+    .catch(err => {
+      console.error('Database connection error:', err);
+      process.exit(1); // Stop the server if the database connection fails
   });
+}
+
 
 // Set up API Routes
 app.get('/api/health', (req, res) => {
@@ -27,9 +31,13 @@ app.get('/api/health', (req, res) => {
 
 // Add /routes files to the API here
 
+// Export the app for supertest
+module.exports = app;
 
-// Start the Server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is operating on port ${PORT}`);
-});
+// Start the Server (if not in test mode)
+if (process.env.NODE_ENV !== 'test') {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Server is operating on port ${PORT}`);
+  });
+}
