@@ -1,0 +1,47 @@
+<div class="dashboard-wrapper">
+  <!-- Floating top bar for mobile screens-->
+  <header class="mobile-top-bar">
+    <button (click)="toggleMenu()" class="hamburger-btn">
+      <span>☰</span>
+    </button>
+    <h2 class="title-text">{{ title }}</h2>
+  </header>
+  <!-- Sidebar Menu Tray -->
+  <aside class="menu-tray" [class.collapsed]="isMenuCollapsed">
+    <div class="brand">
+      <span class="logo">🥗</span>
+      <h2 class="title-text">{{ title }}</h2>
+      <button (click)="toggleMenu()" class="close-menu-btn">✕</button>
+    </div>
+    
+    <nav class="nav-list">
+      @for (item of menuItems; track item.name) {
+        <button 
+          [routerLink]="item.path"
+          routerLinkActive="active"
+          (click)="selectTab(item.name)"
+          [class.active]="activeTab === item.name"
+          class="menu-btn">
+          <span class="btn-icon">{{ item.icon }}</span>
+          <span class="btn-text">{{ item.name }}</span>
+        </button>
+      }
+    </nav>
+
+    <div class="tray-footer">
+      <button (click)='toggleTheme()' class="theme-toggle-btn">
+        <span>{{ isDarkMode ? '☀️ Light Mode' : '🌙 Dark Mode' }}</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Overlay to close menu when clicking outside on mobile views -->
+  <div *ngIf="!isMenuCollapsed" (click)="toggleMenu()" class="menu-overlay"></div>
+
+  <!-- Main Workspace Frame -->
+  <main class="main-content">
+    <app-page-header></app-page-header>
+    <router-outlet></router-outlet>
+  </main>
+
+</div>
