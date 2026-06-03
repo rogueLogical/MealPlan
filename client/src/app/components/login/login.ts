@@ -8,16 +8,16 @@ import { Title } from '@angular/platform-browser';
   styleUrl: './login.scss',
 })
 export class Login implements OnInit {
-  isDarkMode: boolean = false;
+  isDarkMode = false;
 
   private titleService = inject(Title);
-  
+
   ngOnInit(): void {
     // Sync Angular state flag with the root HTML element class state
     if (document.documentElement.classList.contains('dark-mode')) {
       this.isDarkMode = true;
     }
-    this.titleService.setTitle('Login | MealPlan')
+    this.titleService.setTitle('Login | MealPlan');
   }
 
   @HostListener('window:storage', ['$event'])

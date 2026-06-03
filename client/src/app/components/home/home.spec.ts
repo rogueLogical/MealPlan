@@ -9,25 +9,31 @@ describe('Home Component Test Suite', () => {
 
   beforeEach(async () => {
     // Create a mock localStorage container for the virtual testing sandbox
-    let store: { [key: string]: string } = {};
-    
+    let store: Record<string, string> = {};
+
     const mockLocalStorage = {
-      getItem: (key: string): string | null => key in store ? store[key] : null,
-      setItem: (key: string, value: string) => { store[key] = `${value}`; },
-      removeItem: (key: string) => { delete store[key]; },
-      clear: () => { store = {}; },
+      getItem: (key: string): string | null => (key in store ? store[key] : null),
+      setItem: (key: string, value: string) => {
+        store[key] = `${value}`;
+      },
+      removeItem: (key: string) => {
+        delete store[key];
+      },
+      clear: () => {
+        store = {};
+      },
       length: 0,
-      key: (index: number) => null
+      key: () => null,
     };
 
     Object.defineProperty(window, 'localStorage', {
       value: mockLocalStorage,
-      writable: true
+      writable: true,
     });
 
     await TestBed.configureTestingModule({
       imports: [Home],
-      providers: [provideRouter([])]
+      providers: [provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(Home);
@@ -47,10 +53,9 @@ describe('Home Component Test Suite', () => {
     component.toggleTheme();
     expect(component.isDarkMode).toBeTruthy();
     expect(document.documentElement.classList.contains('dark-mode')).toBeTruthy();
-    
+
     // Toggle back down to clean up browser DOM window impacts
     component.toggleTheme();
     expect(component.isDarkMode).toBeFalsy();
   });
-
 });

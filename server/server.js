@@ -15,14 +15,14 @@ const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/meandb';
 
 // Connect to the database (if not in test mode)
 if (process.env.NODE_ENV !== 'test') {
-  mongoose.connect(mongoURI)
+  mongoose
+    .connect(mongoURI)
     .then(() => console.log('Database connected successfully'))
-    .catch(err => {
+    .catch((err) => {
       console.error('Database connection error:', err);
       process.exit(1); // Stop the server if the database connection fails
-  });
+    });
 }
-
 
 // Set up API Routes
 app.get('/api/health', (req, res) => {

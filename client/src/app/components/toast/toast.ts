@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ToastService, ToastMessage } from '../../services/toast';
 import { Observable } from 'rxjs';
@@ -8,16 +8,11 @@ import { Observable } from 'rxjs';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './toast.html',
-  styleUrls: ['./toast.scss']
+  styleUrls: ['./toast.scss'],
 })
-export class Toast implements OnInit {
-  toasts$: Observable<ToastMessage[]>;
-
-  constructor(private toastService: ToastService) {
-    this.toasts$ = this.toastService.toasts$;
-  }
-
-  ngOnInit(): void {}
+export class Toast {
+  private toastService = inject(ToastService);
+  toasts$: Observable<ToastMessage[]> = this.toastService.toasts$;
 
   dismiss(id: number): void {
     this.toastService.clear(id);

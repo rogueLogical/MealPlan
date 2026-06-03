@@ -8,7 +8,7 @@ export interface ToastMessage {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ToastService {
   private toastsSubject = new BehaviorSubject<ToastMessage[]>([]);
@@ -19,7 +19,7 @@ export class ToastService {
   show(text: string, type: 'success' | 'error' | 'info' = 'info'): void {
     const id = this.counter++;
     const currentToasts = this.toastsSubject.value;
-    
+
     this.toastsSubject.next([...currentToasts, { id, text, type }]);
 
     setTimeout(() => {
@@ -27,13 +27,19 @@ export class ToastService {
     }, 4000);
   }
 
-  showSuccess(text: string): void { this.show(text, 'success'); }
-  showError(text: string): void { this.show(text, 'error'); }
-  showInfo(text: string): void { this.show(text, 'info'); }
+  showSuccess(text: string): void {
+    this.show(text, 'success');
+  }
+  showError(text: string): void {
+    this.show(text, 'error');
+  }
+  showInfo(text: string): void {
+    this.show(text, 'info');
+  }
 
   // Remove a toast explicitly by ID when clicked
   clear(id: number): void {
-    const updatedToasts = this.toastsSubject.value.filter(t => t.id !== id);
+    const updatedToasts = this.toastsSubject.value.filter((t) => t.id !== id);
     this.toastsSubject.next(updatedToasts);
   }
 }

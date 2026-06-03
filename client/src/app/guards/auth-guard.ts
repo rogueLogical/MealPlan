@@ -1,11 +1,11 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 
-export const authGuard: CanActivateFn = (route, state) => {
+export const authGuard: CanActivateFn = () => {
   const router = inject(Router);
 
   // TEMPORARY MOCK AUTHENTICATION CHECK: Change this to true/false to test the gate lock
-  const isAuthenticated = true; 
+  const isAuthenticated = true;
 
   if (isAuthenticated) {
     return true; // Grant passage to the dashboard route
