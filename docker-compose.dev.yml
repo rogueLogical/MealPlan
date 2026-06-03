@@ -4,7 +4,7 @@ services:
     image: mongo:latest
     container_name: mealplan_mongodb
     ports:
-      - "27017:27017"
+      - '27017:27017'
     volumes:
       - mongo_data:/data/db
 
@@ -13,7 +13,7 @@ services:
     build: ./server
     container_name: mealplan_server
     ports:
-      - "3000:3000"
+      - '3000:3000'
     volumes:
       - ./server:/usr/src/app
       - /usr/src/app/node_modules
@@ -28,7 +28,7 @@ services:
     build: ./client
     container_name: mealplan_client
     ports:
-      - "4200:4200"
+      - '4200:4200'
     volumes:
       - ./client:/usr/src/app
       - /usr/src/app/node_modules

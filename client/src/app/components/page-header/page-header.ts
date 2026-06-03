@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, NavigationEnd } from '@angular/router';
+import { Router, NavigationEnd, Event } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { Title } from '@angular/platform-browser';
 
@@ -9,22 +9,22 @@ import { Title } from '@angular/platform-browser';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './page-header.html',
-  styleUrls: ['./page-header.scss']
+  styleUrls: ['./page-header.scss'],
 })
 export class PageHeader implements OnInit {
-  currentTitle: string = 'Home';
-  currentIcon: string = '🏠';
+  currentTitle = 'Home';
+  currentIcon = '🏠';
 
   // Mapping matrix translating URL routes to friendly text and icons
-  private routeMap: { [key: string]: { title: string; icon: string } } = {
-    'home': { title: 'Home', icon: '🏠' },
-    'meals': { title: 'Meals Planner', icon: '📅' },
-    'recipes': { title: 'Recipes Library', icon: '🍳' },
-    'groceries': { title: 'Grocery List', icon: '🛒' },
-    'settings': { title: 'Settings', icon: '⚙️' }
+  private routeMap: Record<string, { title: string; icon: string }> = {
+    home: { title: 'Home', icon: '🏠' },
+    meals: { title: 'Meals Planner', icon: '📅' },
+    recipes: { title: 'Recipes Library', icon: '🍳' },
+    groceries: { title: 'Grocery List', icon: '🛒' },
+    settings: { title: 'Settings', icon: '⚙️' },
   };
 
-  constructor(private router: Router) { }
+  private router = inject(Router);
 
   private titleService = inject(Title);
   ngOnInit(): void {
@@ -32,11 +32,11 @@ export class PageHeader implements OnInit {
     this.updateHeaderTitle(this.router.url);
 
     // Listen to active router changes continuously
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe((event: any) => {
-      this.updateHeaderTitle(event.urlAfterRedirects || event.url);
-    });
+    this.router.events
+      .pipe(filter((event: Event) => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        this.updateHeaderTitle(event.urlAfterRedirects || event.url);
+      });
   }
 
   private updateHeaderTitle(url: string): void {
