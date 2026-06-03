@@ -37,7 +37,9 @@
   </aside>
 
   <!-- Overlay to close menu when clicking outside on mobile views -->
-  <div *ngIf="!isMenuCollapsed" (click)="toggleMenu()" class="menu-overlay"></div>
+  @if (!isMenuCollapsed) {
+    <button (click)="toggleMenu()" class="menu-overlay" aria-label="Close navigation menu"></button>
+  }
 
   <!-- Main Workspace Frame -->
   <main class="main-content">

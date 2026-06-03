@@ -1,6 +1,6 @@
 <div class="toast-container">
   @for (toast of toasts$ | async; track toast.id) {
-    <div class="toast-card" [ngClass]="toast.type" (click)="dismiss(toast.id)">
+    <div class="toast-card" [ngClass]="toast.type">
       <span class="toast-icon">
         @switch (toast.type) {
           @case ('success') {
@@ -15,7 +15,7 @@
         }
       </span>
       <p class="toast-text">{{ toast.text }}</p>
-      <button class="toast-close-btn">&times;</button>
+      <button class="toast-close-btn" (click)="dismiss(toast.id)">&times;</button>
     </div>
   }
 </div>
