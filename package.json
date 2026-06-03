@@ -1,0 +1,24 @@
+{
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.7",
+    "prettier": "^3.8.3"
+  },
+  "scripts": {
+    "format:check": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "server/**/*.js": [
+      "prettier --write",
+      "npx --prefix server eslint --fix"
+    ],
+    "client/src/**/*.{ts,html,scss}": [
+      "prettier --write"
+    ],
+    "client/src/**/*.ts": [
+      "npx --prefix client eslint --fix"
+    ]
+  }
+}
