@@ -1,10 +1,42 @@
 <header class="workspace-header">
-  <div class="title-group">
-    <span class="header-icon">{{ currentIcon }}</span>
-    <div class="text-group">
-      <h1>{{ currentTitle }}</h1>
-      <p class="breadcrumbs">{{ currentTitle }}</p>
+  <div class="header-top-row">
+    <div class="title-group">
+      <span class="header-icon">{{ currentIcon }}</span>
+      <div class="text-group">
+        <h1>{{ currentTitle }}</h1>
+        <p class="breadcrumbs">{{ currentTitle }}</p>
+      </div>
+    </div>
+    <div class="profile-container">
+      <button
+        (click)="toggleProfileMenu($event)"
+        class="profile-avatar-btn"
+        aria-label="Toggle user profile settings menu"
+        [attr.aria-expanded]="isProfileMenuOpen"
+      >
+        <img [src]="mockUser.avatarUrl" alt="User Profile Avatar Picture" class="avatar-img" />
+      </button>
+
+      <!-- Clickable Dropdown Sub Menu Menu Window -->
+      @if (isProfileMenuOpen) {
+        <button
+          class="dropdown-backdrop"
+          (click)="closeProfileMenu()"
+          aria-label="Close profile menu"
+        ></button>
+        <div class="profile-dropdown-bubble">
+          <div class="user-info-summary">
+            <p class="user-name">Signed in as</p>
+            <p class="user-email-bold">{{ mockUser.name }}</p>
+          </div>
+          <hr class="dropdown-divider" />
+          <button (click)="logout()" class="logout-btn">
+            <span class="logout-icon">🚪</span> Log Out
+          </button>
+        </div>
+      }
     </div>
   </div>
+
   <hr class="header-divider" />
 </header>

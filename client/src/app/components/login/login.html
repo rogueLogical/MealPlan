@@ -1,19 +1,46 @@
 <div class="login-wrapper">
   <div class="login-container">
-    <!-- Brand Title Header -->
-    <h1 class="brand-title">
-      <div class="logo-box">
+    <!-- Login Form Card -->
+    <main class="login-card">
+      <!-- Brand Title Header -->
+      <h1 class="brand-title">
         <span class="brand-logo">🥗</span>
         <span class="title-text">MealPlan</span>
-      </div>
-    </h1>
+      </h1>
+      <form (ngSubmit)="onLoginSubmit()" #loginForm="ngForm" novalidate class="auth-form">
+        <div class="form-group">
+          <input
+            type="text"
+            id="username"
+            name="username"
+            [(ngModel)]="credentials.username"
+            required
+            placeholder="Enter your username"
+            class="form-control"
+            aria-label="Username"
+          />
+        </div>
 
-    <!-- Login Form Card -->
-    <div class="login-card">
-      <span class="lock-icon">🔒</span>
-      <h2>Authentication Required</h2>
-      <p>Please log in to access your MealPlan Dashboard configurations.</p>
-      <button class="login-btn-mock" disabled>Login Coming Soon</button>
-    </div>
+        <div class="form-group">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            [(ngModel)]="credentials.password"
+            required
+            placeholder="Enter your password"
+            class="form-control"
+            aria-label="Password"
+          />
+        </div>
+
+        <button type="submit" class="login-submit-btn">Log In</button>
+      </form>
+    </main>
+    <footer class="login-footer-links">
+      <button class="utility-link" type="button">Create Account</button>
+      <span class="link-divider">|</span>
+      <button class="utility-link" type="button">Forgot Username/Password</button>
+    </footer>
   </div>
 </div>

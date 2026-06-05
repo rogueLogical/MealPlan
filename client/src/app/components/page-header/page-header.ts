@@ -1,13 +1,13 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, HostListener, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, NavigationEnd, Event } from '@angular/router';
+import { Router, NavigationEnd, Event, RouterLink } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-page-header',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './page-header.html',
   styleUrls: ['./page-header.scss'],
 })
@@ -15,12 +15,18 @@ export class PageHeader implements OnInit {
   currentTitle = 'Home';
   currentIcon = '🏠';
 
+  isProfileMenuOpen = false;
+  mockUser = {
+    // placholder until user management is implemented
+    name: 'Chris',
+    avatarUrl: 'https://api.dicebear.com/10.x/shapes/svg?seed=Chris',
+  };
+
   // Mapping matrix translating URL routes to friendly text and icons
   private routeMap: Record<string, { title: string; icon: string }> = {
     home: { title: 'Home', icon: '🏠' },
-    meals: { title: 'Meals Planner', icon: '📅' },
-    recipes: { title: 'Recipes Library', icon: '🍳' },
-    groceries: { title: 'Grocery List', icon: '🛒' },
+    meals: { title: 'Meal Prep Planner', icon: '📅' },
+    recipes: { title: 'Recipes', icon: '🍳' },
     settings: { title: 'Settings', icon: '⚙️' },
   };
 
@@ -37,6 +43,22 @@ export class PageHeader implements OnInit {
       .subscribe((event: NavigationEnd) => {
         this.updateHeaderTitle(event.urlAfterRedirects || event.url);
       });
+  }
+
+  toggleProfileMenu(event: MouseEvent): void {
+    event.stopPropagation();
+    this.isProfileMenuOpen = !this.isProfileMenuOpen;
+  }
+
+  @HostListener('document:click')
+  closeProfileMenu(): void {
+    this.isProfileMenuOpen = false;
+  }
+
+  logout(): void {
+    // placeholder until user management is implemented
+    console.log('User logged out');
+    this.router.navigate(['/login']);
   }
 
   private updateHeaderTitle(url: string): void {

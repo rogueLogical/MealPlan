@@ -3,12 +3,14 @@
   /* Light Mode Palette (Default) */
   --bg-app: #eae8b8;
   --bg-sidebar: #415776;
-  --bg-card: #ffbe8f;
+  --bg-card: #ffc25f;
 
   --text-main: #111827;
   --text-muted: #6b7280;
   --text-sidebar: #0c0c0d;
   --text-sidebar-hover: #ffffff;
+
+  --form-control-bg: #faeac1;
 
   --accent-primary: #111f3d;
   --border-color: #1a3746;
@@ -25,6 +27,8 @@ html.dark-mode {
   --text-muted: #9ca3af;
   --text-sidebar: #9ca3af;
   --text-sidebar-hover: #f3f4f6;
+
+  --form-control-bg: #17223b;
 
   --accent-primary: #3b82f6;
   --border-color: #374151;
