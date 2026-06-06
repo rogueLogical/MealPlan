@@ -11,7 +11,7 @@ module.exports = (req, res, next) => {
     //  this is for security purposes
     if (!jwtSecret) {
       console.error('Error: JWT_SECRET environment variable is missing.');
-      process.exit(1);
+      return res.status(500).json({ message: 'Internal server configuration error.' });
     }
     const decodedToken = jwt.verify(token, jwtSecret);
 

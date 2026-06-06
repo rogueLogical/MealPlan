@@ -59,7 +59,7 @@ router.post('/login', async (req, res) => {
     //  this is for security purposes
     if (!jwtSecret) {
       console.error('Error: JWT_SECRET environment variable is missing.');
-      process.exit(1);
+      return res.status(500).json({ message: 'Internal server configuration error.' });
     }
     const token = jwt.sign({ userId: user._id }, jwtSecret, { expiresIn: '24h' });
 

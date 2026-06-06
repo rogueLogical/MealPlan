@@ -13,7 +13,10 @@ module.exports = [
         console: 'readonly',
         describe: 'readonly',
         it: 'readonly',
-        expect: 'readonly'
+        expect: 'readonly',
+        beforeAll: 'readonly',
+        afterEach: 'readonly',
+        afterAll: 'readonly'
       }
     },
     rules: {
