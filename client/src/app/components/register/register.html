@@ -1,0 +1,76 @@
+<div class="login-wrapper">
+  <div class="login-container">
+    <!-- Account Creation Card -->
+    <main class="login-card">
+      <h1 class="brand-title">
+        <span class="brand-logo">🥗</span>
+        <span class="title-text">MealPlan</span>
+      </h1>
+
+      <p class="auth-message">Sign up below to create your personalized MealPlan account.</p>
+
+      <form (ngSubmit)="onRegisterSubmit()" #registerForm="ngForm" novalidate class="auth-form">
+        <div class="form-group">
+          <input
+            type="text"
+            id="username"
+            name="username"
+            [(ngModel)]="userData.username"
+            required
+            placeholder="Choose a username"
+            class="form-control"
+            aria-label="Username"
+          />
+        </div>
+
+        <div class="form-group">
+          <input
+            type="email"
+            id="email"
+            name="email"
+            [(ngModel)]="userData.email"
+            required
+            placeholder="Enter your email address"
+            class="form-control"
+            aria-label="Email Address"
+          />
+        </div>
+
+        <div class="form-group">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            [(ngModel)]="userData.password"
+            required
+            placeholder="Create a secure password"
+            class="form-control"
+            aria-label="Password"
+          />
+        </div>
+
+        <div class="form-group">
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            [(ngModel)]="userData.confirmPassword"
+            required
+            placeholder="Confirm your password"
+            class="form-control"
+            aria-label="Confirm Password"
+          />
+        </div>
+
+        <button type="submit" class="login-submit-btn">Create Account</button>
+      </form>
+    </main>
+
+    <!-- Navigation Utility Back Link to Login View -->
+    <footer class="login-footer-links">
+      <button class="utility-link" routerLink="/login" type="button">
+        Already have an account? Log In
+      </button>
+    </footer>
+  </div>
+</div>

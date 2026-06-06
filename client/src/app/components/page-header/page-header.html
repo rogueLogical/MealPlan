@@ -14,7 +14,11 @@
         aria-label="Toggle user profile settings menu"
         [attr.aria-expanded]="isProfileMenuOpen"
       >
-        <img [src]="mockUser.avatarUrl" alt="User Profile Avatar Picture" class="avatar-img" />
+        <img
+          [src]="currentUser?.profilePicture"
+          alt="User Profile Avatar Picture"
+          class="avatar-img"
+        />
       </button>
 
       <!-- Clickable Dropdown Sub Menu Menu Window -->
@@ -27,7 +31,7 @@
         <div class="profile-dropdown-bubble">
           <div class="user-info-summary">
             <p class="user-name">Signed in as</p>
-            <p class="user-email-bold">{{ mockUser.name }}</p>
+            <p class="user-email-bold">{{ currentUser?.username }}</p>
           </div>
           <hr class="dropdown-divider" />
           <button (click)="logout()" class="logout-btn">
