@@ -3,6 +3,9 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const app = require('../server'); // Corrected relative path
 const User = require('../models/User'); // Corrected relative path
+const { MongoMemoryServer } = require('mongodb-memory-server');
+
+let mongoServer;
 
 describe('User Settings API Operations Contract Test Suite', () => {
   let mockToken;
@@ -10,7 +13,8 @@ describe('User Settings API Operations Contract Test Suite', () => {
 
   beforeAll(async () => {
     process.env.JWT_SECRET = 'local_docker_development_only_secret_key_12345';
-    const testMongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/meandb_test';
+    mongoServer = await MongoMemoryServer.create();
+    const testMongoURI = mongoServer.getUri();
     await mongoose.connect(testMongoURI);
 
     // Seed a standard dummy testing account profile configuration
@@ -32,6 +36,7 @@ describe('User Settings API Operations Contract Test Suite', () => {
   afterAll(async () => {
     await User.deleteMany({});
     await mongoose.connection.close();
+    await mongoServer.stop();
   });
 
   it('should successfully update measurement and macronutrient configuration targets when providing a valid token', async () => {

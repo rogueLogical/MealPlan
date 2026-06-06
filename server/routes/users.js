@@ -46,7 +46,7 @@ router.put('/settings', checkAuth, async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { $set: updatePayload },
-      { new: true, runValidators: true } // Returns updated profile, runs schema validators
+      { returnDocument: 'after', runValidators: true } // Returns updated profile, runs schema validators
     ).select('-password'); // Exclude the encrypted password hash
 
     if (!updatedUser) {

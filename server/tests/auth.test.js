@@ -2,11 +2,15 @@ const request = require('supertest');
 const mongoose = require('mongoose');
 const app = require('../server');
 const User = require('../models/User');
+const { MongoMemoryServer } = require('mongodb-memory-server');
+
+let mongoServer;
 
 describe('User Authentication API Integration Contract Suites', () => {
   // Before tests execute, connect to a database connection
   beforeAll(async () => {
-    const testMongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/meandb_test';
+    mongoServer = await MongoMemoryServer.create();
+    const testMongoURI = mongoServer.getUri();
     await mongoose.connect(testMongoURI);
   });
 
@@ -18,6 +22,7 @@ describe('User Authentication API Integration Contract Suites', () => {
   // Sever database sessions completely when tests conclude
   afterAll(async () => {
     await mongoose.connection.close();
+    await mongoServer.stop();
   });
 
   it('should successfully register a new user with encrypted credential security hashing parameters', async () => {
