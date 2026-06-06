@@ -10,7 +10,7 @@ router.put('/settings', checkAuth, async (req, res) => {
     const userId = req.userData.userId;
 
     // Destructure valid configuration tokens out of the incoming HTTP request body
-    const { measurementSystem, nutritionSettings } = req.body;
+    const { measurementSystem, nutritionSettings, profilePicture } = req.body;
 
     // Build dataset object
     const updatePayload = {};
@@ -18,6 +18,7 @@ router.put('/settings', checkAuth, async (req, res) => {
     if (measurementSystem) {
       updatePayload['settings.measurementSystem'] = measurementSystem;
     }
+    if (profilePicture) updatePayload['profilePicture'] = profilePicture;
 
     if (nutritionSettings) {
       // update macro targets if provided by the client
