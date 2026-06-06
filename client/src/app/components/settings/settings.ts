@@ -19,6 +19,7 @@ export class Settings implements OnInit {
     nutritionSettings: {
       dailyMacroTargets: { calories: 2000, protein: 150, carbs: 200, fat: 70 },
     },
+    profilePicture: '',
   };
 
   isLoading = true;
