@@ -6,7 +6,13 @@ require('dotenv').config(); // Loads a local .env file if present
 const app = express();
 
 // Required Middleware
-app.use(cors()); // Allows Angular frontend to talk to this API
+app.use(
+  cors({
+    origin: 'https://thankful-tree-0f242730f-29.eastus2.7.azurestaticapps.net',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+  })
+); // Allows Angular frontend to talk to this API
 app.use(express.json()); // Parses incoming JSON request bodies
 
 // Database Connection
