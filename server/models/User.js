@@ -45,6 +45,14 @@ const UserSchema = new mongoose.Schema(
       likedFoods: [{ type: String }],
       dislikedFoods: [{ type: String }],
       dietaryRestrictions: [{ type: String }]
+    },
+    resetPasswordToken: {
+      type: String,
+      default: undefined
+    },
+    resetPasswordExpires: {
+      type: Date,
+      default: undefined
     }
   },
   {

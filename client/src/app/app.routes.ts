@@ -9,10 +9,13 @@ import { RecipesLibrary } from './components/recipes-library/recipes-library';
 import { GroceryList } from './components/grocery-list/grocery-list';
 import { Settings } from './components/settings/settings';
 import { Register } from './components/register/register';
+import { ForgotPassword } from './components/forgot-password/forgot-password';
 
 export const routes: Routes = [
   { path: 'login', component: Login, canActivate: [guestGuard] },
   { path: 'register', component: Register, canActivate: [guestGuard] },
+  { path: 'forgot-password', component: ForgotPassword, canActivate: [guestGuard] },
+  { path: 'reset-password', component: ForgotPassword, canActivate: [guestGuard] },
   {
     path: '',
     component: Home,
