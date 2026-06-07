@@ -35,12 +35,14 @@ export class Register implements OnInit {
 
     // Basic validation rules checks
     if (!username || !email || !password || !confirmPassword) {
-      this.toastService.showError('Please fill out all mandatory fields.');
+      return;
+    }
+
+    if (username.length < 6) {
       return;
     }
 
     if (password !== confirmPassword) {
-      this.toastService.showError('Passwords do not match.');
       return;
     }
 
