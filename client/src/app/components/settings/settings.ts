@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { UserService, UserSettingsPayload } from '../../services/user';
 import { AuthService } from '../../services/auth';
 import { ToastService } from '../../services/toast';
+import { NumbersOnlyDirective } from '../../directives/numbers-only';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NumbersOnlyDirective],
   templateUrl: './settings.html',
   styleUrls: ['./settings.scss'],
 })

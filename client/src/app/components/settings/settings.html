@@ -75,11 +75,14 @@
             <label for="protein">Protein (g)</label>
             <input
               type="number"
+              appNumbersOnly
               id="protein"
               name="protein"
               [(ngModel)]="settingsData.nutritionSettings.dailyMacroTargets.protein"
               class="form-control-input"
               required
+              pattern="[0-9]*"
+              min="0"
             />
             <span class="macro-stats-hint">
               {{ proteinCalories }} kcal ({{
@@ -93,11 +96,14 @@
             <label for="carbs">Carbohydrates (g)</label>
             <input
               type="number"
+              appNumbersOnly
               id="carbs"
               name="carbs"
               [(ngModel)]="settingsData.nutritionSettings.dailyMacroTargets.carbs"
               class="form-control-input"
               required
+              pattern="[0-9]*"
+              min="0"
             />
             <span class="macro-stats-hint">
               {{ carbsCalories }} kcal ({{ getMacroPercentage(carbsCalories) | number: '1.1-1' }}%)
@@ -109,11 +115,14 @@
             <label for="fat">Fat (g)</label>
             <input
               type="number"
+              appNumbersOnly
               id="fat"
               name="fat"
               [(ngModel)]="settingsData.nutritionSettings.dailyMacroTargets.fat"
               class="form-control-input"
               required
+              pattern="[0-9]*"
+              min="0"
             />
             <span class="macro-stats-hint">
               {{ fatCalories }} kcal ({{ getMacroPercentage(fatCalories) | number: '1.1-1' }}%)
