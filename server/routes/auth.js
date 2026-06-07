@@ -101,11 +101,14 @@ router.post('/forgot-password', async (req, res) => {
     user.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 Hour Expiry Window
     await user.save();
 
-    const recoveryUrl = `http://localhost:4200/reset-password?token=${resetToken}`;
+    // get the client URL from an environment variable for the email link
+    const clientBaseUrl = process.env.CLIENT_URL;
+
+    const recoveryUrl = `${clientBaseUrl}/reset-password?token=${resetToken}`;
     await sendEmail({
       to: user.email,
       subject: 'MealPlan Account Password Reset Request',
-      text: `Hello ${user.username},\n\nYour username is: ${user.username}\n\nYou can reset your account password by clicking this link:\n<a href=${recoveryUrl}>Update Password</a>\n\nThis link expires in 1 hour.`
+      text: `Hello ${user.username},\n\nYour username is: ${user.username}\n\nYou can reset your account password by clicking this link:\n${recoveryUrl}\n\nThis link expires in 1 hour.`
     });
 
     return res

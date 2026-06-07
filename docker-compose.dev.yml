@@ -21,6 +21,7 @@ services:
       - MONGO_URI=mongodb://mongodb:27017/mealplan_mongodb
       - PORT=3000
       - JWT_SECRET=local_docker_development_only_secret_key_12345
+      - CLIENT_URL=http://localhost:4200
     depends_on:
       - mongodb
 
