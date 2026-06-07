@@ -4,6 +4,7 @@ const getTransporter = async () => {
   // If production environment variables are present, connect to real SMTP provider
   if (process.env.SMTP_HOST) {
     return nodemailer.createTransport({
+      service: process.env.SMTP_SERVICE,
       host: process.env.SMTP_HOST,
       port: parseInt(process.env.SMTP_PORT || '587', 10),
       secure: process.env.SMTP_SECURE === 'true', // true for port 465
