@@ -5,7 +5,7 @@
 .header-top-row {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Pushes profile container to the absolute far right */
+  justify-content: space-between;
   width: 100%;
 }
 
@@ -47,7 +47,7 @@
 }
 
 .profile-container {
-  position: relative; /* Anchor container for our absolute positioned dropdown menu bubble */
+  position: relative;
 }
 
 .profile-avatar-btn {
@@ -62,7 +62,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--bg-card);
+  background-color: var(--bg-app);
   transition:
     border-color 0.2s ease,
     transform 0.2s ease;
@@ -110,7 +110,7 @@
   background: transparent;
   border: none;
   padding: 0;
-  z-index: 105; /* Sits just underneath the dropdown bubble (110) */
+  z-index: 105;
   cursor: default;
 }
 
@@ -147,7 +147,7 @@
   background: transparent;
   border: none;
   border-radius: 6px;
-  color: #ef4444; /* Explicitly styled red for destructive logout actions */
+  color: #ef4444; // Explicitly styled red for destructive logout actions
   font-weight: 500;
   font-size: 0.9rem;
   cursor: pointer;
@@ -173,7 +173,7 @@
   transition: background-color 0.3s ease;
 }
 
-/* Animations Keyframes */
+// Animations Keyframes
 @keyframes dropdownFadeIn {
   from {
     opacity: 0;

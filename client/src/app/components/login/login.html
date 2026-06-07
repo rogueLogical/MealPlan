@@ -18,8 +18,16 @@
             placeholder="Enter your username"
             class="form-control"
             aria-label="Username"
+            #userRef="ngModel"
           />
         </div>
+        @if (loginForm.submitted && userRef.invalid) {
+          <div style="color: red">
+            @if (userRef.errors?.['required']) {
+              <small>Username is required.</small>
+            }
+          </div>
+        }
 
         <div class="form-group">
           <input
@@ -31,16 +39,26 @@
             placeholder="Enter your password"
             class="form-control"
             aria-label="Password"
+            #passwordRef="ngModel"
           />
         </div>
+        @if (loginForm.submitted && passwordRef.invalid) {
+          <div style="color: red">
+            @if (passwordRef.errors?.['required']) {
+              <small>Password is required.</small>
+            }
+          </div>
+        }
 
         <button type="submit" class="login-submit-btn">Log In</button>
       </form>
     </main>
     <footer class="login-footer-links">
-      <button class="utility-link" type="button">Create Account</button>
+      <button class="utility-link" routerLink="/register" type="button">Create Account</button>
       <span class="link-divider">|</span>
-      <button class="utility-link" type="button">Forgot Username/Password</button>
+      <button class="utility-link" routerLink="/forgot-password" type="button">
+        Forgot Username/Password
+      </button>
     </footer>
   </div>
 </div>

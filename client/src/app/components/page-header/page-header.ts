@@ -1,13 +1,14 @@
 import { Component, HostListener, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, NavigationEnd, Event, RouterLink } from '@angular/router';
+import { Router, NavigationEnd, Event } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { Title } from '@angular/platform-browser';
+import { AuthService, UserProfile } from '../../services/auth';
 
 @Component({
   selector: 'app-page-header',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './page-header.html',
   styleUrls: ['./page-header.scss'],
 })
@@ -16,11 +17,7 @@ export class PageHeader implements OnInit {
   currentIcon = '🏠';
 
   isProfileMenuOpen = false;
-  mockUser = {
-    // placholder until user management is implemented
-    name: 'Chris',
-    avatarUrl: 'https://api.dicebear.com/10.x/shapes/svg?seed=Chris',
-  };
+  currentUser: UserProfile | null = null;
 
   // Mapping matrix translating URL routes to friendly text and icons
   private routeMap: Record<string, { title: string; icon: string }> = {
@@ -31,11 +28,17 @@ export class PageHeader implements OnInit {
   };
 
   private router = inject(Router);
+  private authService = inject(AuthService);
 
   private titleService = inject(Title);
   ngOnInit(): void {
     // Parse initial title on first component load
     this.updateHeaderTitle(this.router.url);
+
+    // Subscribe to the active user session data profile stream
+    this.authService.currentUser$.subscribe((user) => {
+      this.currentUser = user;
+    });
 
     // Listen to active router changes continuously
     this.router.events
@@ -56,9 +59,7 @@ export class PageHeader implements OnInit {
   }
 
   logout(): void {
-    // placeholder until user management is implemented
-    console.log('User logged out');
-    this.router.navigate(['/login']);
+    this.authService.logout();
   }
 
   private updateHeaderTitle(url: string): void {

@@ -1,16 +1,150 @@
-<div style="padding: 20px">
-  <h3>Notification Center Demonstration</h3>
-  <button
-    (click)="triggerDemo()"
-    style="
-      padding: 10px 20px;
-      cursor: pointer;
-      background: #2563eb;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-    "
-  >
-    Save Configurations
-  </button>
+<div class="settings-wrapper">
+  @if (isLoading) {
+    <div class="loading-spinner-box">
+      <p>Fetching account profile metrics framework...</p>
+    </div>
+  } @else {
+    <form (ngSubmit)="onSettingsSave()" #settingsForm="ngForm" novalidate class="settings-grid">
+      <!-- Profile Picture Card -->
+      <section class="settings-card">
+        <h2>Profile Picture</h2>
+        <p class="section-desc">
+          Provide a public URL link to update your dashboard account navigation avatar.<br />
+          (Tip: you can use
+          <a class="utility-link" href="https://www.dicebear.com/playground/" target="_blank"
+            >www.dicebear.com</a
+          >
+          to create one, or any other publicly hosted image file.)
+        </p>
+
+        <div class="profile-settings-row">
+          <!-- Live Preview Avatar Round Frame Box -->
+          <div class="avatar-preview-frame">
+            <img
+              [src]="settingsData.profilePicture || 'https://dicebear.com'"
+              alt="Live Avatar Preview Thumbnail"
+              class="preview-img"
+            />
+          </div>
+
+          <div class="form-group-row expand-field">
+            <label for="profilePicture">Avatar Image URL</label>
+            <input
+              type="url"
+              id="profilePicture"
+              name="profilePicture"
+              [(ngModel)]="settingsData.profilePicture"
+              placeholder="https://example.com"
+              class="form-control-input-text"
+              aria-label="Profile Picture URL"
+            />
+          </div>
+        </div>
+      </section>
+      <!-- Display Preferences Card -->
+      <section class="settings-card">
+        <h2>Display Preferences</h2>
+        <p class="section-desc">
+          Select your preferred measurement system for tracking recipe volumes and dimensions.
+        </p>
+
+        <div class="form-group-row">
+          <label for="measurementSystem">Recipe Measurement System</label>
+          <select
+            id="measurementSystem"
+            name="measurementSystem"
+            [(ngModel)]="settingsData.measurementSystem"
+            class="form-select-control"
+          >
+            <option value="imperial">Imperial (oz, lbs)</option>
+            <option value="metric">Metric (g, kg)</option>
+          </select>
+        </div>
+      </section>
+
+      <!-- Daily Nutritional Targets Card -->
+      <section class="settings-card">
+        <h2>Daily Nutrition Goals</h2>
+        <p class="section-desc">
+          Enter your target macro ratios. Calories and energy breakdowns will calculate dynamically.
+        </p>
+
+        <div class="macros-grid">
+          <!-- Protein input field element -->
+          <div class="form-group">
+            <label for="protein">Protein (g)</label>
+            <input
+              type="number"
+              appNumbersOnly
+              id="protein"
+              name="protein"
+              [(ngModel)]="settingsData.nutritionSettings.dailyMacroTargets.protein"
+              class="form-control-input"
+              required
+              pattern="[0-9]*"
+              min="0"
+            />
+            <span class="macro-stats-hint">
+              {{ proteinCalories }} kcal ({{
+                getMacroPercentage(proteinCalories) | number: '1.1-1'
+              }}%)
+            </span>
+          </div>
+
+          <!-- Carbohydrates input field element -->
+          <div class="form-group">
+            <label for="carbs">Carbohydrates (g)</label>
+            <input
+              type="number"
+              appNumbersOnly
+              id="carbs"
+              name="carbs"
+              [(ngModel)]="settingsData.nutritionSettings.dailyMacroTargets.carbs"
+              class="form-control-input"
+              required
+              pattern="[0-9]*"
+              min="0"
+            />
+            <span class="macro-stats-hint">
+              {{ carbsCalories }} kcal ({{ getMacroPercentage(carbsCalories) | number: '1.1-1' }}%)
+            </span>
+          </div>
+
+          <!-- Fat input field element -->
+          <div class="form-group">
+            <label for="fat">Fat (g)</label>
+            <input
+              type="number"
+              appNumbersOnly
+              id="fat"
+              name="fat"
+              [(ngModel)]="settingsData.nutritionSettings.dailyMacroTargets.fat"
+              class="form-control-input"
+              required
+              pattern="[0-9]*"
+              min="0"
+            />
+            <span class="macro-stats-hint">
+              {{ fatCalories }} kcal ({{ getMacroPercentage(fatCalories) | number: '1.1-1' }}%)
+            </span>
+          </div>
+
+          <!-- Total Energy Output box element -->
+          <div class="form-group">
+            <span class="display-box-label">Total Calories</span>
+            <div class="calories-value-display">
+              <span class="calories-number">{{ totalCalculatedCalories }}</span>
+              <span class="calories-unit">kcal</span>
+            </div>
+            <span class="macro-stats-hint total-energy-badge">Calculated Energy Sum</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Bottom Form Submit Drawer Action Control Bar -->
+      <footer class="form-action-footer">
+        <button type="submit" class="settings-save-btn">Save Settings</button>
+      </footer>
+    </form>
+  }
 </div>

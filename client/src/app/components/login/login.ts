@@ -1,13 +1,14 @@
 import { Component, OnInit, inject, HostListener } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth';
 import { ToastService } from '../../services/toast';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-login',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
@@ -21,6 +22,7 @@ export class Login implements OnInit {
   private titleService = inject(Title);
   private router = inject(Router);
   private toastService = inject(ToastService);
+  private authService = inject(AuthService);
 
   ngOnInit(): void {
     // Sync Angular state flag with the root HTML element class state
@@ -51,11 +53,15 @@ export class Login implements OnInit {
       return;
     }
 
-    // Temporary mock authorization logic for testing (allows any entry)
-    console.log('Authenticating login inputs:', this.credentials);
-    this.toastService.showSuccess(`Welcome back, ${this.credentials.username}!`);
-
-    // Direct user to the home page
-    this.router.navigate(['/home']);
+    this.authService.login(this.credentials).subscribe({
+      next: () => {
+        this.toastService.showSuccess(`Welcome back, ${this.credentials.username}!`);
+        this.router.navigate(['/home']);
+      },
+      error: (err) => {
+        console.error('Login Failure:', err);
+        this.toastService.showError(err.error?.message || 'Invalid username or password.');
+      },
+    });
   }
 }

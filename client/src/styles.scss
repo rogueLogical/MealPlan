@@ -60,3 +60,25 @@ body {
 *:after {
   box-sizing: inherit;
 }
+
+/* Prevent Browser Autofill Background Color Shifting */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  // Force dark/light theme text color variables
+  -webkit-text-fill-color: var(--text-main) !important;
+
+  // Lock the background color using a solid internal shadow
+  box-shadow: 0 0 0 1000px var(--form-control-bg) inset !important;
+
+  // Force border formatting
+  border: 1px solid var(--border-color) !important;
+  border-radius: 20px !important;
+  background-clip: padding-box !important;
+  text-shadow: 0 0 0 var(--text-main);
+  border-color: var(--accent-primary) !important;
+  box-shadow:
+    0 0 0 1000px var(--bg-card) inset !important,
+    0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+}
