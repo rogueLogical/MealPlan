@@ -8,7 +8,7 @@ const app = express();
 // Required Middleware
 app.use(
   cors({
-    origin: 'https://thankful-tree-0f242730f-29.eastus2.7.azurestaticapps.net',
+    origin: 'https://thankful-tree-0f242730f.7.azurestaticapps.net',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
   })
