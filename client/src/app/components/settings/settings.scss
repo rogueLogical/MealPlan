@@ -213,8 +213,10 @@
     transform: scale(0.98);
   }
 }
-.macro-stats-hint {
-  margin-top: 6px;
+.setting-hint {
+  margin-top: 0px;
+  margin-bottom: 0px;
+  margin-left: 12px;
   font-size: 0.8rem;
   font-weight: 500;
   color: var(--text-muted);
