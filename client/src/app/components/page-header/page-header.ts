@@ -17,6 +17,7 @@ export class PageHeader implements OnInit {
   currentIcon = '🏠';
 
   isProfileMenuOpen = false;
+  isHidden = false;
   currentUser: UserProfile | null = null;
 
   // Mapping matrix translating URL routes to friendly text and icons
@@ -29,6 +30,7 @@ export class PageHeader implements OnInit {
 
   private router = inject(Router);
   private authService = inject(AuthService);
+  private lastScrollPosition = 0;
 
   private titleService = inject(Title);
   ngOnInit(): void {
@@ -56,6 +58,26 @@ export class PageHeader implements OnInit {
   @HostListener('document:click')
   closeProfileMenu(): void {
     this.isProfileMenuOpen = false;
+  }
+
+  @HostListener('window:scroll')
+  onWindowScroll(): void {
+    const currentScroll = window.scrollY || document.documentElement.scrollTop;
+
+    // Keep header visible at the very top of the page
+    if (currentScroll <= 60) {
+      this.isHidden = false;
+    }
+    // Hide header if scrolling down
+    else if (currentScroll > this.lastScrollPosition) {
+      this.isHidden = true;
+    }
+    // Show header if scrolling up
+    else {
+      this.isHidden = false;
+    }
+
+    this.lastScrollPosition = currentScroll;
   }
 
   logout(): void {

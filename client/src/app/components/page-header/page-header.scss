@@ -1,5 +1,37 @@
 .workspace-header {
-  margin-bottom: 24px;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background-color: var(--bg-app);
+  margin-left: -40px;
+  margin-right: -40px;
+  padding-left: 40px;
+  padding-right: 40px;
+  padding-top: 20px;
+  margin-top: -20px;
+  padding-bottom: 10px;
+  margin-bottom: 14px;
+  box-shadow: 0px 0px 5px 3px var(--bg-app);
+
+  transition:
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 0.3s ease;
+
+  /* mobile screens */
+  @media (max-width: 768px) {
+    top: 60px;
+    padding-top: 16px;
+    margin-top: -16px;
+    margin-left: -24px;
+    margin-right: -24px;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  /* The class Angular triggers when scrolling down */
+  &.header-hidden {
+    transform: translateY(-150%);
+  }
 }
 
 .header-top-row {
