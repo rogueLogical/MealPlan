@@ -70,6 +70,11 @@
     transform 0.3s ease,
     background-color 0.3s ease;
   z-index: 50;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  align-self: flex-start;
+  overflow-y: auto;
 
   .brand {
     display: flex;
