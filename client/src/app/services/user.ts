@@ -11,6 +11,7 @@ export interface MacroTargets {
 }
 
 export interface BackendUserDocument {
+  email?: string;
   profilePicture?: string;
   settings?: {
     measurementSystem: 'metric' | 'imperial';
@@ -21,6 +22,7 @@ export interface BackendUserDocument {
 }
 
 export interface UserSettingsPayload {
+  email?: string;
   measurementSystem: 'metric' | 'imperial';
   profilePicture?: string;
   nutritionSettings: {

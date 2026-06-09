@@ -2,7 +2,7 @@ import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService, UserSettingsPayload } from '../../services/user';
-import { AuthService } from '../../services/auth';
+import { AuthService, UserProfile } from '../../services/auth';
 import { ToastService } from '../../services/toast';
 import { NumbersOnlyDirective } from '../../directives/numbers-only';
 
@@ -16,6 +16,7 @@ import { NumbersOnlyDirective } from '../../directives/numbers-only';
 export class Settings implements OnInit {
   // Setup a default initial local form state
   settingsData: UserSettingsPayload = {
+    email: '',
     measurementSystem: 'imperial',
     nutritionSettings: {
       dailyMacroTargets: { calories: 2000, protein: 150, carbs: 200, fat: 70 },
@@ -35,6 +36,7 @@ export class Settings implements OnInit {
       next: (response) => {
         if (response.user) {
           this.settingsData = {
+            email: response.user.email || '',
             measurementSystem: response.user.settings?.measurementSystem || 'imperial',
             profilePicture: response.user.profilePicture || '',
             nutritionSettings: {
@@ -88,9 +90,15 @@ export class Settings implements OnInit {
     this.userService.updateUserSettings(this.settingsData).subscribe({
       next: () => {
         this.toastService.showSuccess('User settings updated successfully!');
+        // update client side user data when settings are saved
+        const updatedProfile: Partial<UserProfile> = {};
         if (this.settingsData.profilePicture) {
-          this.authService.updateCurrentUser({ profilePicture: this.settingsData.profilePicture });
+          updatedProfile.profilePicture = this.settingsData.profilePicture;
         }
+        if (this.settingsData.email) {
+          updatedProfile.email = this.settingsData.email;
+        }
+        this.authService.updateCurrentUser(updatedProfile);
       },
       error: (err) => {
         console.error('Failed to update configurations profile:', err);

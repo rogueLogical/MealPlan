@@ -5,17 +5,10 @@
     </div>
   } @else {
     <form (ngSubmit)="onSettingsSave()" #settingsForm="ngForm" novalidate class="settings-grid">
-      <!-- Profile Picture Card -->
+      <!-- Profile Settings Card -->
       <section class="settings-card">
-        <h2>Profile Picture</h2>
-        <p class="section-desc">
-          Provide a public URL link to update your dashboard account navigation avatar.<br />
-          (Tip: you can use
-          <a class="utility-link" href="https://www.dicebear.com/playground/" target="_blank"
-            >www.dicebear.com</a
-          >
-          to create one, or any other publicly hosted image file.)
-        </p>
+        <h2>Profile Settings</h2>
+        <p class="section-desc"></p>
 
         <div class="profile-settings-row">
           <!-- Live Preview Avatar Round Frame Box -->
@@ -38,7 +31,29 @@
               class="form-control-input-text"
               aria-label="Profile Picture URL"
             />
+            <p class="setting-hint">
+              Provide a public URL link to update your dashboard account navigation avatar.<br />
+              (Tip: you can use
+              <a class="utility-link" href="https://www.dicebear.com/playground/" target="_blank"
+                >www.dicebear.com</a
+              >
+              to create one, or any other publicly hosted image file.)
+            </p>
           </div>
+        </div>
+        <div class="form-group-row expand-field" style="margin-top: 24px; max-width: 100%">
+          <label for="settingsEmail">Account Email Address</label>
+          <input
+            type="email"
+            id="settingsEmail"
+            name="settingsEmail"
+            [(ngModel)]="settingsData.email"
+            placeholder="your.email@example.com"
+            class="form-control-input-text"
+            aria-label="Account Email Address"
+            required
+            pattern="^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
+          />
         </div>
       </section>
       <!-- Display Preferences Card -->
@@ -84,7 +99,7 @@
               pattern="[0-9]*"
               min="0"
             />
-            <span class="macro-stats-hint">
+            <span class="setting-hint">
               {{ proteinCalories }} kcal ({{
                 getMacroPercentage(proteinCalories) | number: '1.1-1'
               }}%)
@@ -105,7 +120,7 @@
               pattern="[0-9]*"
               min="0"
             />
-            <span class="macro-stats-hint">
+            <span class="setting-hint">
               {{ carbsCalories }} kcal ({{ getMacroPercentage(carbsCalories) | number: '1.1-1' }}%)
             </span>
           </div>
@@ -124,7 +139,7 @@
               pattern="[0-9]*"
               min="0"
             />
-            <span class="macro-stats-hint">
+            <span class="setting-hint">
               {{ fatCalories }} kcal ({{ getMacroPercentage(fatCalories) | number: '1.1-1' }}%)
             </span>
           </div>
@@ -136,7 +151,7 @@
               <span class="calories-number">{{ totalCalculatedCalories }}</span>
               <span class="calories-unit">kcal</span>
             </div>
-            <span class="macro-stats-hint total-energy-badge">Calculated Energy Sum</span>
+            <span class="setting-hint total-energy-badge">Calculated Energy Sum</span>
           </div>
         </div>
       </section>
