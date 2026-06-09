@@ -5,9 +5,9 @@
     </div>
   } @else {
     <form (ngSubmit)="onSettingsSave()" #settingsForm="ngForm" novalidate class="settings-grid">
-      <!-- Profile Picture Card -->
+      <!-- Profile Settings Card -->
       <section class="settings-card">
-        <h2>Profile Picture</h2>
+        <h2>Profile Settings</h2>
         <p class="section-desc">
           Provide a public URL link to update your dashboard account navigation avatar.<br />
           (Tip: you can use
@@ -39,6 +39,20 @@
               aria-label="Profile Picture URL"
             />
           </div>
+        </div>
+        <div class="form-group-row expand-field" style="margin-top: 24px; max-width: 100%">
+          <label for="settingsEmail">Account Email Address</label>
+          <input
+            type="email"
+            id="settingsEmail"
+            name="settingsEmail"
+            [(ngModel)]="settingsData.email"
+            placeholder="your.email@example.com"
+            class="form-control-input-text"
+            aria-label="Account Email Address"
+            required
+            pattern="^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
+          />
         </div>
       </section>
       <!-- Display Preferences Card -->

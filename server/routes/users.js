@@ -10,7 +10,7 @@ router.put('/settings', checkAuth, async (req, res) => {
     const userId = req.userData.userId;
 
     // Destructure valid configuration tokens out of the incoming HTTP request body
-    const { measurementSystem, nutritionSettings, profilePicture } = req.body;
+    const { measurementSystem, nutritionSettings, profilePicture, email } = req.body;
 
     // Build dataset object
     const updatePayload = {};
@@ -19,6 +19,22 @@ router.put('/settings', checkAuth, async (req, res) => {
       updatePayload['settings.measurementSystem'] = measurementSystem;
     }
     if (profilePicture) updatePayload['profilePicture'] = profilePicture;
+
+    if (email) {
+      // check if email exists on an account that is not the current user
+      const sanitizedEmail = email.trim().toLowerCase();
+      const emailConflict = await User.findOne({
+        email: sanitizedEmail,
+        _id: { $ne: userId }
+      });
+      if (emailConflict) {
+        return res.status(400).json({
+          message: 'The email address you entered is already registered to another account.'
+        });
+      }
+
+      updatePayload['email'] = sanitizedEmail;
+    }
 
     if (nutritionSettings) {
       // update macro targets if provided by the client
