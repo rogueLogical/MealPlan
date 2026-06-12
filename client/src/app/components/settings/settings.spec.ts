@@ -125,4 +125,37 @@ describe('Settings Management (Test Cases 7 & 8)', () => {
     expect(userServiceMock.updateUserSettings).toHaveBeenCalledWith(component.settingsData);
     expect(component.settingsData.nutritionSettings.dailyMacroTargets.calories).toBe(2030);
   });
+
+  it('should parse culinary text inputs into arrays and save culinary preferences (Test Case 9)', async () => {
+    // Setup the UI state exactly as a user would leave it before clicking save
+    component.settingsData.nutritionSettings.dietaryRestrictions = ['Dairy-Free', 'Keto'];
+    component.likedFoodsInput = 'Steak, Avocado, Eggs';
+
+    // Include extra spacing and trailing commas to verify the .trim() and .filter() cleanup logic
+    component.dislikedFoodsInput = 'Sugar, Bread, Pasta, ';
+
+    userServiceMock.updateUserSettings.mockReturnValue(of({ success: true }));
+
+    // Trigger the save operation
+    component.onSettingsSave();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    // Verify the component successfully split, trimmed, and cleaned the string inputs into arrays
+    expect(component.settingsData.nutritionSettings.likedFoods).toEqual([
+      'Steak',
+      'Avocado',
+      'Eggs',
+    ]);
+    expect(component.settingsData.nutritionSettings.dislikedFoods).toEqual([
+      'Sugar',
+      'Bread',
+      'Pasta',
+    ]);
+
+    // Verify the finalized arrays were correctly packaged into the API payload
+    expect(userServiceMock.updateUserSettings).toHaveBeenCalledWith(component.settingsData);
+    expect(toastServiceMock.showSuccess).toHaveBeenCalledWith(
+      'User settings updated successfully!',
+    );
+  });
 });
