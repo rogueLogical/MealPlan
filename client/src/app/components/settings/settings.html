@@ -1,7 +1,7 @@
 <div class="settings-wrapper">
   @if (isLoading) {
     <div class="loading-spinner-box">
-      <p>Fetching account profile metrics framework...</p>
+      <p>Fetching account settings...</p>
     </div>
   } @else {
     <form (ngSubmit)="onSettingsSave()" #settingsForm="ngForm" novalidate class="settings-grid">

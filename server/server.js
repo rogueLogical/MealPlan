@@ -10,7 +10,8 @@ app.use(
   cors({
     origin: 'https://thankful-tree-0f242730f-29.eastus2.7.azurestaticapps.net',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    exposedHeaders: ['X-New-Token']
   })
 ); // Allows Angular frontend to talk to this API
 app.use(express.json()); // Parses incoming JSON request bodies

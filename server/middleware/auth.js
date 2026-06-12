@@ -38,6 +38,14 @@ module.exports = (req, res, next) => {
         .json({ message: 'Authentication failed. Token is invalid or expired.' });
     }
 
+    // Apply sliding session logic, if less than 1 hour left, refresh token
+    const currentTime = Math.floor(Date.now() / 1000);
+    const timeRemaining = decodedToken.exp - currentTime;
+    if (timeRemaining < 3600) {
+      const newToken = jwt.sign({ userId: decodedToken.userId }, jwtSecret, { expiresIn: '24h' });
+      res.setHeader('X-New-Token', newToken);
+    }
+
     // Append the extracted credentials context safely onto the request
     req.userData = { userId: decodedToken.userId };
 
