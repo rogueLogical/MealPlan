@@ -10,24 +10,27 @@ export interface MacroTargets {
   fat: number;
 }
 
+export interface NutritionSettings {
+  dailyMacroTargets: MacroTargets;
+  likedFoods?: string[];
+  dislikedFoods?: string[];
+  dietaryRestrictions?: string[];
+}
+
 export interface BackendUserDocument {
   email?: string;
   profilePicture?: string;
   settings?: {
     measurementSystem: 'metric' | 'imperial';
   };
-  nutritionSettings?: {
-    dailyMacroTargets: MacroTargets;
-  };
+  nutritionSettings?: NutritionSettings;
 }
 
 export interface UserSettingsPayload {
   email?: string;
   measurementSystem: 'metric' | 'imperial';
   profilePicture?: string;
-  nutritionSettings: {
-    dailyMacroTargets: MacroTargets;
-  };
+  nutritionSettings: NutritionSettings;
 }
 
 @Injectable({

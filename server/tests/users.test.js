@@ -61,4 +61,30 @@ describe('User Settings API Operations Contract Test Suite', () => {
 
     expect(res.statusCode).toEqual(401);
   });
+
+  it('should successfully update dietary restrictions and culinary preference arrays', async () => {
+    // Dispatch an update request populated with the new array structures
+    const res = await request(app)
+      .put('/api/users/settings')
+      .set('Authorization', `Bearer ${mockToken}`)
+      .send({
+        nutritionSettings: {
+          dietaryRestrictions: ['Vegetarian', 'Nut Allergy'],
+          likedFoods: ['Tofu', 'Broccoli', 'Spinach'],
+          dislikedFoods: ['Beef', 'Pork']
+        }
+      });
+
+    // Verify the server accepted the request
+    expect(res.statusCode).toEqual(200);
+
+    // Verify the returned user profile contains the exact arrays we sent
+    expect(res.body.nutritionSettings.dietaryRestrictions).toContain('Vegetarian');
+    expect(res.body.nutritionSettings.dietaryRestrictions).toHaveLength(2);
+
+    expect(res.body.nutritionSettings.likedFoods).toContain('Spinach');
+    expect(res.body.nutritionSettings.likedFoods).toHaveLength(3);
+
+    expect(res.body.nutritionSettings.dislikedFoods).toContain('Pork');
+  });
 });
