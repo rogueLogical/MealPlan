@@ -155,6 +155,66 @@
           </div>
         </div>
       </section>
+      <section class="settings-card">
+        <h2>Diet & Culinary Preferences</h2>
+        <p class="section-desc">
+          Tell us how you eat. These preferences will help during recipe generation.
+        </p>
+
+        <div class="settings-grid">
+          <div class="form-group expand-field">
+            <span class="display-box-label" style="margin-bottom: 2px">Dietary Restrictions</span>
+            <span class="setting-hint" style="margin-bottom: 12px; margin-top: 0"
+              >Select all that apply.</span
+            >
+
+            <div class="checkbox-grid">
+              @for (restriction of availableRestrictions; track restriction) {
+                <label class="checkbox-label">
+                  <input
+                    type="checkbox"
+                    [checked]="hasRestriction(restriction)"
+                    (change)="toggleRestriction(restriction, $event)"
+                  />
+                  {{ restriction }}
+                </label>
+              }
+            </div>
+          </div>
+
+          <div class="form-group expand-field">
+            <label for="likedFoods">Favorite Foods & Cuisines</label>
+            <span class="setting-hint" style="margin-bottom: 6px; margin-top: -4px"
+              >Separate items with commas.</span
+            >
+            <input
+              type="text"
+              id="likedFoods"
+              name="likedFoods"
+              [(ngModel)]="likedFoodsInput"
+              placeholder="e.g., Mexican, Birria, Pork, Mediterranean, Sushi"
+              class="form-control-input-text"
+              aria-label="Favorite Foods"
+            />
+          </div>
+
+          <div class="form-group expand-field">
+            <label for="dislikedFoods">Disliked Foods & Ingredients to Avoid</label>
+            <span class="setting-hint" style="margin-bottom: 6px; margin-top: -4px"
+              >Separate items with commas.</span
+            >
+            <input
+              type="text"
+              id="dislikedFoods"
+              name="dislikedFoods"
+              [(ngModel)]="dislikedFoodsInput"
+              placeholder="e.g., Mushrooms, Cilantro, Olives, Indian"
+              class="form-control-input-text"
+              aria-label="Disliked Foods"
+            />
+          </div>
+        </div>
+      </section>
 
       <!-- Bottom Form Submit Drawer Action Control Bar -->
       <footer class="form-action-footer">

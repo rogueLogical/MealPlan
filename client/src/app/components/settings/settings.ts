@@ -14,12 +14,34 @@ import { NumbersOnlyDirective } from '../../directives/numbers-only';
   styleUrls: ['./settings.scss'],
 })
 export class Settings implements OnInit {
-  // Setup a default initial local form state
+  availableRestrictions = [
+    'Vegetarian',
+    'Vegan',
+    'Pescatarian',
+    'Keto',
+    'Paleo',
+    'Gluten-Free',
+    'Dairy-Free',
+    'Nut Allergy',
+    'Shellfish Allergy',
+    'Soy Allergy',
+    'Kosher',
+    'Halal',
+  ];
+
+  // Temporary string holders for the comma-separated text inputs
+  likedFoodsInput = '';
+  dislikedFoodsInput = '';
+
+  // Setup default form state
   settingsData: UserSettingsPayload = {
     email: '',
     measurementSystem: 'imperial',
     nutritionSettings: {
       dailyMacroTargets: { calories: 2000, protein: 150, carbs: 200, fat: 70 },
+      dietaryRestrictions: [],
+      likedFoods: [],
+      dislikedFoods: [],
     },
     profilePicture: '',
   };
@@ -44,8 +66,14 @@ export class Settings implements OnInit {
                 ...this.settingsData.nutritionSettings.dailyMacroTargets,
                 ...response.user.nutritionSettings?.dailyMacroTargets,
               },
+              dietaryRestrictions: response.user.nutritionSettings?.dietaryRestrictions || [],
+              likedFoods: response.user.nutritionSettings?.likedFoods || [],
+              dislikedFoods: response.user.nutritionSettings?.dislikedFoods || [],
             },
           };
+          this.likedFoodsInput = this.settingsData.nutritionSettings.likedFoods?.join(', ') || '';
+          this.dislikedFoodsInput =
+            this.settingsData.nutritionSettings.dislikedFoods?.join(', ') || '';
         }
         this.isLoading = false;
         this.cdr.detectChanges();
@@ -77,6 +105,22 @@ export class Settings implements OnInit {
     return total;
   }
 
+  hasRestriction(restriction: string): boolean {
+    return this.settingsData.nutritionSettings.dietaryRestrictions?.includes(restriction) || false;
+  }
+
+  toggleRestriction(restriction: string, event: Event): void {
+    const isChecked = (event.target as HTMLInputElement).checked;
+    let currentList = this.settingsData.nutritionSettings.dietaryRestrictions || [];
+
+    if (isChecked) {
+      currentList.push(restriction);
+    } else {
+      currentList = currentList.filter((item) => item !== restriction);
+    }
+
+    this.settingsData.nutritionSettings.dietaryRestrictions = currentList;
+  }
   getMacroPercentage(macroCalories: number): number {
     const total = this.totalCalculatedCalories;
     if (total === 0) return 0;
@@ -86,7 +130,16 @@ export class Settings implements OnInit {
   onSettingsSave(): void {
     // Re-verify calculations are accurate in the payload string before making the API request
     this.settingsData.nutritionSettings.dailyMacroTargets.calories = this.totalCalculatedCalories;
+    // change comma separated lists to arrays
+    this.settingsData.nutritionSettings.likedFoods = this.likedFoodsInput
+      .split(',')
+      .map((item) => item.trim())
+      .filter((item) => item.length > 0);
 
+    this.settingsData.nutritionSettings.dislikedFoods = this.dislikedFoodsInput
+      .split(',')
+      .map((item) => item.trim())
+      .filter((item) => item.length > 0);
     this.userService.updateUserSettings(this.settingsData).subscribe({
       next: () => {
         this.toastService.showSuccess('User settings updated successfully!');
