@@ -158,4 +158,72 @@ describe('Settings Management (Test Cases 7 & 8)', () => {
       'User settings updated successfully!',
     );
   });
+
+  it('should correctly calculate macro targets per meal and snack (Test Case 10)', () => {
+    // Establish a known baseline state
+    component.settingsData.nutritionSettings.dailyMacroTargets = {
+      calories: 2000,
+      protein: 150,
+      carbs: 200,
+      fat: 70,
+    };
+    component.settingsData.nutritionSettings.dailyMealsCount = 3;
+    component.settingsData.nutritionSettings.dailySnacksCount = 2;
+
+    // Set an 80/20 split
+    component.settingsData.nutritionSettings.mealMacroSplitPercentage = {
+      calories: 80,
+      protein: 80,
+      carbs: 80,
+      fat: 80,
+    };
+
+    // Verify Meal Targets (80% of total, divided by 3 meals)
+    // Protein: (150 * 0.8) / 3 = 40
+    expect(component.targetMealProtein).toBe(40);
+    // Carbs: (200 * 0.8) / 3 = 53.33 -> rounded to 53
+    expect(component.targetMealCarbs).toBe(53);
+    // Fat: (70 * 0.8) / 3 = 18.66 -> rounded to 19
+    expect(component.targetMealFat).toBe(19);
+    // Calories: (40g * 4) + (53g * 4) + (19g * 9) = 160 + 212 + 171 = 543 kcal
+    expect(component.targetMealCalories).toBe(543);
+
+    // 3. Verify Snack Targets (20% of total, divided by 2 snacks)
+    // Protein: (150 * 0.2) / 2 = 15
+    expect(component.targetSnackProtein).toBe(15);
+    // Carbs: (200 * 0.2) / 2 = 20
+    expect(component.targetSnackCarbs).toBe(20);
+    // Fat: (70 * 0.2) / 2 = 7
+    expect(component.targetSnackFat).toBe(7);
+    // Calories: (15g * 4) + (20g * 4) + (7g * 9) = 60 + 80 + 63 = 203 kcal
+    expect(component.targetSnackCalories).toBe(203);
+  });
+
+  it('should enforce boundary rules and lock sliders when snacks are set to zero (Test Case 11)', () => {
+    // Test Meal Boundary (Minimum 1)
+    component.settingsData.nutritionSettings.dailyMealsCount = 0;
+    component.validateMealsCount();
+    expect(component.settingsData.nutritionSettings.dailyMealsCount).toBe(1);
+
+    component.settingsData.nutritionSettings.dailyMealsCount = 99;
+    component.validateMealsCount();
+    expect(component.settingsData.nutritionSettings.dailyMealsCount).toBe(6); // Max boundary
+
+    // Test Snack Boundary & Slider Lock (Minimum 0)
+    component.settingsData.nutritionSettings.mealMacroSplitPercentage = {
+      calories: 80,
+      protein: 80,
+      carbs: 80,
+      fat: 80,
+    };
+
+    // Simulate user dialing snacks down to 0
+    component.onSnacksCountChange(0);
+
+    // Verify the count is accepted, but the sliders snap to 100%
+    expect(component.settingsData.nutritionSettings.dailySnacksCount).toBe(0);
+    expect(component.settingsData.nutritionSettings.mealMacroSplitPercentage.protein).toBe(100);
+    expect(component.settingsData.nutritionSettings.mealMacroSplitPercentage.carbs).toBe(100);
+    expect(component.settingsData.nutritionSettings.mealMacroSplitPercentage.fat).toBe(100);
+  });
 });
