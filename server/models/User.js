@@ -44,7 +44,15 @@ const UserSchema = new mongoose.Schema(
       },
       likedFoods: [{ type: String }],
       dislikedFoods: [{ type: String }],
-      dietaryRestrictions: [{ type: String }]
+      dietaryRestrictions: [{ type: String }],
+      dailyMealsCount: { type: Number, default: 3 },
+      dailySnacksCount: { type: Number, default: 2 },
+      mealMacroSplitPercentage: {
+        calories: { type: Number, default: 80 },
+        protein: { type: Number, default: 80 },
+        carbs: { type: Number, default: 80 },
+        fat: { type: Number, default: 80 }
+      }
     },
     resetPasswordToken: {
       type: String,

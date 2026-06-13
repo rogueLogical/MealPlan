@@ -56,6 +56,36 @@ describe('User Settings API Operations Contract Test Suite', () => {
     expect(res.body.nutritionSettings.dailyMacroTargets.protein).toEqual(180);
   });
 
+  it('should successfully update daily meal structure and macro split percentages', async () => {
+    // Dispatch an update request populated with the new structure layout
+    const res = await request(app)
+      .put('/api/users/settings')
+      .set('Authorization', `Bearer ${mockToken}`)
+      .send({
+        nutritionSettings: {
+          dailyMealsCount: 4,
+          dailySnacksCount: 1,
+          mealMacroSplitPercentage: {
+            calories: 85,
+            protein: 90,
+            carbs: 80,
+            fat: 85
+          }
+        }
+      });
+
+    // Verify the server accepted the request
+    expect(res.statusCode).toEqual(200);
+
+    // Verify the returned user profile correctly saved the exact integers
+    expect(res.body.nutritionSettings.dailyMealsCount).toEqual(4);
+    expect(res.body.nutritionSettings.dailySnacksCount).toEqual(1);
+
+    // Verify the nested split object persisted properly
+    expect(res.body.nutritionSettings.mealMacroSplitPercentage.protein).toEqual(90);
+    expect(res.body.nutritionSettings.mealMacroSplitPercentage.carbs).toEqual(80);
+  });
+
   it('should explicitly reject adjustments with a 401 when the Authorization header is missing', async () => {
     const res = await request(app).put('/api/users/settings').send({ measurementSystem: 'metric' });
 
