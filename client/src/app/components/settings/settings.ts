@@ -42,6 +42,9 @@ export class Settings implements OnInit {
       dietaryRestrictions: [],
       likedFoods: [],
       dislikedFoods: [],
+      dailyMealsCount: 3,
+      dailySnacksCount: 2,
+      mealMacroSplitPercentage: { calories: 80, protein: 80, carbs: 80, fat: 80 },
     },
     profilePicture: '',
   };
@@ -69,6 +72,10 @@ export class Settings implements OnInit {
               dietaryRestrictions: response.user.nutritionSettings?.dietaryRestrictions || [],
               likedFoods: response.user.nutritionSettings?.likedFoods || [],
               dislikedFoods: response.user.nutritionSettings?.dislikedFoods || [],
+              dailyMealsCount: response.user.nutritionSettings?.dailyMealsCount ?? 3,
+              dailySnacksCount: response.user.nutritionSettings?.dailySnacksCount ?? 2,
+              mealMacroSplitPercentage: response.user.nutritionSettings
+                ?.mealMacroSplitPercentage || { calories: 80, protein: 80, carbs: 80, fat: 80 },
             },
           };
           this.likedFoodsInput = this.settingsData.nutritionSettings.likedFoods?.join(', ') || '';
@@ -105,6 +112,71 @@ export class Settings implements OnInit {
     return total;
   }
 
+  get targetMealCalories(): number {
+    return this.targetMealProtein * 4 + this.targetMealCarbs * 4 + this.targetMealFat * 9;
+  }
+
+  get targetMealProtein(): number {
+    const split = this.settingsData.nutritionSettings.mealMacroSplitPercentage?.protein || 80;
+    const count = this.settingsData.nutritionSettings.dailyMealsCount || 1;
+    return Math.round(
+      ((this.settingsData.nutritionSettings.dailyMacroTargets.protein || 0) * (split / 100)) /
+        count,
+    );
+  }
+
+  get targetMealCarbs(): number {
+    const split = this.settingsData.nutritionSettings.mealMacroSplitPercentage?.carbs || 80;
+    const count = this.settingsData.nutritionSettings.dailyMealsCount || 1;
+    return Math.round(
+      ((this.settingsData.nutritionSettings.dailyMacroTargets.carbs || 0) * (split / 100)) / count,
+    );
+  }
+
+  get targetMealFat(): number {
+    const split = this.settingsData.nutritionSettings.mealMacroSplitPercentage?.fat || 80;
+    const count = this.settingsData.nutritionSettings.dailyMealsCount || 1;
+    return Math.round(
+      ((this.settingsData.nutritionSettings.dailyMacroTargets.fat || 0) * (split / 100)) / count,
+    );
+  }
+
+  get targetSnackCalories(): number {
+    if (this.settingsData.nutritionSettings.dailySnacksCount === 0) return 0;
+    return this.targetSnackProtein * 4 + this.targetSnackCarbs * 4 + this.targetSnackFat * 9;
+  }
+
+  get targetSnackProtein(): number {
+    const split = this.settingsData.nutritionSettings.mealMacroSplitPercentage?.protein || 80;
+    const count = this.settingsData.nutritionSettings.dailySnacksCount || 1;
+    if (count === 0) return 0;
+    return Math.round(
+      ((this.settingsData.nutritionSettings.dailyMacroTargets.protein || 0) *
+        ((100 - split) / 100)) /
+        count,
+    );
+  }
+
+  get targetSnackCarbs(): number {
+    const split = this.settingsData.nutritionSettings.mealMacroSplitPercentage?.carbs || 80;
+    const count = this.settingsData.nutritionSettings.dailySnacksCount || 1;
+    if (count === 0) return 0;
+    return Math.round(
+      ((this.settingsData.nutritionSettings.dailyMacroTargets.carbs || 0) * ((100 - split) / 100)) /
+        count,
+    );
+  }
+
+  get targetSnackFat(): number {
+    const split = this.settingsData.nutritionSettings.mealMacroSplitPercentage?.fat || 80;
+    const count = this.settingsData.nutritionSettings.dailySnacksCount || 1;
+    if (count === 0) return 0;
+    return Math.round(
+      ((this.settingsData.nutritionSettings.dailyMacroTargets.fat || 0) * ((100 - split) / 100)) /
+        count,
+    );
+  }
+
   hasRestriction(restriction: string): boolean {
     return this.settingsData.nutritionSettings.dietaryRestrictions?.includes(restriction) || false;
   }
@@ -127,9 +199,47 @@ export class Settings implements OnInit {
     return (macroCalories / total) * 100;
   }
 
+  validateMealsCount(): void {
+    const count = this.settingsData.nutritionSettings.dailyMealsCount;
+    // If the user clears the input entirely, or types 0, securely reset to 1
+    if (count === undefined || count === null || count < 1) {
+      this.settingsData.nutritionSettings.dailyMealsCount = 1;
+    } else if (count > 6) {
+      this.settingsData.nutritionSettings.dailyMealsCount = 6;
+    }
+  }
+
+  onSnacksCountChange(newValue: number): void {
+    let count = newValue;
+
+    // Ensure bounds are respected (0 to 6 snacks)
+    if (count === undefined || count === null || count < 0) {
+      count = 0;
+    } else if (count > 6) {
+      count = 6;
+    }
+
+    this.settingsData.nutritionSettings.dailySnacksCount = count;
+
+    // Lock Snap sliders to 100% Meals if Snacks are 0
+    if (this.settingsData.nutritionSettings.dailySnacksCount === 0) {
+      this.settingsData.nutritionSettings.mealMacroSplitPercentage = {
+        calories: 100, // Kept in sync for backend payload consistency
+        protein: 100,
+        carbs: 100,
+        fat: 100,
+      };
+    }
+  }
+
   onSettingsSave(): void {
     // Re-verify calculations are accurate in the payload string before making the API request
     this.settingsData.nutritionSettings.dailyMacroTargets.calories = this.totalCalculatedCalories;
+
+    // Catch edge cases where the user hits 'Enter' before the input (blur) events can fire
+    this.validateMealsCount();
+    this.onSnacksCountChange(this.settingsData.nutritionSettings.dailySnacksCount || 0);
+
     // change comma separated lists to arrays
     this.settingsData.nutritionSettings.likedFoods = this.likedFoodsInput
       .split(',')

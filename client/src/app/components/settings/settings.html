@@ -155,6 +155,148 @@
           </div>
         </div>
       </section>
+
+      <section class="settings-card">
+        <h2>Daily Meal Structure</h2>
+        <p class="section-desc">
+          Set how many meals and snacks you plan to eat daily, and how your macros should be divided
+          between meals and snacks.
+        </p>
+
+        <div class="macros-grid" style="margin-bottom: 30px">
+          <div class="form-group">
+            <label for="mealsCount">Number of Meals</label>
+            <input
+              type="number"
+              id="mealsCount"
+              name="mealsCount"
+              min="1"
+              max="6"
+              [(ngModel)]="settingsData.nutritionSettings.dailyMealsCount"
+              (blur)="validateMealsCount()"
+              appNumbersOnly
+              class="form-control-input"
+            />
+          </div>
+          <div class="form-group">
+            <label for="snacksCount">Number of Snacks</label>
+            <input
+              type="number"
+              id="snacksCount"
+              name="snacksCount"
+              min="0"
+              max="6"
+              [(ngModel)]="settingsData.nutritionSettings.dailySnacksCount"
+              (ngModelChange)="onSnacksCountChange($event)"
+              (blur)="onSnacksCountChange(settingsData.nutritionSettings.dailySnacksCount || 0)"
+              appNumbersOnly
+              class="form-control-input"
+            />
+          </div>
+        </div>
+
+        <h3 style="font-size: 1.05rem; margin-bottom: 16px">Macro Split (Meals vs. Snacks)</h3>
+
+        <div class="form-group expand-field" style="margin-bottom: 20px">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 4px">
+            <label for="proteinSplit">Protein Split</label>
+            <span class="setting-hint" style="margin: 0">
+              Meals: {{ settingsData.nutritionSettings.mealMacroSplitPercentage?.protein }}% |
+              Snacks:
+              {{ 100 - (settingsData.nutritionSettings.mealMacroSplitPercentage?.protein || 0) }}%
+            </span>
+          </div>
+          <input
+            type="range"
+            name="proteinSplit"
+            min="0"
+            max="100"
+            step="5"
+            [(ngModel)]="settingsData.nutritionSettings.mealMacroSplitPercentage!.protein"
+            [disabled]="settingsData.nutritionSettings.dailySnacksCount === 0"
+            style="width: 100%; accent-color: var(--accent-primary)"
+          />
+        </div>
+
+        <div class="form-group expand-field" style="margin-bottom: 20px">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 4px">
+            <label for="carbsSplit">Carbohydrate Split</label>
+            <span class="setting-hint" style="margin: 0">
+              Meals: {{ settingsData.nutritionSettings.mealMacroSplitPercentage?.carbs }}% | Snacks:
+              {{ 100 - (settingsData.nutritionSettings.mealMacroSplitPercentage?.carbs || 0) }}%
+            </span>
+          </div>
+          <input
+            type="range"
+            name="carbsSplit"
+            min="0"
+            max="100"
+            step="5"
+            [(ngModel)]="settingsData.nutritionSettings.mealMacroSplitPercentage!.carbs"
+            [disabled]="settingsData.nutritionSettings.dailySnacksCount === 0"
+            style="width: 100%; accent-color: var(--accent-primary)"
+          />
+        </div>
+
+        <div class="form-group expand-field" style="margin-bottom: 20px">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 4px">
+            <label for="fatSplit">Fat Split</label>
+            <span class="setting-hint" style="margin: 0">
+              Meals: {{ settingsData.nutritionSettings.mealMacroSplitPercentage?.fat }}% | Snacks:
+              {{ 100 - (settingsData.nutritionSettings.mealMacroSplitPercentage?.fat || 0) }}%
+            </span>
+          </div>
+          <input
+            type="range"
+            name="fatSplit"
+            min="0"
+            max="100"
+            step="5"
+            [(ngModel)]="settingsData.nutritionSettings.mealMacroSplitPercentage!.fat"
+            [disabled]="settingsData.nutritionSettings.dailySnacksCount === 0"
+            style="width: 100%; accent-color: var(--accent-primary)"
+          />
+        </div>
+
+        <div style="display: flex; gap: 20px; margin-top: 30px">
+          <div
+            style="
+              flex: 1;
+              padding: 16px;
+              background-color: rgba(37, 99, 235, 0.05);
+              border-radius: 8px;
+              border: 1px dashed var(--accent-primary);
+            "
+          >
+            <h4 style="margin: 0 0 12px 0; color: var(--text-main)">Target Per Meal</h4>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.9rem">
+              <div><strong>Calories:</strong> {{ targetMealCalories }}</div>
+              <div><strong>Protein:</strong> {{ targetMealProtein }}g</div>
+              <div><strong>Carbs:</strong> {{ targetMealCarbs }}g</div>
+              <div><strong>Fat:</strong> {{ targetMealFat }}g</div>
+            </div>
+          </div>
+
+          <div
+            style="
+              flex: 1;
+              padding: 16px;
+              background-color: rgba(37, 99, 235, 0.05);
+              border-radius: 8px;
+              border: 1px dashed var(--accent-primary);
+            "
+          >
+            <h4 style="margin: 0 0 12px 0; color: var(--text-main)">Target Per Snack</h4>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.9rem">
+              <div><strong>Calories:</strong> {{ targetSnackCalories }}</div>
+              <div><strong>Protein:</strong> {{ targetSnackProtein }}g</div>
+              <div><strong>Carbs:</strong> {{ targetSnackCarbs }}g</div>
+              <div><strong>Fat:</strong> {{ targetSnackFat }}g</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section class="settings-card">
         <h2>Diet & Culinary Preferences</h2>
         <p class="section-desc">

@@ -15,6 +15,9 @@ export interface NutritionSettings {
   likedFoods?: string[];
   dislikedFoods?: string[];
   dietaryRestrictions?: string[];
+  dailyMealsCount?: number;
+  dailySnacksCount?: number;
+  mealMacroSplitPercentage?: MacroTargets;
 }
 
 export interface BackendUserDocument {

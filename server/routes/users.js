@@ -48,6 +48,27 @@ router.put('/settings', checkAuth, async (req, res) => {
         if (fat !== undefined) updatePayload['nutritionSettings.dailyMacroTargets.fat'] = fat;
       }
 
+      // Update meal macro breakdown structure
+      if (nutritionSettings.dailyMealsCount !== undefined) {
+        updatePayload['nutritionSettings.dailyMealsCount'] = nutritionSettings.dailyMealsCount;
+      }
+      if (nutritionSettings.dailySnacksCount !== undefined) {
+        updatePayload['nutritionSettings.dailySnacksCount'] = nutritionSettings.dailySnacksCount;
+      }
+
+      if (nutritionSettings.mealMacroSplitPercentage) {
+        const split = nutritionSettings.mealMacroSplitPercentage;
+
+        if (split.calories !== undefined)
+          updatePayload['nutritionSettings.mealMacroSplitPercentage.calories'] = split.calories;
+        if (split.protein !== undefined)
+          updatePayload['nutritionSettings.mealMacroSplitPercentage.protein'] = split.protein;
+        if (split.carbs !== undefined)
+          updatePayload['nutritionSettings.mealMacroSplitPercentage.carbs'] = split.carbs;
+        if (split.fat !== undefined)
+          updatePayload['nutritionSettings.mealMacroSplitPercentage.fat'] = split.fat;
+      }
+
       // Update preferred meal structural arrays if provided by the client
       if (nutritionSettings.likedFoods)
         updatePayload['nutritionSettings.likedFoods'] = nutritionSettings.likedFoods;
