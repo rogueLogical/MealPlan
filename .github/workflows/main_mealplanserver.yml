@@ -18,6 +18,7 @@ jobs:
     permissions:
       contents: read #This is required for actions/checkout
       pull-requests: write # required to post comments on the Pull Request
+      checks: write
 
     steps:
       - uses: actions/checkout@v6
