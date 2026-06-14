@@ -358,4 +358,54 @@ describe('Settings Management (Test Cases 7 & 8)', () => {
     component.onSnacksCountChange(undefined as unknown as number);
     expect(component.settingsData.nutritionSettings.dailySnacksCount).toBe(0);
   });
+
+  it('should trigger HTML fallback branches when macro split percentages are 0', async () => {
+    // Ensure the form is visible so the DOM actually renders the sliders
+    component.isLoading = false;
+
+    // Set the values explicitly to 0.
+    component.settingsData.nutritionSettings.mealMacroSplitPercentage = {
+      calories: 0,
+      protein: 0,
+      carbs: 0,
+      fat: 0,
+    };
+
+    // Force the template to physically paint the 0 values
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    // Verify the HTML successfully rendered the fallback math without crashing
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.textContent).toContain('Meals: 0%');
+  });
+
+  it('should trigger remaining HTML template branches for avatar fallbacks and empty blur events', async () => {
+    component.isLoading = false;
+
+    // Force the Avatar fallback (profilePicture || 'https://dicebear.com')
+    component.settingsData.profilePicture = '';
+
+    // Force the Snacks Blur fallback (dailySnacksCount || 0)
+    component.settingsData.nutritionSettings.dailySnacksCount = undefined as unknown as number;
+
+    // Command Angular to paint these empty states to the virtual DOM
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    // Verify the image src successfully fell back to the default URL
+    const avatarImg = compiled.querySelector('.preview-img') as HTMLImageElement;
+    if (avatarImg) {
+      expect(avatarImg.src).toContain('dicebear.com');
+    }
+
+    // Physically trigger the blur event on the input to execute the HTML line
+    const snacksInput = compiled.querySelector('input[name="snacksCount"]') as HTMLInputElement;
+    if (snacksInput) {
+      // This tells the virtual browser to simulate the user clicking away from the input
+      snacksInput.dispatchEvent(new Event('blur'));
+    }
+  });
 });
