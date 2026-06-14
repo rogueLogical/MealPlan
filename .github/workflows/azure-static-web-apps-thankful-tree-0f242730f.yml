@@ -31,6 +31,10 @@ jobs:
           cache: 'npm'
           cache-dependency-path: './client/package-lock.json'
 
+      # need to install lcov in ubuntu-latest environment for coverage comment posting
+      - name: Install lcov
+        run: sudo apt-get update && sudo apt-get install -y lcov
+
       # Install client dependencies and run tests in headless mode
       - name: Install Dependencies and Execute Angular Tests
         working-directory: ./client
