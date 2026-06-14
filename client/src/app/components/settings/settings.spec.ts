@@ -291,10 +291,10 @@ describe('Settings Management (Test Cases 7 & 8)', () => {
   });
 
   it('should render the loading spinner when isLoading is true (Test Case 15a)', () => {
-    // 1. Start with a fresh component and immediately set it to load
+    // Start with a fresh component and immediately set it to load
     component.isLoading = true;
 
-    // 2. Trigger the HTML branch for @if (isLoading)
+    // Trigger the HTML branch for @if (isLoading)
     fixture.detectChanges();
 
     // The branch is covered!
@@ -302,10 +302,10 @@ describe('Settings Management (Test Cases 7 & 8)', () => {
   });
 
   it('should disable macro sliders when dailySnacksCount is 0 (Test Case 15b)', async () => {
-    // 1. Ensure the form is set to be visible
+    // Ensure the form is set to be visible
     component.isLoading = false;
 
-    // 2. Set the exact edge-case data BEFORE we tell the HTML to render
+    // Set the exact edge-case data BEFORE we tell the HTML to render
     component.settingsData.nutritionSettings.mealMacroSplitPercentage = {
       calories: 80,
       protein: 80,
@@ -314,17 +314,48 @@ describe('Settings Management (Test Cases 7 & 8)', () => {
     };
     component.settingsData.nutritionSettings.dailySnacksCount = 0;
 
-    // 3. Command Angular to render the form for the very first time.
+    // Command Angular to render the form for the very first time.
     // Because dailySnacksCount is ALREADY 0, ngModel renders it perfectly on the first try.
     fixture.detectChanges();
     await fixture.whenStable();
 
-    // 4. Verify the disabled state was applied to the DOM element
+    // Verify the disabled state was applied to the DOM element
     const compiled = fixture.nativeElement as HTMLElement;
     const proteinSlider = compiled.querySelector('input[name="proteinSplit"]') as HTMLInputElement;
 
     if (proteinSlider) {
       expect(proteinSlider.disabled).toBe(true);
     }
+  });
+
+  it('should execute fallback branches when user profile data is missing or undefined', () => {
+    // Mock an API response that has absolutely NO nutritionSettings or profile data.
+    // This forces every single `?.`, `||`, and `??` operator in ngOnInit to use its fallback.
+    userServiceMock.getUserProfile.mockReturnValue(
+      of({
+        user: {
+          email: 'barebones@example.com',
+          // No profilePicture, settings, or nutritionSettings provided!
+        },
+      }),
+    );
+
+    // Trigger the initialization
+    component.ngOnInit();
+
+    // Verify the component safely fell back to the defaults without crashing
+    expect(component.settingsData.nutritionSettings.dailyMealsCount).toBe(3);
+    expect(component.settingsData.nutritionSettings.dailySnacksCount).toBe(2);
+    expect(component.settingsData.nutritionSettings.mealMacroSplitPercentage!.protein).toBe(80);
+
+    // Force 'undefined' directly into the count validators to trigger their hidden branches
+    component.settingsData.nutritionSettings.dailyMealsCount = undefined as unknown as number;
+    component.validateMealsCount();
+    expect(component.settingsData.nutritionSettings.dailyMealsCount).toBe(1);
+
+    component.settingsData.nutritionSettings.dailySnacksCount = undefined as unknown as number;
+    // Pass undefined as the $event argument
+    component.onSnacksCountChange(undefined as unknown as number);
+    expect(component.settingsData.nutritionSettings.dailySnacksCount).toBe(0);
   });
 });
