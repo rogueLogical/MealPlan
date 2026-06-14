@@ -48,14 +48,6 @@ jobs:
         with:
           name: server-coverage-report
           path: server/coverage/
-      
-      - name: Generate Coverage Markdown
-        uses: irongut/CodeCoverageSummary@v1.3.0
-        with:
-          filename: server/coverage/**/cobertura-coverage.xml
-          badge: true
-          format: markdown
-          output: both
 
       - name: test (push)
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
