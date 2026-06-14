@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { provideRouter } from '@angular/router';
 import { provideLocationMocks } from '@angular/common/testing';
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { describe, it, expect, beforeEach, vi, Mock } from 'vitest';
 import { Settings } from './settings';
 import { UserService, UserSettingsPayload } from '../../services/user';
@@ -225,5 +225,68 @@ describe('Settings Management (Test Cases 7 & 8)', () => {
     expect(component.settingsData.nutritionSettings.mealMacroSplitPercentage.protein).toBe(100);
     expect(component.settingsData.nutritionSettings.mealMacroSplitPercentage.carbs).toBe(100);
     expect(component.settingsData.nutritionSettings.mealMacroSplitPercentage.fat).toBe(100);
+  });
+
+  it('should handle API errors during initialization fetching to cover HTML loading branches', () => {
+    // Force the API to fail
+    userServiceMock.getUserProfile.mockReturnValue(throwError(() => new Error('API down')));
+
+    // Trigger the fetch
+    component.ngOnInit();
+
+    // Verify the catch block executes and clears the loading state
+    expect(component.isLoading).toBe(false);
+    expect(toastServiceMock.showError).toHaveBeenCalledWith(
+      'Could not fetch account settings profile endpoints.',
+    );
+  });
+
+  it('should safely calculate macro percentages when total calories are zero to prevent division by zero', () => {
+    // Force the edge-case state
+    component.settingsData.nutritionSettings.dailyMacroTargets = {
+      calories: 0,
+      protein: 0,
+      carbs: 0,
+      fat: 0,
+    };
+
+    // Verify the getter catches the 0 and returns 0 instead of NaN
+    expect(component.getMacroPercentage(0)).toBe(0);
+  });
+
+  it('should correctly add and remove dietary restrictions when checkboxes are toggled', () => {
+    // Start with one restriction
+    component.settingsData.nutritionSettings.dietaryRestrictions = ['Vegan'];
+
+    // Simulate checking a NEW box
+    const mockEventAdd = { target: { checked: true } } as unknown as Event;
+    component.toggleRestriction('Keto', mockEventAdd);
+    expect(component.settingsData.nutritionSettings.dietaryRestrictions).toContain('Keto');
+    expect(component.settingsData.nutritionSettings.dietaryRestrictions).toContain('Vegan');
+
+    // Simulate UNCHECKING an existing box
+    const mockEventRemove = { target: { checked: false } } as unknown as Event;
+    component.toggleRestriction('Vegan', mockEventRemove);
+    expect(component.settingsData.nutritionSettings.dietaryRestrictions).not.toContain('Vegan');
+    expect(component.settingsData.nutritionSettings.dietaryRestrictions).toContain('Keto');
+  });
+
+  it('should handle API errors and partial data when saving settings', () => {
+    // Test the Error Branch: Force the save to fail
+    userServiceMock.updateUserSettings.mockReturnValue(
+      throwError(() => ({ error: { message: 'Save failed' } })),
+    );
+    component.onSettingsSave();
+    expect(toastServiceMock.showError).toHaveBeenCalledWith('Save failed');
+
+    // Test the Partial Data Branch: Ensure we don't accidentally wipe out the user's email or avatar if they save with empty fields
+    userServiceMock.updateUserSettings.mockReturnValue(of({ success: true }));
+    component.settingsData.profilePicture = '';
+    component.settingsData.email = '';
+
+    component.onSettingsSave();
+
+    // Verify it only passes an empty object to the Auth Service, preventing data deletion
+    expect(authServiceMock.updateCurrentUser).toHaveBeenCalledWith({});
   });
 });
