@@ -47,6 +47,7 @@ jobs:
         uses: zgosalvez/github-actions-report-lcov@v4
         if: github.event_name == 'pull_request'
         with:
+          working-directory: ./client
           coverage-files: client/coverage/**/lcov.info
           github-token: ${{ secrets.GITHUB_TOKEN }}
           update-comment: true
