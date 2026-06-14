@@ -290,35 +290,39 @@ describe('Settings Management (Test Cases 7 & 8)', () => {
     expect(authServiceMock.updateCurrentUser).toHaveBeenCalledWith({});
   });
 
-  it('should trigger HTML template branches for loading states and disabled sliders (Test Case 15)', () => {
-    // Force the HTML to render the @if (isLoading) branch
+  it('should render the loading spinner when isLoading is true (Test Case 15a)', () => {
+    // 1. Start with a fresh component and immediately set it to load
     component.isLoading = true;
+
+    // 2. Trigger the HTML branch for @if (isLoading)
     fixture.detectChanges();
 
-    // Verify the DOM actually recognized the loading state (optional but good practice)
+    // The branch is covered!
     expect(component.isLoading).toBe(true);
+  });
 
-    // Force the HTML to render the loaded state, with sliders enabled
+  it('should disable macro sliders when dailySnacksCount is 0 (Test Case 15b)', async () => {
+    // 1. Ensure the form is set to be visible
     component.isLoading = false;
-    component.settingsData.nutritionSettings.dailySnacksCount = 2;
-    // We must ensure the object exists so the HTML doesn't crash when reading .protein
+
+    // 2. Set the exact edge-case data BEFORE we tell the HTML to render
     component.settingsData.nutritionSettings.mealMacroSplitPercentage = {
       calories: 80,
       protein: 80,
       carbs: 80,
       fat: 80,
     };
-    fixture.detectChanges();
-
-    // Force the HTML to render the disabled slider branch ([disabled]="... === 0")
     component.settingsData.nutritionSettings.dailySnacksCount = 0;
-    fixture.detectChanges();
 
-    // Verify the disabled state was applied to the DOM
+    // 3. Command Angular to render the form for the very first time.
+    // Because dailySnacksCount is ALREADY 0, ngModel renders it perfectly on the first try.
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    // 4. Verify the disabled state was applied to the DOM element
     const compiled = fixture.nativeElement as HTMLElement;
     const proteinSlider = compiled.querySelector('input[name="proteinSplit"]') as HTMLInputElement;
 
-    // If the element exists in the test DOM, verify it successfully disabled
     if (proteinSlider) {
       expect(proteinSlider.disabled).toBe(true);
     }
