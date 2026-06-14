@@ -22,6 +22,7 @@ jobs:
         with:
           submodules: true
           lfs: false
+
       # Set up Node.js on the runner container
       - name: Setup Node.js Environment for testing
         uses: actions/setup-node@v6
@@ -29,13 +30,23 @@ jobs:
           node-version: '20'
           cache: 'npm'
           cache-dependency-path: './client/package-lock.json'
+
       # Install client dependencies and run tests in headless mode
       - name: Install Dependencies and Execute Angular Tests
         working-directory: ./client
         run: |
           npm ci
           npm run lint
-          npm run test
+          npm run test -- --coverage
+
+      - name: Post Coverage Comment
+        uses: zgosalvez/github-actions-report-lcov@v4
+        if: github.event_name == 'pull_request'
+        with:
+          coverage-files: client/coverage/**/lcov.info
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          update-comment: true
+
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
