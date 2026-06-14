@@ -46,6 +46,20 @@ describe('ToastService', () => {
     expect(toasts[0].type).toBe('info');
   });
 
+  it('should use "info" as the default type when calling show() with only one argument', () => {
+    // intentionally OMIT the second argument here to trigger the default parameter branch
+    service.show('Default fallback trigger!');
+
+    let toasts: ToastMessage[] = [];
+    service.toasts$.subscribe((t) => (toasts = t));
+
+    expect(toasts.length).toBe(1);
+    expect(toasts[0].text).toBe('Default fallback trigger!');
+
+    // Verify the system automatically assigned 'info'
+    expect(toasts[0].type).toBe('info');
+  });
+
   it('should auto-clear toasts after 4 seconds', () => {
     vi.useFakeTimers();
 
