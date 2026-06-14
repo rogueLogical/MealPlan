@@ -42,6 +42,13 @@ jobs:
           working-directory: server
           run: npm run test
 
+      - name: Upload Server Coverage Report
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-coverage-report
+          path: server/coverage/
+
       - name: test (push)
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         working-directory: ./server
