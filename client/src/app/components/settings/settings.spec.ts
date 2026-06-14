@@ -408,4 +408,41 @@ describe('Settings Management (Test Cases 7 & 8)', () => {
       snacksInput.dispatchEvent(new Event('blur'));
     }
   });
+
+  it('should trigger the hidden @for branch when the restrictions array is empty', () => {
+    // Ensure the form is visible so the DOM reaches the loop
+    component.isLoading = false;
+
+    // Temporarily empty the array to force the compiler down the hidden "@empty" pathway
+    component.availableRestrictions = [];
+
+    // Force Angular to render the empty state
+    fixture.detectChanges();
+
+    // Verify the DOM correctly bypassed the loop and rendered zero checkboxes
+    const compiled = fixture.nativeElement as HTMLElement;
+    const checkboxes = compiled.querySelectorAll('input[type="checkbox"]');
+    expect(checkboxes.length).toBe(0);
+  });
+
+  it('should evaluate both sides of the HTML fallback on the snacksCount blur event', () => {
+    // Ensure the form is visible and rendered
+    component.isLoading = false;
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    const snacksInput = compiled.querySelector('input[name="snacksCount"]') as HTMLInputElement;
+
+    // Test the LEFT side of the branch (when a valid number exists)
+    component.settingsData.nutritionSettings.dailySnacksCount = 2;
+    fixture.detectChanges();
+    snacksInput.dispatchEvent(new Event('blur'));
+
+    // Test the RIGHT side of the branch (force the HTML to use the '|| 0' fallback)
+    component.settingsData.nutritionSettings.dailySnacksCount = undefined as unknown as number;
+    fixture.detectChanges();
+
+    // Firing the blur event now forces line 191 to evaluate the '|| 0' fallback!
+    snacksInput.dispatchEvent(new Event('blur'));
+  });
 });
