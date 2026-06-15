@@ -22,7 +22,7 @@ Object.defineProperty(window, 'localStorage', {
   writable: true,
 });
 
-describe('Test Case 5: User Account Login', () => {
+describe('User Account Login', () => {
   let component: Login;
   let fixture: ComponentFixture<Login>;
   let authServiceMock: MockAuthService;
@@ -48,7 +48,7 @@ describe('Test Case 5: User Account Login', () => {
     fixture.detectChanges();
   });
 
-  it('should authenticate a user who logs into an existing account', () => {
+  it('should authenticate a user who logs into an existing account (UT-5)', () => {
     const mockResponse: AuthResponse = {
       message: 'Success',
       token: 'mock-jwt',

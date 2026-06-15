@@ -45,11 +45,11 @@ describe('Home Component Test Suite', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should default theme to light theme', () => {
+  it('should default theme to light theme (UT-2)', () => {
     expect(component.isDarkMode).toBeFalsy();
   });
 
-  it('should update dark-mode parameter when toggleTheme is called', () => {
+  it('should update dark-mode parameter when toggleTheme is called (UT-3)', () => {
     component.toggleTheme();
     expect(component.isDarkMode).toBeTruthy();
     expect(document.documentElement.classList.contains('dark-mode')).toBeTruthy();

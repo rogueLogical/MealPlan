@@ -29,7 +29,7 @@ describe('User Authentication API Integration Contract Suites', () => {
     await mongoServer.stop();
   });
 
-  it('should successfully register a new user with encrypted credential security hashing parameters', async () => {
+  it('should successfully register a new user with encrypted credential security hashing parameters (UT-17)', async () => {
     const res = await request(app).post('/api/auth/register').send({
       username: 'testdeveloper',
       email: 'test@mealplan.com',
@@ -41,7 +41,7 @@ describe('User Authentication API Integration Contract Suites', () => {
     expect(res.body.user.username).toEqual('testdeveloper');
   });
 
-  it('should reject login access when providing an incorrect password signature combo parameter', async () => {
+  it('should reject login access when providing an incorrect password signature combo (UT-18)', async () => {
     // Inject a default mock user
     const setupUser = new User({
       username: 'loginTester',
@@ -59,8 +59,8 @@ describe('User Authentication API Integration Contract Suites', () => {
     expect(res.body.message).toContain('Invalid username');
   });
 
-  // --- Test Case 10: Recover Account ---
-  it('should successfully dispatch a recovery email and update the database when a valid email is submitted', async () => {
+  // Recover Account
+  it('should successfully dispatch a recovery email and update the database when a valid email is submitted (UT-15)', async () => {
     // Setup Preconditions: Create an existing user
     const testUser = new User({
       username: 'recoveryTester',
@@ -91,8 +91,8 @@ describe('User Authentication API Integration Contract Suites', () => {
     expect(updatedUser.resetPasswordExpires).toBeDefined();
   });
 
-  // --- Test Case 11: Reset Password ---
-  it('should update the user password in the database when submitting a valid reset token', async () => {
+  // Reset Password
+  it('should update the user password in the database when submitting a valid reset token (UT-16)', async () => {
     // Setup Preconditions: Create a user that already has an active reset token
     const mockResetToken = 'crypto_hex_string_12345';
     const testUser = new User({

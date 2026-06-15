@@ -12,7 +12,7 @@ Feature: 1.2.1 Nutritional Goal Entry
     And the user data is updated in the database
 
   
-Feature: 1.2.3. Dietary Restricitons
+Feature: 1.2.3. Dietary Restrictions
   The system shall provide a way for users to specify 
   their dietary restrictions. 
   Scenario: Successful Dietary Restriction Entry (UAT-9)

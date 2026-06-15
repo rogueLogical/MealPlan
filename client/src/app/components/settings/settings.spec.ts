@@ -24,7 +24,7 @@ interface MockToastService {
   showError: Mock<(msg: string) => void>;
 }
 
-describe('Settings Management (Test Cases 7 & 8)', () => {
+describe('Settings Management', () => {
   let component: Settings;
   let fixture: ComponentFixture<Settings>;
   let userServiceMock: MockUserService;
@@ -75,7 +75,7 @@ describe('Settings Management (Test Cases 7 & 8)', () => {
     fixture.detectChanges(); // Triggers ngOnInit() profile initialization load
   });
 
-  it('should save user preferences when they are set by the user (Test Case 7)', async () => {
+  it('should save user preferences when they are set by the user (UT-8)', async () => {
     // Update general account profile properties in settingsData
     component.settingsData.measurementSystem = 'metric';
     component.settingsData.profilePicture = 'new-avatar.png';
@@ -106,7 +106,7 @@ describe('Settings Management (Test Cases 7 & 8)', () => {
     expect(component.settingsData.profilePicture).toBe('avatar.png'); // Holds re-fetched value
   });
 
-  it('should save user goals and dietary restrictions when they are set by the user (Test Case 8)', async () => {
+  it('should save user goals when they are set by the user (UT-9)', async () => {
     // Update nutritional macro structures inside settingsData property mapping
     const customMacros = { calories: 0, protein: 150, carbs: 200, fat: 70 };
     component.settingsData.nutritionSettings.dailyMacroTargets = customMacros;
@@ -127,7 +127,7 @@ describe('Settings Management (Test Cases 7 & 8)', () => {
     expect(component.settingsData.nutritionSettings.dailyMacroTargets.calories).toBe(2030);
   });
 
-  it('should parse culinary text inputs into arrays and save culinary preferences (Test Case 9)', async () => {
+  it('should parse culinary text inputs into arrays and save culinary preferences (UT-10)', async () => {
     // Setup the UI state exactly as a user would leave it before clicking save
     component.settingsData.nutritionSettings.dietaryRestrictions = ['Dairy-Free', 'Keto'];
     component.likedFoodsInput = 'Steak, Avocado, Eggs';
@@ -160,7 +160,7 @@ describe('Settings Management (Test Cases 7 & 8)', () => {
     );
   });
 
-  it('should correctly calculate macro targets per meal and snack (Test Case 10)', () => {
+  it('should correctly calculate macro targets per meal and snack (UT-11)', () => {
     // Establish a known baseline state
     component.settingsData.nutritionSettings.dailyMacroTargets = {
       calories: 2000,
@@ -200,7 +200,7 @@ describe('Settings Management (Test Cases 7 & 8)', () => {
     expect(component.targetSnackCalories).toBe(203);
   });
 
-  it('should enforce boundary rules and lock sliders when snacks are set to zero (Test Case 11)', () => {
+  it('should enforce boundary rules and lock sliders when snacks are set to zero (UT-12)', () => {
     // Test Meal Boundary (Minimum 1)
     component.settingsData.nutritionSettings.dailyMealsCount = 0;
     component.validateMealsCount();
@@ -291,7 +291,7 @@ describe('Settings Management (Test Cases 7 & 8)', () => {
     expect(authServiceMock.updateCurrentUser).toHaveBeenCalledWith({});
   });
 
-  it('should render the loading spinner when isLoading is true (Test Case 15a)', () => {
+  it('should render the loading spinner when isLoading is true', () => {
     // Start with a fresh component and immediately set it to load
     component.isLoading = true;
 
@@ -302,7 +302,7 @@ describe('Settings Management (Test Cases 7 & 8)', () => {
     expect(component.isLoading).toBe(true);
   });
 
-  it('should disable macro sliders when dailySnacksCount is 0 (Test Case 15b)', async () => {
+  it('should disable macro sliders when dailySnacksCount is 0', async () => {
     // Ensure the form is set to be visible
     component.isLoading = false;
 
