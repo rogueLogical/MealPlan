@@ -77,7 +77,7 @@ describe('ForgotPassword Component Workflow Suites', () => {
       expect(component.token).toBeNull();
     });
 
-    it('should dispatch an authentication link request successfully on valid form submission', async () => {
+    it('should dispatch an authentication link request successfully on valid form submission (UT-13)', async () => {
       const mockSuccessResponse = {
         message: 'If that email address exists, a recovery link has been dispatched.',
       };
@@ -106,7 +106,7 @@ describe('ForgotPassword Component Workflow Suites', () => {
       expect(component.token).toBe('secure_crypto_hex_token_12345');
     });
 
-    it('should execute password updates completely and redirect user to log in screen on success', async () => {
+    it('should execute password updates completely and redirect user to log in screen on success (UT-14)', async () => {
       const mockSuccessResponse = { message: 'Your password has been successfully reset.' };
       authServiceMock.resetPassword.mockReturnValue(of(mockSuccessResponse));
       const navigateSpy = vi.spyOn(router, 'navigate');

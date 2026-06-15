@@ -36,7 +36,7 @@ interface MockAuthService {
   currentUser$: Observable<UserProfile | null>;
 }
 
-describe('Test Case 6: User Account Logout', () => {
+describe('User Account Logout', () => {
   let component: PageHeader;
   let fixture: ComponentFixture<PageHeader>;
   let authServiceMock: MockAuthService;
@@ -94,7 +94,7 @@ describe('Test Case 6: User Account Logout', () => {
     });
   });
 
-  it('should remove authentication for a user who logs out of a currently logged in account', async () => {
+  it('should remove authentication for a user who logs out of a currently logged in account (UT-6)', async () => {
     const navigateSpy = vi.spyOn(router, 'navigate');
 
     component.logout();
@@ -107,7 +107,7 @@ describe('Test Case 6: User Account Logout', () => {
     expect(mockStorage['token']).toBeUndefined();
   });
 
-  it('should redirect user to login screen when attempting to navigate to /home after logout', async () => {
+  it('should redirect user to login screen when attempting to navigate to /home after logout (UT-7)', async () => {
     // simulate a logged-out environment state
     delete mockStorage['token'];
     currentUserSubject.next(null);

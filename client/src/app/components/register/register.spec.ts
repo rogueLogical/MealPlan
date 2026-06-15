@@ -13,7 +13,7 @@ interface MockAuthService {
   >;
 }
 
-describe('Test Case 4: User Account Creation', () => {
+describe('User Account Creation', () => {
   let component: Register;
   let fixture: ComponentFixture<Register>;
   let authServiceMock: MockAuthService;
@@ -40,7 +40,7 @@ describe('Test Case 4: User Account Creation', () => {
     fixture.detectChanges();
   });
 
-  it('should create a new user account upon new account form submission', () => {
+  it('should create a new user account upon new account form submission (UT-4)', () => {
     const mockRegistrationPayload = {
       username: 'testuser',
       email: 'test@example.com',

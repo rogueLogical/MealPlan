@@ -16,11 +16,12 @@ export class ToastService {
   private counter = 0;
 
   // Add a toast banner and trigger a 4-second auto-destruct timer
-  show(text: string, type: 'success' | 'error' | 'info' = 'info'): void {
+  show(text: string, type?: 'success' | 'error' | 'info'): void {
+    const toastType = type || 'info';
     const id = this.counter++;
     const currentToasts = this.toastsSubject.value;
 
-    this.toastsSubject.next([...currentToasts, { id, text, type }]);
+    this.toastsSubject.next([...currentToasts, { id, text, type: toastType }]);
 
     setTimeout(() => {
       this.clear(id);
