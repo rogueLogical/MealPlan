@@ -39,9 +39,11 @@ app.get('/api/health', (req, res) => {
 // Add /routes files to the API here
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
+const ingredientRoutes = require('./routes/ingredients');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/ingredients', ingredientRoutes);
 
 // Export the app for supertest
 module.exports = app;

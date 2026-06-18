@@ -6,7 +6,7 @@ import { environment } from '../../environments/environment';
 export interface MacroTargets {
   calories: number;
   protein: number;
-  carbs: number;
+  netCarbs: number;
   fat: number;
 }
 

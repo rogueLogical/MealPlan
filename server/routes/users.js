@@ -39,12 +39,13 @@ router.put('/settings', checkAuth, async (req, res) => {
     if (nutritionSettings) {
       // update macro targets if provided by the client
       if (nutritionSettings.dailyMacroTargets) {
-        const { calories, protein, carbs, fat } = nutritionSettings.dailyMacroTargets;
+        const { calories, protein, netCarbs, fat } = nutritionSettings.dailyMacroTargets;
         if (calories !== undefined)
           updatePayload['nutritionSettings.dailyMacroTargets.calories'] = calories;
         if (protein !== undefined)
           updatePayload['nutritionSettings.dailyMacroTargets.protein'] = protein;
-        if (carbs !== undefined) updatePayload['nutritionSettings.dailyMacroTargets.carbs'] = carbs;
+        if (netCarbs !== undefined)
+          updatePayload['nutritionSettings.dailyMacroTargets.netCarbs'] = netCarbs;
         if (fat !== undefined) updatePayload['nutritionSettings.dailyMacroTargets.fat'] = fat;
       }
 
@@ -63,8 +64,8 @@ router.put('/settings', checkAuth, async (req, res) => {
           updatePayload['nutritionSettings.mealMacroSplitPercentage.calories'] = split.calories;
         if (split.protein !== undefined)
           updatePayload['nutritionSettings.mealMacroSplitPercentage.protein'] = split.protein;
-        if (split.carbs !== undefined)
-          updatePayload['nutritionSettings.mealMacroSplitPercentage.carbs'] = split.carbs;
+        if (split.netCarbs !== undefined)
+          updatePayload['nutritionSettings.mealMacroSplitPercentage.netCarbs'] = split.netCarbs;
         if (split.fat !== undefined)
           updatePayload['nutritionSettings.mealMacroSplitPercentage.fat'] = split.fat;
       }

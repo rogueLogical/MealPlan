@@ -108,20 +108,22 @@
 
           <!-- Carbohydrates input field element -->
           <div class="form-group">
-            <label for="carbs">Carbohydrates (g)</label>
+            <label for="netCarbs">Net Carbs (g)</label>
             <input
               type="number"
               appNumbersOnly
-              id="carbs"
-              name="carbs"
-              [(ngModel)]="settingsData.nutritionSettings.dailyMacroTargets.carbs"
+              id="netCarbs"
+              name="netCarbs"
+              [(ngModel)]="settingsData.nutritionSettings.dailyMacroTargets.netCarbs"
               class="form-control-input"
               required
               pattern="[0-9]*"
               min="0"
             />
             <span class="setting-hint">
-              {{ carbsCalories }} kcal ({{ getMacroPercentage(carbsCalories) | number: '1.1-1' }}%)
+              {{ netCarbsCalories }} kcal ({{
+                getMacroPercentage(netCarbsCalories) | number: '1.1-1'
+              }}%)
             </span>
           </div>
 
@@ -220,19 +222,20 @@
 
         <div class="form-group expand-field" style="margin-bottom: 20px">
           <div style="display: flex; justify-content: space-between; margin-bottom: 4px">
-            <label for="carbsSplit">Carbohydrate Split</label>
+            <label for="netCarbsSplit">Net Carbs Split</label>
             <span class="setting-hint" style="margin: 0">
-              Meals: {{ settingsData.nutritionSettings.mealMacroSplitPercentage?.carbs }}% | Snacks:
-              {{ 100 - (settingsData.nutritionSettings.mealMacroSplitPercentage?.carbs || 0) }}%
+              Meals: {{ settingsData.nutritionSettings.mealMacroSplitPercentage?.netCarbs }}% |
+              Snacks:
+              {{ 100 - (settingsData.nutritionSettings.mealMacroSplitPercentage?.netCarbs || 0) }}%
             </span>
           </div>
           <input
             type="range"
-            name="carbsSplit"
+            name="netCarbsSplit"
             min="0"
             max="100"
             step="5"
-            [(ngModel)]="settingsData.nutritionSettings.mealMacroSplitPercentage!.carbs"
+            [(ngModel)]="settingsData.nutritionSettings.mealMacroSplitPercentage!.netCarbs"
             [disabled]="settingsData.nutritionSettings.dailySnacksCount === 0"
             style="width: 100%; accent-color: var(--accent-primary)"
           />
