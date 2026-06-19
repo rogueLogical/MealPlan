@@ -42,7 +42,7 @@ IngredientSchema.index({ name: 'text' });
 IngredientSchema.index({ tags: 1 });
 
 // Auto-calculate Net Carbs before saving to the database
-IngredientSchema.pre('save', function (next) {
+IngredientSchema.pre('save', function () {
   // Check if any of the carb-related fields were modified
   if (
     this.isModified('nutrition.totalCarbs') ||
@@ -55,7 +55,6 @@ IngredientSchema.pre('save', function (next) {
     // Prevent negative net carbs in case of bad user input
     this.nutrition.netCarbs = calculatedNet < 0 ? 0 : calculatedNet;
   }
-  next();
 });
 
 module.exports = mongoose.model('Ingredient', IngredientSchema);

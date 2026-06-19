@@ -68,7 +68,7 @@ describe('User Settings API Operations Contract Test Suite', () => {
           mealMacroSplitPercentage: {
             calories: 85,
             protein: 90,
-            carbs: 80,
+            netCarbs: 80,
             fat: 85
           }
         }
@@ -83,7 +83,7 @@ describe('User Settings API Operations Contract Test Suite', () => {
 
     // Verify the nested split object persisted properly
     expect(res.body.nutritionSettings.mealMacroSplitPercentage.protein).toEqual(90);
-    expect(res.body.nutritionSettings.mealMacroSplitPercentage.carbs).toEqual(80);
+    expect(res.body.nutritionSettings.mealMacroSplitPercentage.netCarbs).toEqual(80);
   });
 
   it('should explicitly reject adjustments with a 401 when the Authorization header is missing', async () => {
