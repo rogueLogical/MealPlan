@@ -69,13 +69,14 @@ router.post('/', checkAuth, async (req, res) => {
       ingredient: savedIngredient
     });
   } catch (err) {
-    console.error('Create Ingredient API Error:', err);
     // MongoDB duplicate key error code
     if (err.code === 11000) {
-      return res
-        .status(400)
-        .json({ message: 'An ingredient with this exact name already exists in the database.' });
+      return res.status(400).json({
+        success: false,
+        message: 'An ingredient with this exact name already exists in the database.'
+      });
     }
+    console.error('Create Ingredient API Error:', err);
     res.status(500).json({ message: 'Failed to create ingredient.' });
   }
 });

@@ -12,9 +12,9 @@ describe('IngredientService', () => {
   const mockIngredient: Ingredient = {
     _id: '123',
     name: 'Almond Flour',
-    standardAmount: 100,
-    standardUnit: 'g',
-    nutrition: {
+    servingSize: 100,
+    servingUnit: 'g',
+    nutritionPerServing: {
       calories: 590,
       protein: 21,
       totalCarbs: 21,

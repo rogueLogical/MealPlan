@@ -55,9 +55,9 @@ describe('Ingredient Management API Integration Contract Suites', () => {
       .set('Authorization', `Bearer ${creatorToken}`)
       .send({
         name: 'Almond Flour',
-        standardAmount: 100,
-        standardUnit: 'g',
-        nutrition: {
+        servingSize: 100,
+        servingUnit: 'g',
+        nutritionPerServing: {
           calories: 590,
           protein: 21,
           totalCarbs: 21,
@@ -100,8 +100,10 @@ describe('Ingredient Management API Integration Contract Suites', () => {
     await Ingredient.insertMany([
       {
         name: 'chicken breast',
+        servingSize: 160,
+        servingUnit: 'g',
         tags: ['High Protein', 'Paleo'],
-        nutrition: {
+        nutritionPerServing: {
           calories: 165,
           protein: 31,
           totalCarbs: 0,
@@ -112,8 +114,10 @@ describe('Ingredient Management API Integration Contract Suites', () => {
       },
       {
         name: 'erythritol',
+        servingSize: 10,
+        servingUnit: 'g',
         tags: ['Keto', 'Sweetener'],
-        nutrition: {
+        nutritionPerServing: {
           calories: 24,
           protein: 0,
           totalCarbs: 100,
@@ -124,8 +128,10 @@ describe('Ingredient Management API Integration Contract Suites', () => {
       },
       {
         name: 'broccoli',
+        servingSize: 100,
+        servingUnit: 'g',
         tags: ['Vegetarian', 'Keto'],
-        nutrition: {
+        nutritionPerServing: {
           calories: 34,
           protein: 2.8,
           totalCarbs: 6.6,
@@ -150,8 +156,17 @@ describe('Ingredient Management API Integration Contract Suites', () => {
   it('should successfully update an ingredient and recalculate net carbs (UT-22)', async () => {
     const ingredient = await Ingredient.create({
       name: 'test bar',
+      servingSize: 100,
+      servingUnit: 'g',
       createdBy: creatorId,
-      nutrition: { calories: 200, protein: 20, totalCarbs: 25, fiber: 5, sugarAlcohols: 10, fat: 8 }
+      nutritionPerServing: {
+        calories: 200,
+        protein: 20,
+        totalCarbs: 25,
+        fiber: 5,
+        sugarAlcohols: 10,
+        fat: 8
+      }
     });
 
     // Verification before update: 25 - 5 - 10 = 10 net carbs
@@ -161,7 +176,7 @@ describe('Ingredient Management API Integration Contract Suites', () => {
       .put(`/api/ingredients/${ingredient._id}`)
       .set('Authorization', `Bearer ${creatorToken}`)
       .send({
-        nutrition: {
+        nutritionPerServing: {
           calories: 200,
           protein: 20,
           totalCarbs: 25,
