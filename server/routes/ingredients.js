@@ -19,7 +19,7 @@ router.get('/', checkAuth, async (req, res) => {
     // Tag Filtering
     if (tags) {
       const tagsArray = tags.split(',').map((tag) => tag.trim());
-      queryObj.tags = { $in: tagsArray };
+      queryObj.tags = { $all: tagsArray };
     }
 
     // Pagination Math

@@ -1,0 +1,2593 @@
+[
+  {
+    "name": "hummus, commercial",
+    "servingSize": 33.9,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 7.4,
+      "fat": 17.1,
+      "totalCarbs": 14.9,
+      "fiber": 5.4,
+      "sugarAlcohols": 0,
+      "netCarbs": 9.5
+    },
+    "tags": [
+      "Low-Carb",
+      "High-Fat",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "milk, reduced fat, fluid, 2% milkfat, with added vitamin a and vitamin d",
+    "servingSize": 227,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 3.4,
+      "fat": 1.9,
+      "totalCarbs": 4.9,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 4.9
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "Vegetarian",
+      "Pescatarian",
+      "Gluten-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "tomatoes, grape, raw",
+    "servingSize": 49.7,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 0.8,
+      "fat": 0.6,
+      "totalCarbs": 5.5,
+      "fiber": 2.1,
+      "sugarAlcohols": 0,
+      "netCarbs": 3.4
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "beans, snap, green, canned, regular pack, drained solids",
+    "servingSize": 129,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 1,
+      "fat": 0.4,
+      "totalCarbs": 4.1,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 4.1
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "broccoli, raw",
+    "servingSize": 76,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 2.6,
+      "fat": 0.3,
+      "totalCarbs": 6.3,
+      "fiber": 2.4,
+      "sugarAlcohols": 0,
+      "netCarbs": 3.9
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "milk, lowfat, fluid, 1% milkfat, with added vitamin a and vitamin d",
+    "servingSize": 233,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 3.4,
+      "fat": 1,
+      "totalCarbs": 5.2,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 5.2
+    },
+    "tags": [
+      "Low-Carb",
+      "Vegetarian",
+      "Pescatarian",
+      "Gluten-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "milk, nonfat, fluid, with added vitamin a and vitamin d (fat free or skim)",
+    "servingSize": 229,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 3.4,
+      "fat": 0.1,
+      "totalCarbs": 4.9,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 4.9
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "Vegetarian",
+      "Pescatarian",
+      "Gluten-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "milk, whole, 3.25% milkfat, with added vitamin d",
+    "servingSize": 229,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 3.3,
+      "fat": 3.2,
+      "totalCarbs": 4.7,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 4.7
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "Vegetarian",
+      "Pescatarian",
+      "Gluten-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "frankfurter, beef, unheated",
+    "servingSize": 48.6,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 11.7,
+      "fat": 28,
+      "totalCarbs": 2.9,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 2.9
+    },
+    "tags": ["Keto", "Low-Carb", "High-Fat", "Dairy-Free", "Nut-Free", "Shellfish-Free"]
+  },
+  {
+    "name": "nuts, almonds, dry roasted, with salt added",
+    "servingSize": 135,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 20.4,
+      "fat": 57.8,
+      "totalCarbs": 16.2,
+      "fiber": 11,
+      "sugarAlcohols": 0,
+      "netCarbs": 5.2
+    },
+    "tags": [
+      "Low-Carb",
+      "High-Fiber",
+      "High-Fat",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "cheese, ricotta, whole milk",
+    "servingSize": 64.6,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 7.8,
+      "fat": 11,
+      "totalCarbs": 6.9,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 6.9
+    },
+    "tags": [
+      "Low-Carb",
+      "Vegetarian",
+      "Pescatarian",
+      "Gluten-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "kale, raw",
+    "servingSize": 20.6,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 2.9,
+      "fat": 1.5,
+      "totalCarbs": 4.4,
+      "fiber": 4.1,
+      "sugarAlcohols": 0,
+      "netCarbs": 0.3
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "egg, whole, raw, frozen, pasteurized",
+    "servingSize": 28.4,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 12.3,
+      "fat": 10.3,
+      "totalCarbs": 0.9,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 0.9
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "Vegetarian",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "egg, white, raw, frozen, pasteurized",
+    "servingSize": 28.4,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 10.1,
+      "fat": 0.2,
+      "totalCarbs": 0.7,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 0.7
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "Vegetarian",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "egg, white, dried",
+    "servingSize": 7,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 79.9,
+      "fat": 0.7,
+      "totalCarbs": 6,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 6
+    },
+    "tags": [
+      "Low-Carb",
+      "High-Protein",
+      "Vegetarian",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "sauce, salsa, ready-to-serve",
+    "servingSize": 35.7,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 1.4,
+      "fat": 0.2,
+      "totalCarbs": 6.7,
+      "fiber": 1.8,
+      "sugarAlcohols": 0,
+      "netCarbs": 4.9
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "sausage, breakfast sausage, beef, pre-cooked, unprepared",
+    "servingSize": 18.6,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 13.3,
+      "fat": 28.7,
+      "totalCarbs": 3.4,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 3.4
+    },
+    "tags": ["Keto", "Low-Carb", "High-Fat", "Shellfish-Free"]
+  },
+  {
+    "name": "onion rings, breaded, par fried, frozen, prepared, heated in oven",
+    "servingSize": 20.2,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 4.5,
+      "fat": 14.4,
+      "totalCarbs": 36.3,
+      "fiber": 2.4,
+      "sugarAlcohols": 0,
+      "netCarbs": 33.9
+    },
+    "tags": ["High-Carb", "Vegetarian", "Pescatarian", "Shellfish-Free"]
+  },
+  {
+    "name": "pickles, cucumber, dill or kosher dill",
+    "servingSize": 40.4,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 0.5,
+      "fat": 0.4,
+      "totalCarbs": 2,
+      "fiber": 1,
+      "sugarAlcohols": 0,
+      "netCarbs": 1
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "peanut butter, smooth style, with salt",
+    "servingSize": 32,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 22.5,
+      "fat": 51.1,
+      "totalCarbs": 22.3,
+      "fiber": 4.8,
+      "sugarAlcohols": 0,
+      "netCarbs": 17.5
+    },
+    "tags": [
+      "High-Fat",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "cheese, parmesan, grated",
+    "servingSize": 7.6,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 29.6,
+      "fat": 28,
+      "totalCarbs": 12.4,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 12.4
+    },
+    "tags": [
+      "High-Fat",
+      "Vegetarian",
+      "Pescatarian",
+      "Gluten-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "cheese, pasteurized process, american, vitamin d fortified",
+    "servingSize": 20.6,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 18,
+      "fat": 30.6,
+      "totalCarbs": 5.3,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 5.3
+    },
+    "tags": [
+      "Low-Carb",
+      "High-Fat",
+      "Vegetarian",
+      "Pescatarian",
+      "Gluten-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "grapefruit juice, white, canned or bottled, unsweetened",
+    "servingSize": 257,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 0.6,
+      "fat": 0.7,
+      "totalCarbs": 7.6,
+      "fiber": 0.2,
+      "sugarAlcohols": 0,
+      "netCarbs": 7.4
+    },
+    "tags": [
+      "Low-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "peaches, yellow, raw",
+    "servingSize": 154,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 0.9,
+      "fat": 0.3,
+      "totalCarbs": 10.1,
+      "fiber": 1.5,
+      "sugarAlcohols": 0,
+      "netCarbs": 8.6
+    },
+    "tags": [
+      "Low-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "seeds, sunflower seed kernels, dry roasted, with salt added",
+    "servingSize": 127,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 21,
+      "fat": 56.1,
+      "totalCarbs": 17.1,
+      "fiber": 10.3,
+      "sugarAlcohols": 0,
+      "netCarbs": 6.8
+    },
+    "tags": [
+      "Low-Carb",
+      "High-Fiber",
+      "High-Fat",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "sausage, italian, pork, mild, cooked, pan-fried",
+    "servingSize": 86.6,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 18.2,
+      "fat": 26.2,
+      "totalCarbs": 2.2,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 2.2
+    },
+    "tags": ["Keto", "Low-Carb", "High-Fat", "Shellfish-Free"]
+  },
+  {
+    "name": "bread, white, commercially prepared",
+    "servingSize": 27.3,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 9.4,
+      "fat": 3.6,
+      "totalCarbs": 49.2,
+      "fiber": 2.3,
+      "sugarAlcohols": 0,
+      "netCarbs": 46.9
+    },
+    "tags": ["High-Carb", "Vegetarian", "Pescatarian", "Nut-Free", "Shellfish-Free"]
+  },
+  {
+    "name": "sausage, turkey, breakfast links, mild, raw",
+    "servingSize": 27.9,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 16.7,
+      "fat": 10.4,
+      "totalCarbs": 0.9,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 0.9
+    },
+    "tags": ["Keto", "Low-Carb", "High-Protein", "Shellfish-Free"]
+  },
+  {
+    "name": "cheese, swiss",
+    "servingSize": 21.9,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 27,
+      "fat": 31,
+      "totalCarbs": 1.4,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 1.4
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Fat",
+      "Vegetarian",
+      "Pescatarian",
+      "Gluten-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "kale, frozen, cooked, boiled, drained, without salt",
+    "servingSize": 118,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 2.9,
+      "fat": 1.2,
+      "totalCarbs": 5.3,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 5.3
+    },
+    "tags": [
+      "Low-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "mustard, prepared, yellow",
+    "servingSize": 6,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 4.3,
+      "fat": 3.4,
+      "totalCarbs": 5.3,
+      "fiber": 4.3,
+      "sugarAlcohols": 0,
+      "netCarbs": 1
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "figs, dried, uncooked",
+    "servingSize": 149,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 3.3,
+      "fat": 0.9,
+      "totalCarbs": 63.9,
+      "fiber": 9.8,
+      "sugarAlcohols": 0,
+      "netCarbs": 54.1
+    },
+    "tags": [
+      "High-Fiber",
+      "High-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "melons, cantaloupe, raw",
+    "servingSize": 160,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 0.8,
+      "fat": 0.2,
+      "totalCarbs": 8.2,
+      "fiber": 0.8,
+      "sugarAlcohols": 0,
+      "netCarbs": 7.4
+    },
+    "tags": [
+      "Low-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "nectarines, raw",
+    "servingSize": 143,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 1.1,
+      "fat": 0.3,
+      "totalCarbs": 9.2,
+      "fiber": 1.5,
+      "sugarAlcohols": 0,
+      "netCarbs": 7.7
+    },
+    "tags": [
+      "Low-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "oranges, raw, navels (includes foods for usda's food distribution program)",
+    "servingSize": 165,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 0.9,
+      "fat": 0.2,
+      "totalCarbs": 11.8,
+      "fiber": 2,
+      "sugarAlcohols": 0,
+      "netCarbs": 9.8
+    },
+    "tags": [
+      "Low-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "lettuce, cos or romaine, raw",
+    "servingSize": 581,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 1.2,
+      "fat": 0.3,
+      "totalCarbs": 3.2,
+      "fiber": 1.8,
+      "sugarAlcohols": 0,
+      "netCarbs": 1.4
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "cheese, cheddar",
+    "servingSize": 17,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 23.3,
+      "fat": 34,
+      "totalCarbs": 2.4,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 2.4
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Fat",
+      "Vegetarian",
+      "Pescatarian",
+      "Gluten-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "cheese, cottage, lowfat, 2% milkfat",
+    "servingSize": 220,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 11,
+      "fat": 2.3,
+      "totalCarbs": 4.3,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 4.3
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "Vegetarian",
+      "Pescatarian",
+      "Gluten-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "cheese, mozzarella, low moisture, part-skim",
+    "servingSize": 86.2,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 23.7,
+      "fat": 20.4,
+      "totalCarbs": 4.4,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 4.4
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "High-Fat",
+      "Vegetarian",
+      "Pescatarian",
+      "Gluten-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "egg, whole, dried",
+    "servingSize": 28.4,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 48.1,
+      "fat": 39.8,
+      "totalCarbs": 1.9,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 1.9
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "High-Fat",
+      "Vegetarian",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "egg, yolk, raw, frozen, pasteurized",
+    "servingSize": 28.4,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 15.6,
+      "fat": 25.1,
+      "totalCarbs": 0.6,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 0.6
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Fat",
+      "Vegetarian",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "egg, yolk, dried",
+    "servingSize": 28.4,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 34.2,
+      "fat": 55.5,
+      "totalCarbs": 1.1,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 1.1
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Fat",
+      "Vegetarian",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "cheese, dry white, queso seco",
+    "servingSize": 97.3,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 24.5,
+      "fat": 24.3,
+      "totalCarbs": 2.1,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 2.1
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "High-Fat",
+      "Vegetarian",
+      "Pescatarian",
+      "Gluten-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "yogurt, greek, plain, nonfat",
+    "servingSize": 156,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 10.3,
+      "fat": 0.4,
+      "totalCarbs": 3.6,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 3.6
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "Vegetarian",
+      "Pescatarian",
+      "Gluten-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "yogurt, greek, strawberry, nonfat",
+    "servingSize": 150,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 8.1,
+      "fat": 0.2,
+      "totalCarbs": 12.2,
+      "fiber": 0.6,
+      "sugarAlcohols": 0,
+      "netCarbs": 11.6
+    },
+    "tags": [
+      "High-Carb",
+      "Vegetarian",
+      "Pescatarian",
+      "Gluten-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "oil, coconut",
+    "servingSize": 11.6,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 0,
+      "fat": 99.1,
+      "totalCarbs": 0.8,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 0.8
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Fat",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "turkey, ground, 93% lean, 7% fat, pan-broiled crumbles",
+    "servingSize": 155,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 27.1,
+      "fat": 11.6,
+      "totalCarbs": 0,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 0
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "chicken, broilers or fryers, drumstick, meat only, cooked, braised",
+    "servingSize": 94.7,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 23.9,
+      "fat": 6,
+      "totalCarbs": 0,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 0
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "chicken, broiler or fryers, breast, skinless, boneless, meat only, cooked, braised",
+    "servingSize": 174,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 32.1,
+      "fat": 3.2,
+      "totalCarbs": 0,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 0
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "sauce, pasta, spaghetti/marinara, ready-to-serve",
+    "servingSize": 135,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 1.4,
+      "fat": 1.5,
+      "totalCarbs": 8.1,
+      "fiber": 1.8,
+      "sugarAlcohols": 0,
+      "netCarbs": 6.3
+    },
+    "tags": [
+      "Low-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "ham, sliced, pre-packaged, deli meat (96%fat free, water added)",
+    "servingSize": 13.5,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 16.7,
+      "fat": 3.7,
+      "totalCarbs": 0.3,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 0.3
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free"
+    ]
+  },
+  {
+    "name": "pears, raw, bartlett (includes foods for usda's food distribution program)",
+    "servingSize": 140,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 0.4,
+      "fat": 0.2,
+      "totalCarbs": 15.1,
+      "fiber": 3.1,
+      "sugarAlcohols": 0,
+      "netCarbs": 12
+    },
+    "tags": [
+      "High-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "olives, green, manzanilla, stuffed with pimiento",
+    "servingSize": 3.2,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 1.2,
+      "fat": 12.9,
+      "totalCarbs": 5,
+      "fiber": 4,
+      "sugarAlcohols": 0,
+      "netCarbs": 1
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "sausage, pork, chorizo, link or ground, cooked, pan-fried",
+    "servingSize": 80.4,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 19.3,
+      "fat": 28.1,
+      "totalCarbs": 2.6,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 2.6
+    },
+    "tags": ["Keto", "Low-Carb", "High-Fat", "Dairy-Free", "Nut-Free", "Shellfish-Free"]
+  },
+  {
+    "name": "cookies, oatmeal, soft, with raisins",
+    "servingSize": 27,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 5.8,
+      "fat": 14.3,
+      "totalCarbs": 69.6,
+      "fiber": 3.3,
+      "sugarAlcohols": 0,
+      "netCarbs": 66.3
+    },
+    "tags": ["High-Carb", "Vegetarian", "Pescatarian", "Shellfish-Free"]
+  },
+  {
+    "name": "tomatoes, canned, red, ripe, diced",
+    "servingSize": 245,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 0.8,
+      "fat": 0.5,
+      "totalCarbs": 3.3,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 3.3
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "fish, haddock, raw",
+    "servingSize": 176,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 16.3,
+      "fat": 0.5,
+      "totalCarbs": 0,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 0
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "Pescatarian",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "fish, pollock, raw",
+    "servingSize": 177,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 12.3,
+      "fat": 0.4,
+      "totalCarbs": 0,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 0
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "Pescatarian",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "fish, tuna, light, canned in water, drained solids",
+    "servingSize": 107,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 19,
+      "fat": 0.9,
+      "totalCarbs": 0.1,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 0.1
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "Pescatarian",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "sugars, granulated",
+    "servingSize": 4,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 0,
+      "fat": 0.3,
+      "totalCarbs": 99.6,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 99.6
+    },
+    "tags": [
+      "High-Carb",
+      "Vegetarian",
+      "Pescatarian",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "restaurant, chinese, sweet and sour pork",
+    "servingSize": 611,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 8.9,
+      "fat": 13.6,
+      "totalCarbs": 25.5,
+      "fiber": 1,
+      "sugarAlcohols": 0,
+      "netCarbs": 24.5
+    },
+    "tags": ["High-Carb", "Dairy-Free", "Shellfish-Free"]
+  },
+  {
+    "name": "restaurant, chinese, fried rice, without meat",
+    "servingSize": 133,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 3.8,
+      "fat": 3.2,
+      "totalCarbs": 32.5,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 32.5
+    },
+    "tags": ["High-Carb", "Vegetarian", "Pescatarian", "Dairy-Free", "Shellfish-Free"]
+  },
+  {
+    "name": "restaurant, latino, tamale, pork",
+    "servingSize": 142,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 7.4,
+      "fat": 9,
+      "totalCarbs": 15.8,
+      "fiber": 2.4,
+      "sugarAlcohols": 0,
+      "netCarbs": 13.4
+    },
+    "tags": ["High-Carb", "Gluten-Free", "Dairy-Free", "Nut-Free", "Shellfish-Free", "Soy-Free"]
+  },
+  {
+    "name": "restaurant, latino, pupusas con frijoles (pupusas, bean)",
+    "servingSize": 126,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 5.6,
+      "fat": 9,
+      "totalCarbs": 31.5,
+      "fiber": 5.8,
+      "sugarAlcohols": 0,
+      "netCarbs": 25.7
+    },
+    "tags": [
+      "High-Carb",
+      "Vegetarian",
+      "Pescatarian",
+      "Gluten-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "beef, loin, top loin steak, boneless, lip-on, separable lean only, trimmed to 1/8\" fat, choice, raw",
+    "servingSize": 284,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 22.8,
+      "fat": 6.4,
+      "totalCarbs": 0,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 0
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "beef, loin, tenderloin roast, separable lean only, boneless, trimmed to 0\" fat, select, cooked, roasted",
+    "servingSize": 462,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 27.7,
+      "fat": 6.4,
+      "totalCarbs": 0,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 0
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "beef, round, eye of round roast, boneless, separable lean only, trimmed to 0\" fat, select, raw",
+    "servingSize": 690,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 23.4,
+      "fat": 2.5,
+      "totalCarbs": 0,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 0
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "beef, round, top round roast, boneless, separable lean only, trimmed to 0\" fat, select, raw",
+    "servingSize": 788,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 23.7,
+      "fat": 2.4,
+      "totalCarbs": 0,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 0
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "beef, short loin, t-bone steak, bone-in, separable lean only, trimmed to 1/8\" fat, choice, cooked, grilled",
+    "servingSize": 360,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 27.3,
+      "fat": 11.4,
+      "totalCarbs": 0,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 0
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "beef, short loin, porterhouse steak, separable lean only, trimmed to 1/8\" fat, select, raw",
+    "servingSize": 525,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 22.7,
+      "fat": 5.3,
+      "totalCarbs": 0,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 0
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "bread, whole-wheat, commercially prepared",
+    "servingSize": 32.1,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 12.3,
+      "fat": 3.6,
+      "totalCarbs": 43.1,
+      "fiber": 6,
+      "sugarAlcohols": 0,
+      "netCarbs": 37.1
+    },
+    "tags": ["High-Fiber", "High-Carb", "Vegetarian", "Pescatarian", "Shellfish-Free"]
+  },
+  {
+    "name": "beef, loin, tenderloin roast, separable lean only, boneless, trimmed to 0\" fat, select, cooked, roasted",
+    "servingSize": 462,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 27.7,
+      "fat": 6.4,
+      "totalCarbs": 0,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 0
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "beef, loin, top loin steak, boneless, lip-on, separable lean only, trimmed to 1/8\" fat, choice, raw",
+    "servingSize": 284,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 22.8,
+      "fat": 6.4,
+      "totalCarbs": 0,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 0
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "beef, round, eye of round roast, boneless, separable lean only, trimmed to 0\" fat, select, raw",
+    "servingSize": 690,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 23.4,
+      "fat": 2.5,
+      "totalCarbs": 0,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 0
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "beef, round, top round roast, boneless, separable lean only, trimmed to 0\" fat, select, raw",
+    "servingSize": 788,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 23.7,
+      "fat": 2.4,
+      "totalCarbs": 0,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 0
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "beef, short loin, porterhouse steak, separable lean only, trimmed to 1/8\" fat, select, raw",
+    "servingSize": 525,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 22.7,
+      "fat": 5.3,
+      "totalCarbs": 0,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 0
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "beef, short loin, t-bone steak, bone-in, separable lean only, trimmed to 1/8\" fat, choice, cooked, grilled",
+    "servingSize": 360,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 27.3,
+      "fat": 11.4,
+      "totalCarbs": 0,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 0
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "cheese, dry white, queso seco",
+    "servingSize": 97.3,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 24.5,
+      "fat": 24.3,
+      "totalCarbs": 2.1,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 2.1
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "High-Fat",
+      "Vegetarian",
+      "Pescatarian",
+      "Gluten-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "cheese, ricotta, whole milk",
+    "servingSize": 64.6,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 7.8,
+      "fat": 11,
+      "totalCarbs": 6.9,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 6.9
+    },
+    "tags": [
+      "Low-Carb",
+      "Vegetarian",
+      "Pescatarian",
+      "Gluten-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "cheese, swiss",
+    "servingSize": 21.9,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 27,
+      "fat": 31,
+      "totalCarbs": 1.4,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 1.4
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Fat",
+      "Vegetarian",
+      "Pescatarian",
+      "Gluten-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "figs, dried, uncooked",
+    "servingSize": 149,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 3.3,
+      "fat": 0.9,
+      "totalCarbs": 63.9,
+      "fiber": 9.8,
+      "sugarAlcohols": 0,
+      "netCarbs": 54.1
+    },
+    "tags": [
+      "High-Fiber",
+      "High-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "lettuce, cos or romaine, raw",
+    "servingSize": 581,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 1.2,
+      "fat": 0.3,
+      "totalCarbs": 3.2,
+      "fiber": 1.8,
+      "sugarAlcohols": 0,
+      "netCarbs": 1.4
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "melons, cantaloupe, raw",
+    "servingSize": 160,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 0.8,
+      "fat": 0.2,
+      "totalCarbs": 8.2,
+      "fiber": 0.8,
+      "sugarAlcohols": 0,
+      "netCarbs": 7.4
+    },
+    "tags": [
+      "Low-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "oranges, raw, navels",
+    "servingSize": 165,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 0.9,
+      "fat": 0.2,
+      "totalCarbs": 11.8,
+      "fiber": 2,
+      "sugarAlcohols": 0,
+      "netCarbs": 9.8
+    },
+    "tags": [
+      "Low-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "milk, lowfat, fluid, 1% milkfat, with added vitamin a and vitamin d",
+    "servingSize": 246,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 3.4,
+      "fat": 1,
+      "totalCarbs": 5.2,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 5.2
+    },
+    "tags": [
+      "Low-Carb",
+      "Vegetarian",
+      "Pescatarian",
+      "Gluten-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "pears, raw, bartlett",
+    "servingSize": 140,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 0.4,
+      "fat": 0.2,
+      "totalCarbs": 15.1,
+      "fiber": 3.1,
+      "sugarAlcohols": 0,
+      "netCarbs": 12
+    },
+    "tags": ["High-Carb"]
+  },
+  {
+    "name": "restaurant, chinese, sweet and sour pork",
+    "servingSize": 611,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 8.9,
+      "fat": 13.6,
+      "totalCarbs": 25.5,
+      "fiber": 1,
+      "sugarAlcohols": 0,
+      "netCarbs": 24.5
+    },
+    "tags": ["High-Carb", "Dairy-Free", "Shellfish-Free"]
+  },
+  {
+    "name": "milk, nonfat, fluid, with added vitamin a and vitamin d (fat free or skim)",
+    "servingSize": 246,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 3.4,
+      "fat": 0.1,
+      "totalCarbs": 4.9,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 4.9
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "Vegetarian",
+      "Pescatarian",
+      "Gluten-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "sauce, salsa, ready-to-serve",
+    "servingSize": 35.7,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 1.4,
+      "fat": 0.2,
+      "totalCarbs": 6.7,
+      "fiber": 1.8,
+      "sugarAlcohols": 0,
+      "netCarbs": 4.9
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "milk, reduced fat, fluid, 2% milkfat, with added vitamin a and vitamin d",
+    "servingSize": 245,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 3.4,
+      "fat": 1.9,
+      "totalCarbs": 4.9,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 4.9
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "Vegetarian",
+      "Pescatarian",
+      "Gluten-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "sausage, breakfast sausage, beef, pre-cooked, unprepared",
+    "servingSize": 18.6,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 13.3,
+      "fat": 28.7,
+      "totalCarbs": 3.4,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 3.4
+    },
+    "tags": ["Keto", "Low-Carb", "High-Fat", "Dairy-Free", "Nut-Free", "Shellfish-Free"]
+  },
+  {
+    "name": "sausage, italian, pork, mild, cooked, pan-fried",
+    "servingSize": 86.6,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 18.2,
+      "fat": 26.2,
+      "totalCarbs": 2.2,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 2.2
+    },
+    "tags": ["Keto", "Low-Carb", "High-Fat", "Dairy-Free", "Nut-Free", "Shellfish-Free"]
+  },
+  {
+    "name": "sausage, pork, chorizo, link or ground, cooked, pan-fried",
+    "servingSize": 80.4,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 19.3,
+      "fat": 28.1,
+      "totalCarbs": 2.6,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 2.6
+    },
+    "tags": ["Keto", "Low-Carb", "High-Fat", "Dairy-Free", "Nut-Free", "Shellfish-Free"]
+  },
+  {
+    "name": "milk, whole, 3.25% milkfat, with added vitamin d",
+    "servingSize": 249,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 3.3,
+      "fat": 3.2,
+      "totalCarbs": 4.6,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 4.6
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "Vegetarian",
+      "Pescatarian",
+      "Gluten-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "sausage, turkey, breakfast links, mild, raw",
+    "servingSize": 27.9,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 16.7,
+      "fat": 10.4,
+      "totalCarbs": 0.9,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 0.9
+    },
+    "tags": ["Keto", "Low-Carb", "High-Protein", "Dairy-Free", "Nut-Free", "Shellfish-Free"]
+  },
+  {
+    "name": "sugars, granulated",
+    "servingSize": 4,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 0,
+      "fat": 0.3,
+      "totalCarbs": 99.6,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 99.6
+    },
+    "tags": [
+      "High-Carb",
+      "Vegetarian",
+      "Pescatarian",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "turkey, ground, 93% lean, 7% fat, pan-broiled crumbles",
+    "servingSize": 155,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 27.1,
+      "fat": 11.6,
+      "totalCarbs": 0,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 0
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "ham, sliced, restaurant",
+    "servingSize": 16.2,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 19.6,
+      "fat": 3.7,
+      "totalCarbs": 2.4,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 2.4
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free"
+    ]
+  },
+  {
+    "name": "cheese, american, restaurant",
+    "servingSize": 16,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 17.5,
+      "fat": 31.1,
+      "totalCarbs": 6.4,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 6.4
+    },
+    "tags": [
+      "Low-Carb",
+      "High-Fat",
+      "Vegetarian",
+      "Pescatarian",
+      "Gluten-Free",
+      "Nut-Free",
+      "Shellfish-Free"
+    ]
+  },
+  {
+    "name": "broccoli, raw",
+    "servingSize": 76,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 2.6,
+      "fat": 0.3,
+      "totalCarbs": 6.3,
+      "fiber": 2.4,
+      "sugarAlcohols": 0,
+      "netCarbs": 3.9
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "eggs, grade a, large, egg white",
+    "servingSize": 34,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 10.7,
+      "fat": 0,
+      "totalCarbs": 2.4,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 2.4
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "Vegetarian",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "eggs, grade a, large, egg yolk",
+    "servingSize": 17,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 16.2,
+      "fat": 28.8,
+      "totalCarbs": 1,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 1
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Fat",
+      "Vegetarian",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "eggs, grade a, large, egg whole",
+    "servingSize": 50.3,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 12.4,
+      "fat": 10,
+      "totalCarbs": 1,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 1
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "Vegetarian",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "pork, cured, bacon, cooked, restaurant",
+    "servingSize": 6.3,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 40.9,
+      "fat": 36.5,
+      "totalCarbs": 2.1,
+      "fiber": 0,
+      "sugarAlcohols": 0,
+      "netCarbs": 2.1
+    },
+    "tags": [
+      "Keto",
+      "Low-Carb",
+      "High-Protein",
+      "High-Fat",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free"
+    ]
+  },
+  {
+    "name": "onions, red, raw",
+    "servingSize": 197,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 0.9,
+      "fat": 0.1,
+      "totalCarbs": 9.9,
+      "fiber": 2.2,
+      "sugarAlcohols": 0,
+      "netCarbs": 7.7
+    },
+    "tags": [
+      "Low-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "onions, yellow, raw",
+    "servingSize": 143,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 0.8,
+      "fat": 0.1,
+      "totalCarbs": 8.6,
+      "fiber": 1.9,
+      "sugarAlcohols": 0,
+      "netCarbs": 6.7
+    },
+    "tags": [
+      "Low-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "bananas, overripe, raw",
+    "servingSize": 110,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 0.7,
+      "fat": 0.2,
+      "totalCarbs": 20.1,
+      "fiber": 1.7,
+      "sugarAlcohols": 0,
+      "netCarbs": 18.4
+    },
+    "tags": [
+      "High-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "bananas, ripe and slightly ripe, raw",
+    "servingSize": 115,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 0.7,
+      "fat": 0.3,
+      "totalCarbs": 23,
+      "fiber": 1.7,
+      "sugarAlcohols": 0,
+      "netCarbs": 21.3
+    },
+    "tags": [
+      "High-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "bananas, overripe, raw",
+    "servingSize": 110,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 0.7,
+      "fat": 0.2,
+      "totalCarbs": 20.1,
+      "fiber": 1.7,
+      "sugarAlcohols": 0,
+      "netCarbs": 18.4
+    },
+    "tags": [
+      "High-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  },
+  {
+    "name": "bananas, ripe and slightly ripe, raw",
+    "servingSize": 115,
+    "servingUnit": "g",
+    "nutritionPerServing": {
+      "protein": 0.7,
+      "fat": 0.3,
+      "totalCarbs": 23,
+      "fiber": 1.7,
+      "sugarAlcohols": 0,
+      "netCarbs": 21.3
+    },
+    "tags": [
+      "High-Carb",
+      "Vegetarian",
+      "Vegan",
+      "Pescatarian",
+      "Paleo",
+      "Gluten-Free",
+      "Dairy-Free",
+      "Nut-Free",
+      "Shellfish-Free",
+      "Soy-Free",
+      "Kosher",
+      "Halal"
+    ]
+  }
+]

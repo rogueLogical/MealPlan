@@ -6,13 +6,16 @@
   "scripts": {
     "start": "node server.js",
     "test": "jest --runInBand --detectOpenHandles --coverage",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "seed:parse": "node scripts/parse_usda_csv.js",
+    "seed:tag": "node scripts/tag_ingredients.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@google/genai": "^2.9.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
@@ -24,6 +27,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "csv-parser": "^3.2.1",
     "eslint": "^10.4.1",
     "jest": "^30.4.2",
     "mongodb-memory-server": "^11.2.0",

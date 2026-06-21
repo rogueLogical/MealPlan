@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const { seedIngredients } = require('./utils/ingredient-seeder');
 require('dotenv').config(); // Loads a local .env file if present
 
 const app = express();
@@ -24,7 +25,10 @@ const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/meandb';
 if (process.env.NODE_ENV !== 'test') {
   mongoose
     .connect(mongoURI)
-    .then(() => console.log('Database connected successfully'))
+    .then(async () => {
+      console.log('Database connected successfully');
+      await seedIngredients();
+    })
     .catch((err) => {
       console.error('Database connection error:', err);
       process.exit(1); // Stop the server if the database connection fails

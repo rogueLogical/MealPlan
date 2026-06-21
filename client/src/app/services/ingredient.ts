@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface Macros {
-  calories: number;
+  calories?: number;
   protein: number;
   totalCarbs: number;
   fiber: number;
@@ -17,9 +17,15 @@ export interface Ingredient {
   _id?: string;
   name: string;
   createdBy?: string | null;
-  standardAmount: number;
-  standardUnit: string;
-  nutrition: Macros;
+
+  servingSize: number;
+  servingUnit: string;
+  nutritionPerServing: Macros;
+
+  standardAmount?: number;
+  standardUnit?: string;
+  nutrition?: Macros;
+
   tags?: string[];
 }
 

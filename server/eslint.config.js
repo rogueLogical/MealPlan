@@ -17,7 +17,9 @@ module.exports = [
         beforeAll: 'readonly',
         afterEach: 'readonly',
         afterAll: 'readonly',
-        jest: 'readonly'
+        jest: 'readonly',
+        __dirname: 'readonly',
+        setTimeout: 'readonly'
       }
     },
     rules: {

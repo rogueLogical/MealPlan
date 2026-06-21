@@ -1,0 +1,86 @@
+<div class="modal-container">
+  <button class="modal-backdrop" (click)="closeSearch()" aria-label="Close search window"></button>
+
+  <div class="modal-content search-modal">
+    <header class="modal-header">
+      <h2>Search Database</h2>
+      <button class="close-btn" (click)="closeSearch()">✕</button>
+    </header>
+
+    <div class="search-toolbar">
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        (keydown.enter)="onSearchChange()"
+        placeholder="Search ingredients..."
+        class="form-control-input search-input"
+      />
+      <button class="btn-primary" (click)="onSearchChange()">Search</button>
+      <button class="btn-secondary" (click)="openCreateForm()">+ Custom</button>
+    </div>
+
+    <div class="results-list">
+      <div class="tags-container">
+        <div class="filter-tags" aria-label="Dietary Filters">
+          @for (tag of availableTags; track tag) {
+            <button
+              type="button"
+              class="tag-chip"
+              [class.active]="selectedTags.includes(tag)"
+              (click)="toggleFilterTag(tag)"
+              [attr.aria-pressed]="selectedTags.includes(tag)"
+            >
+              {{ tag }}
+            </button>
+          }
+        </div>
+      </div>
+      @for (item of results; track item._id) {
+        <div
+          class="result-card"
+          role="button"
+          tabindex="0"
+          (click)="selectIngredient(item)"
+          (keydown.enter)="selectIngredient(item)"
+          (keydown.space)="selectIngredient(item)"
+        >
+          <div class="item-info">
+            <h4>{{ item.name | titlecase }}</h4>
+            <span class="macros-summary">
+              {{ item.nutrition?.calories }} kcal | Net Carbs: {{ item.nutrition?.netCarbs }}g |
+              Protein: {{ item.nutrition?.protein }}g | Fat: {{ item.nutrition?.fat }}g
+            </span>
+          </div>
+          <button class="btn-secondary" (click)="openEditForm(item._id!, $event)">✏️</button>
+        </div>
+      }
+
+      <footer class="pagination-footer">
+        <button
+          class="btn-secondary"
+          [disabled]="currentPage === 1"
+          (click)="executeSearch(currentPage - 1)"
+        >
+          Previous
+        </button>
+        <span class="page-indicator">Page {{ currentPage }} of {{ totalPages || 1 }}</span>
+        <button
+          class="btn-secondary"
+          [disabled]="currentPage >= totalPages"
+          (click)="executeSearch(currentPage + 1)"
+        >
+          Next
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  @if (showFormModal) {
+    <app-ingredient-form
+      [ingredientId]="editingIngredientId"
+      (closeForm)="onFormClosed()"
+      (saved)="onFormSaved()"
+    >
+    </app-ingredient-form>
+  }
+</div>
