@@ -132,20 +132,30 @@ Retrieves a paginated list of ingredients. Supports text search and tag filterin
   {
     "data": [
       {
-        "_id": "60d5ecb8b392...",
-        "name": "Almond Flour",
-        "servingSize": 100,
-        "servingUnit": "g",
-        "nutritionPerServing": {
-          "calories": 590,
-          "protein": 21,
-          "totalCarbs": 21,
-          "fiber": 12,
-          "sugarAlcohols": 0,
-          "netCarbs": 9,
-          "fat": 52
-        },
-        "tags": ["Keto", "Gluten-Free"]
+      "_id": "60d5ecb8b392d7... (auto-generated)",
+      "name": "avocado, raw",
+      "createdBy": "user_id_here (optional)",
+      "servingSize": 150,
+      "servingUnit": "g",
+      "nutritionPerServing": {
+        "protein": 3.0,
+        "totalCarbs": 12.8,
+        "fiber": 10.0,
+        "sugarAlcohols": 0,
+        "netCarbs": 2.8, // AUTO-CALCULATED
+        "fat": 22.0,
+        "calories": 240  // AUTO-CALCULATED
+      },
+      "nutrition": {     // AUTO-CALCULATED (100g Baseline)
+        "protein": 2.0,
+        "totalCarbs": 8.5,
+        "fiber": 6.7,
+        "sugarAlcohols": 0,
+        "netCarbs": 1.9,
+        "fat": 14.7,
+        "calories": 160
+      },
+      "tags": ["Keto", "High-Fat", "High-Fiber", "Vegan"]
       }
     ],
     "meta": {
