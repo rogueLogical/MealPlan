@@ -45,7 +45,7 @@ Authenticates a user and provisions a JWT session token.
 - Success Response (200): Returns a JWT token and user profile object.
 
 `POST /auth/forgot-password`
-
+standardUnit
 Generates a secure recovery token and dispatches an email with a reset link.
 
 - Auth Required: No
@@ -134,9 +134,9 @@ Retrieves a paginated list of ingredients. Supports text search and tag filterin
       {
         "_id": "60d5ecb8b392...",
         "name": "Almond Flour",
-        "standardAmount": 100,
-        "standardUnit": "g",
-        "nutrition": {
+        "servingSize": 100,
+        "servingUnit": "g",
+        "nutritionPerServing": {
           "calories": 590,
           "protein": 21,
           "totalCarbs": 21,
