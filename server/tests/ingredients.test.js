@@ -80,7 +80,16 @@ describe('Ingredient Management API Integration Contract Suites', () => {
     // Seed the database
     await Ingredient.create({
       name: 'salt',
-      nutrition: { calories: 0, protein: 0, totalCarbs: 0, fiber: 0, sugarAlcohols: 0, fat: 0 }
+      servingSize: 100,
+      servingUnit: 'g',
+      nutritionPerServing: {
+        calories: 0,
+        protein: 0,
+        totalCarbs: 0,
+        fiber: 0,
+        sugarAlcohols: 0,
+        fat: 0
+      }
     });
 
     const res = await request(app)
@@ -88,7 +97,16 @@ describe('Ingredient Management API Integration Contract Suites', () => {
       .set('Authorization', `Bearer ${creatorToken}`)
       .send({
         name: 'Salt', // Capitalized to test case-insensitivity
-        nutrition: { calories: 0, protein: 0, totalCarbs: 0, fiber: 0, sugarAlcohols: 0, fat: 0 }
+        servingSize: 100,
+        servingUnit: 'g',
+        nutritionPerServing: {
+          calories: 0,
+          protein: 0,
+          totalCarbs: 0,
+          fiber: 0,
+          sugarAlcohols: 0,
+          fat: 0
+        }
       });
 
     expect(res.statusCode).toEqual(400);

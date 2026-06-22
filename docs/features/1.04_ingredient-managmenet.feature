@@ -4,14 +4,14 @@ Feature: 1.4.1. Ingredient Search
 
   Scenario: Paginated text search (UAT-12)
     Given a logged in user navigates to the ingredient search page
-    When the user enters a query into the search bar
+    When the user enters a query into the search bar and submits
     Then the system returns a paginated list of ingredients matching the text
     And the user can navigate between pages of results
 
   Scenario: Tag-based filtering (UAT-13)
     Given a logged in user navigates to the ingredient search page
     When the user selects one or more dietary tags (e.g., "Keto", "Dairy-Free")
-    Then the system returns a paginated list of ingredients containing at least one of the selected tags
+    Then the system returns a paginated list of ingredients containing all the selected tags
 
 Feature: 1.4.2. Ingredient Creation
   The system shall provide users with a way to create 
@@ -20,10 +20,11 @@ Feature: 1.4.2. Ingredient Creation
 
   Scenario: Successful custom ingredient creation (UAT-14)
     Given a logged in user navigates to the create ingredient form
-    When the user enters the ingredient name, base 100g standard, and tags
+    When the user enters the ingredient name, nutrition facts data, and tags
     And the user inputs macros including total carbs, fiber, and sugar alcohols
     And the user clicks the Save Ingredient button
     Then the backend automatically calculates and stores the net carbs
+    And the backend automatically calculates the 100g standard nutritional values
     And the database links the ingredient to the user's account ID
     And a toast message appears confirming the ingredient was created
 
@@ -56,5 +57,6 @@ Feature: 1.4.3. Ingredient Storage & Modification
 
   Scenario: Prevent modification of global/other user ingredients (UAT-18)
     Given a logged in user is viewing an ingredient created by the system or another user
+    When the user attempts to modify the ingredient
     Then the interface hides or disables the Edit and Delete buttons
     And if the user attempts to send a direct PUT or DELETE API request, the system returns a 403 Forbidden error
