@@ -53,7 +53,7 @@ describe('Settings Management', () => {
           profilePicture: 'avatar.png',
           settings: { measurementSystem: 'metric' },
           nutritionSettings: {
-            dailyMacroTargets: { calories: 1500, protein: 100, carbs: 150, fat: 50 },
+            dailyMacroTargets: { calories: 1500, protein: 100, netCarbs: 150, fat: 50 },
           },
         },
       }),
@@ -108,7 +108,7 @@ describe('Settings Management', () => {
 
   it('should save user goals when they are set by the user (UT-9)', async () => {
     // Update nutritional macro structures inside settingsData property mapping
-    const customMacros = { calories: 0, protein: 150, carbs: 200, fat: 70 };
+    const customMacros = { calories: 0, protein: 150, netCarbs: 200, fat: 70 };
     component.settingsData.nutritionSettings.dailyMacroTargets = customMacros;
     fixture.detectChanges();
 
@@ -165,7 +165,7 @@ describe('Settings Management', () => {
     component.settingsData.nutritionSettings.dailyMacroTargets = {
       calories: 2000,
       protein: 150,
-      carbs: 200,
+      netCarbs: 200,
       fat: 70,
     };
     component.settingsData.nutritionSettings.dailyMealsCount = 3;
@@ -175,7 +175,7 @@ describe('Settings Management', () => {
     component.settingsData.nutritionSettings.mealMacroSplitPercentage = {
       calories: 80,
       protein: 80,
-      carbs: 80,
+      netCarbs: 80,
       fat: 80,
     };
 
@@ -214,7 +214,7 @@ describe('Settings Management', () => {
     component.settingsData.nutritionSettings.mealMacroSplitPercentage = {
       calories: 80,
       protein: 80,
-      carbs: 80,
+      netCarbs: 80,
       fat: 80,
     };
 
@@ -224,7 +224,7 @@ describe('Settings Management', () => {
     // Verify the count is accepted, but the sliders snap to 100%
     expect(component.settingsData.nutritionSettings.dailySnacksCount).toBe(0);
     expect(component.settingsData.nutritionSettings.mealMacroSplitPercentage.protein).toBe(100);
-    expect(component.settingsData.nutritionSettings.mealMacroSplitPercentage.carbs).toBe(100);
+    expect(component.settingsData.nutritionSettings.mealMacroSplitPercentage.netCarbs).toBe(100);
     expect(component.settingsData.nutritionSettings.mealMacroSplitPercentage.fat).toBe(100);
   });
 
@@ -247,7 +247,7 @@ describe('Settings Management', () => {
     component.settingsData.nutritionSettings.dailyMacroTargets = {
       calories: 0,
       protein: 0,
-      carbs: 0,
+      netCarbs: 0,
       fat: 0,
     };
 
@@ -310,7 +310,7 @@ describe('Settings Management', () => {
     component.settingsData.nutritionSettings.mealMacroSplitPercentage = {
       calories: 80,
       protein: 80,
-      carbs: 80,
+      netCarbs: 80,
       fat: 80,
     };
     component.settingsData.nutritionSettings.dailySnacksCount = 0;
@@ -368,7 +368,7 @@ describe('Settings Management', () => {
     component.settingsData.nutritionSettings.mealMacroSplitPercentage = {
       calories: 0,
       protein: 0,
-      carbs: 0,
+      netCarbs: 0,
       fat: 0,
     };
 

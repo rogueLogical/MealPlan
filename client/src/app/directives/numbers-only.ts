@@ -33,7 +33,7 @@ export class NumbersOnlyDirective {
     }
 
     // Block the key if it is not a digit (0-9)
-    const isDigit = /^[0-9]$/.test(event.key);
+    const isDigit = /^[0-9.]$/.test(event.key);
     if (!isDigit) {
       event.preventDefault();
     }

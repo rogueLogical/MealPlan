@@ -90,3 +90,30 @@ Configure your IDE workspace settings to enable formatting automatically wheneve
 "editor.formatOnSave": true,
 "editor.defaultFormatter": "esbenp.prettier-vscode"
 ```
+
+## The Ingredient Database Pipeline
+
+Our ingredient database is seeded using a custom, fault-tolerant, two-step pipeline that combines mathematical precision from the USDA with semantic intelligence from AI.
+
+This solution generates the ingredient seed file located at `/server/data/ingredient_foundation_seed.json`. Which is then used when the server first boots up to pre-load the ingredients database table with the ingredients contained within. (You can add more ingredients to that manually if you want them to also be included in the initial database)
+
+To completely rebuild the local database, run these scripts in order from within the /server directory:
+
+### 1. The Mathematical Parser (`npm run seed:parse`)
+
+This script (`server/scripts/parse_usda_csv.js`) streams the raw USDA Foundation Foods CSV files.
+
+- **Data Integrity:** It aggressively purges any food that lacks a reliable real-world serving size.
+- **Rule-Based Tagging:** It applies strictly calculated tags based on established nutritional science:
+  - **Keto / Low-Carb:** Calculated directly from Net Carbs (Total Carbs - Fiber - Sugar Alcohols).
+  - **High-Protein:** Uses a "Two-Key Lock" system (Must be $\ge$ 30% of total calories AND $\ge$ 10g of absolute protein per serving) to filter out low-density foods like broccoli.
+  - **High-Fat:** $\ge$ 60% of total calories AND $\ge$ 15g per serving.
+  - **High-Fiber:** $\ge$ 5g per serving (FDA standard).
+
+### 2. The Semantic AI Tagger (`npm run seed:tag`)
+
+This script (`server/scripts/tag_ingredients_ai.js`) reads the mathematically parsed output and uses the Gemini API to intelligently apply lifestyle and dietary tags (Vegan, Gluten-Free, Kosher, etc.).
+
+- Processes ingredients in throttled batches of 50 to respect API rate limits.
+- Forces strict JSON output and limits the AI to a predefined vocabulary matching the frontend application.
+- Merges the semantic tags with the mathematical tags without duplication.

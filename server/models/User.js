@@ -39,7 +39,7 @@ const UserSchema = new mongoose.Schema(
       dailyMacroTargets: {
         calories: { type: Number, default: 2000 },
         protein: { type: Number, default: 150 },
-        carbs: { type: Number, default: 200 },
+        netCarbs: { type: Number, default: 200 },
         fat: { type: Number, default: 70 }
       },
       likedFoods: [{ type: String }],
@@ -50,7 +50,7 @@ const UserSchema = new mongoose.Schema(
       mealMacroSplitPercentage: {
         calories: { type: Number, default: 80 },
         protein: { type: Number, default: 80 },
-        carbs: { type: Number, default: 80 },
+        netCarbs: { type: Number, default: 80 },
         fat: { type: Number, default: 80 }
       }
     },

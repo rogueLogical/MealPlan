@@ -1,0 +1,176 @@
+<div class="modal-container">
+  <button
+    class="modal-backdrop"
+    (click)="closeFormDialog()"
+    aria-label="Close ingredient form"
+  ></button>
+
+  <div class="modal-content">
+    <header class="modal-header">
+      <h2>{{ isEditMode ? 'Edit Ingredient' : 'Create New Ingredient' }}</h2>
+      <button class="close-btn" (click)="closeFormDialog()">✕</button>
+    </header>
+
+    @if (isLoading) {
+      <div class="loading-state">Loading...</div>
+    } @else {
+      <form (ngSubmit)="onSubmit()" #ingForm="ngForm" class="modal-body">
+        @if (isEditMode && !isOwner) {
+          <div class="read-only-banner">
+            You do not own this Ingredient. You cannot modify it's values.
+          </div>
+        }
+
+        <div class="form-group">
+          <label for="name">Ingredient Name</label>
+          <input
+            type="text"
+            name="name"
+            id="name"
+            [(ngModel)]="formData.name"
+            class="form-control-input"
+            required
+            [disabled]="isEditMode && !isOwner"
+          />
+        </div>
+
+        <div class="standard-banner">
+          <span class="info-icon">ℹ️</span>
+          <span>Enter the nutritional data exactly as it appears on the package label.</span>
+        </div>
+
+        <div class="macros-grid">
+          <div class="form-group highlight-box">
+            <label for="calories">Calories Per Serving (Calculated)</label>
+            <div id="calories" class="calculated-value">{{ uiCalories }} kcal</div>
+          </div>
+          <div class="form-group">
+            <label for="servingSize">Serving Size (g)</label>
+            <input
+              type="number"
+              step="0.1"
+              id="servingSize"
+              name="servingSize"
+              [(ngModel)]="formData.servingSize"
+              appNumbersOnly
+              class="form-control-input"
+              required
+              min="1"
+              [disabled]="isEditMode && !isOwner"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="proteinInput">Protein Per Serving (g)</label>
+            <input
+              type="number"
+              step="0.1"
+              id="proteinInput"
+              name="protein"
+              [(ngModel)]="formData.nutritionPerServing.protein"
+              appNumbersOnly
+              class="form-control-input"
+              [disabled]="isEditMode && !isOwner"
+            />
+          </div>
+          <div class="form-group">
+            <label for="fatInput">Fat Per Serving (g)</label>
+            <input
+              type="number"
+              step="0.1"
+              id="fatInput"
+              name="fat"
+              [(ngModel)]="formData.nutritionPerServing.fat"
+              appNumbersOnly
+              class="form-control-input"
+              [disabled]="isEditMode && !isOwner"
+            />
+          </div>
+        </div>
+
+        <fieldset class="carb-tracking-box">
+          <legend>Carbohydrate Breakdown</legend>
+          <div class="macros-grid">
+            <div class="form-group">
+              <label for="totalCarbsInput">Total Carbs Per Serving (g)</label>
+              <input
+                type="number"
+                step="0.1"
+                id="totalCarbsInput"
+                name="totalCarbs"
+                [(ngModel)]="formData.nutritionPerServing.totalCarbs"
+                appNumbersOnly
+                class="form-control-input"
+                [disabled]="isEditMode && !isOwner"
+              />
+            </div>
+            <div class="form-group">
+              <label for="fiberInput">Fiber Per Serving (g)</label>
+              <input
+                type="number"
+                step="0.1"
+                id="fiberInput"
+                name="fiber"
+                [(ngModel)]="formData.nutritionPerServing.fiber"
+                appNumbersOnly
+                class="form-control-input"
+                [disabled]="isEditMode && !isOwner"
+              />
+            </div>
+            <div class="form-group">
+              <label for="sugarAlcoholsInput">Sugar Alcohols Per Serving (g)</label>
+              <input
+                type="number"
+                step="0.1"
+                id="sugarAlcoholsInput"
+                name="sugarAlcohols"
+                [(ngModel)]="formData.nutritionPerServing.sugarAlcohols"
+                appNumbersOnly
+                class="form-control-input"
+                [disabled]="isEditMode && !isOwner"
+              />
+            </div>
+            <div class="form-group highlight-box">
+              <label for="netCarbs">Net Carbs (Calculated)</label>
+              <div id="netCarbs" class="calculated-value">{{ uiNetCarbs }}g</div>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="form-group tag-fieldset">
+          <legend>Dietary Tags</legend>
+          <div class="checkbox-grid">
+            @for (tag of availableTags; track tag; let i = $index) {
+              <label
+                class="checkbox-label"
+                [class.disabled]="isEditMode && !isOwner"
+                [for]="'tag-' + i"
+              >
+                <input
+                  type="checkbox"
+                  [id]="'tag-' + i"
+                  [checked]="hasTag(tag)"
+                  (change)="toggleTag(tag, $event)"
+                  [disabled]="isEditMode && !isOwner"
+                />
+                {{ tag }}
+              </label>
+            }
+          </div>
+        </fieldset>
+
+        <footer class="modal-footer">
+          <div class="action-group">
+            @if (isEditMode && isOwner) {
+              <button type="button" class="btn-danger" (click)="onDelete()">Delete</button>
+            }
+            <button type="button" class="btn-secondary" (click)="closeFormDialog()">Cancel</button>
+            @if (!isEditMode || isOwner) {
+              <button type="submit" class="btn-primary">Save Ingredient</button>
+            }
+          </div>
+        </footer>
+      </form>
+    }
+  </div>
+</div>

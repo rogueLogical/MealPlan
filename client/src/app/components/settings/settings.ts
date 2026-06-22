@@ -19,12 +19,13 @@ export class Settings implements OnInit {
     'Vegan',
     'Pescatarian',
     'Keto',
+    'Low-Carb',
     'Paleo',
     'Gluten-Free',
     'Dairy-Free',
-    'Nut Allergy',
-    'Shellfish Allergy',
-    'Soy Allergy',
+    'Nut-Free',
+    'Shellfish-Free',
+    'Soy-Free',
     'Kosher',
     'Halal',
   ];
@@ -38,13 +39,13 @@ export class Settings implements OnInit {
     email: '',
     measurementSystem: 'imperial',
     nutritionSettings: {
-      dailyMacroTargets: { calories: 2000, protein: 150, carbs: 200, fat: 70 },
+      dailyMacroTargets: { calories: 2000, protein: 150, netCarbs: 200, fat: 70 },
       dietaryRestrictions: [],
       likedFoods: [],
       dislikedFoods: [],
       dailyMealsCount: 3,
       dailySnacksCount: 2,
-      mealMacroSplitPercentage: { calories: 80, protein: 80, carbs: 80, fat: 80 },
+      mealMacroSplitPercentage: { calories: 80, protein: 80, netCarbs: 80, fat: 80 },
     },
     profilePicture: '',
   };
@@ -75,7 +76,7 @@ export class Settings implements OnInit {
               dailyMealsCount: response.user.nutritionSettings?.dailyMealsCount ?? 3,
               dailySnacksCount: response.user.nutritionSettings?.dailySnacksCount ?? 2,
               mealMacroSplitPercentage: response.user.nutritionSettings
-                ?.mealMacroSplitPercentage || { calories: 80, protein: 80, carbs: 80, fat: 80 },
+                ?.mealMacroSplitPercentage || { calories: 80, protein: 80, netCarbs: 80, fat: 80 },
             },
           };
           this.likedFoodsInput = this.settingsData.nutritionSettings.likedFoods?.join(', ') || '';
@@ -98,8 +99,8 @@ export class Settings implements OnInit {
     return (this.settingsData.nutritionSettings.dailyMacroTargets.protein || 0) * 4;
   }
 
-  get carbsCalories(): number {
-    return (this.settingsData.nutritionSettings.dailyMacroTargets.carbs || 0) * 4;
+  get netCarbsCalories(): number {
+    return (this.settingsData.nutritionSettings.dailyMacroTargets.netCarbs || 0) * 4;
   }
 
   get fatCalories(): number {
@@ -107,7 +108,7 @@ export class Settings implements OnInit {
   }
 
   get totalCalculatedCalories(): number {
-    const total = this.proteinCalories + this.carbsCalories + this.fatCalories;
+    const total = this.proteinCalories + this.netCarbsCalories + this.fatCalories;
     this.settingsData.nutritionSettings.dailyMacroTargets.calories = total;
     return total;
   }
@@ -126,10 +127,11 @@ export class Settings implements OnInit {
   }
 
   get targetMealCarbs(): number {
-    const split = this.settingsData.nutritionSettings.mealMacroSplitPercentage?.carbs || 80;
+    const split = this.settingsData.nutritionSettings.mealMacroSplitPercentage?.netCarbs || 80;
     const count = this.settingsData.nutritionSettings.dailyMealsCount || 1;
     return Math.round(
-      ((this.settingsData.nutritionSettings.dailyMacroTargets.carbs || 0) * (split / 100)) / count,
+      ((this.settingsData.nutritionSettings.dailyMacroTargets.netCarbs || 0) * (split / 100)) /
+        count,
     );
   }
 
@@ -158,11 +160,12 @@ export class Settings implements OnInit {
   }
 
   get targetSnackCarbs(): number {
-    const split = this.settingsData.nutritionSettings.mealMacroSplitPercentage?.carbs || 80;
+    const split = this.settingsData.nutritionSettings.mealMacroSplitPercentage?.netCarbs || 80;
     const count = this.settingsData.nutritionSettings.dailySnacksCount || 1;
     if (count === 0) return 0;
     return Math.round(
-      ((this.settingsData.nutritionSettings.dailyMacroTargets.carbs || 0) * ((100 - split) / 100)) /
+      ((this.settingsData.nutritionSettings.dailyMacroTargets.netCarbs || 0) *
+        ((100 - split) / 100)) /
         count,
     );
   }
@@ -226,7 +229,7 @@ export class Settings implements OnInit {
       this.settingsData.nutritionSettings.mealMacroSplitPercentage = {
         calories: 100, // Kept in sync for backend payload consistency
         protein: 100,
-        carbs: 100,
+        netCarbs: 100,
         fat: 100,
       };
     }
