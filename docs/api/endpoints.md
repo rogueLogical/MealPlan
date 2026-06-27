@@ -194,3 +194,58 @@ Updates an existing ingredient. Users can only update ingredients they created.
 Permanently deletes an ingredient. Users can only delete ingredients they created.
 
 - Success Response (200): Returns a deletion confirmation message.
+
+## Recipes (`/recipes`)
+
+All `/recipes` endpoints require a valid Bearer JWT in the `Authorization` header.
+
+`POST /recipes`
+
+Creates a new recipe. The `ingredients` array requires `weightInGrams` for backend macro calculations, while `displayAmount` and `displayUnit` are optional strings for frontend rendering.
+
+- Body:
+  ```JSON
+  {
+    "title": "Keto Avocado Toast",
+    "description": "A low-carb morning staple.",
+    "instructions": "Toast the bread. Mash the avocado. Combine.",
+    "prepTimeMinutes": 5,
+    "portions": 1,
+    "tags": ["Keto", "Vegetarian", "High-Fat"],
+    "ingredients": [
+      {
+        "ingredientId": "60d5ecb8b392d7...",
+        "name": "Avocado, raw",
+        "weightInGrams": 100,
+        "displayAmount": 0.5,
+        "displayUnit": "Medium",
+        "nutrition": {
+          "calories": 160,
+          "protein": 2.0,
+          "totalCarbs": 8.5,
+          "fiber": 6.7,
+          "sugarAlcohols": 0,
+          "netCarbs": 1.8,
+          "fat": 14.7
+        }
+      },
+      {
+        "ingredientId": "60d5ecb8b392d8...",
+        "name": "Keto Bread",
+        "weightInGrams": 50,
+        "displayAmount": 2,
+        "displayUnit": "Slices",
+        "nutrition": {
+          "calories": 120,
+          "protein": 10.0,
+          "totalCarbs": 14.0,
+          "fiber": 12.0,
+          "sugarAlcohols": 0,
+          "netCarbs": 2.0,
+          "fat": 6.0
+        }
+      }
+    ]
+  }
+  ```
+- Success Response (201): Returns the created recipe with the totalNutrition automatically calculated by the backend.

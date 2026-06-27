@@ -44,10 +44,12 @@ app.get('/api/health', (req, res) => {
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const ingredientRoutes = require('./routes/ingredients');
+const recipeRoutes = require('./routes/recipes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/ingredients', ingredientRoutes);
+app.use('/api/recipes', recipeRoutes);
 
 // Export the app for supertest
 module.exports = app;

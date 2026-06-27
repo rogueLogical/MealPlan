@@ -114,7 +114,7 @@ router.get('/me', checkAuth, async (req, res) => {
 
     res.status(200).json({ user });
   } catch (err) {
-    console.error('Settings API Error:', err);
+    console.error('Fetch User Profile API Error:', err);
     res.status(500).json({ message: 'Internal server error.' });
   }
 });
