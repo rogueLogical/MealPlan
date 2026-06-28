@@ -61,7 +61,13 @@ const UserSchema = new mongoose.Schema(
     resetPasswordExpires: {
       type: Date,
       default: undefined
-    }
+    },
+    favoriteRecipes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Recipe'
+      }
+    ]
   },
   {
     timestamps: true

@@ -119,4 +119,38 @@ router.get('/me', checkAuth, async (req, res) => {
   }
 });
 
+// POST /api/users/favorites/:recipeId
+router.post('/favorites/:recipeId', checkAuth, async (req, res) => {
+  try {
+    const userId = req.userData.userId;
+    const { recipeId } = req.params;
+
+    const user = await User.findById(userId);
+
+    // Check if the recipe is already in the array
+    const index = user.favoriteRecipes.indexOf(recipeId);
+    let isFavorite = false;
+
+    if (index === -1) {
+      // Not favorited yet, so add it
+      user.favoriteRecipes.push(recipeId);
+      isFavorite = true;
+    } else {
+      // Already favorited, so remove it
+      user.favoriteRecipes.splice(index, 1);
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      isFavorite,
+      favoriteRecipes: user.favoriteRecipes,
+      message: 'Favorite status updated'
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 module.exports = router;

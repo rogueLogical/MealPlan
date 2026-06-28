@@ -1,0 +1,72 @@
+<div class="modal-container">
+  <button class="modal-backdrop" (click)="onClose()" aria-label="Close search window"></button>
+
+  <div class="modal-content search-modal">
+    <div class="modal-header">
+      <h2>Search Community Recipes</h2>
+      <button class="close-btn" (click)="onClose()" title="Close">✕</button>
+    </div>
+
+    <div class="search-container">
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Search for recipes or ingredients..."
+        (input)="onSearchChange($event)"
+      />
+    </div>
+
+    <div class="results-container">
+      <div class="filter-tags" aria-label="Dietary Filters">
+        @for (tag of availableTags; track tag) {
+          <button
+            type="button"
+            class="tag-chip"
+            [class.active]="selectedTags.includes(tag)"
+            (click)="toggleFilterTag(tag)"
+            [attr.aria-pressed]="selectedTags.includes(tag)"
+          >
+            {{ tag }}
+          </button>
+        }
+      </div>
+
+      @if (isLoading) {
+        <div class="loading-spinner">Searching...</div>
+      } @else if (hasSearched && searchResults.length === 0) {
+        <div class="empty-state">No public recipes found matching your search and filters.</div>
+      } @else {
+        <div class="recipes-grid">
+          @for (result of searchResults; track result._id) {
+            <app-recipe-card
+              [recipe]="result"
+              [isFavorite]="favoriteRecipeIds.includes(result._id)"
+              (view)="view.emit($event)"
+              (toggleFavorite)="toggleFavorite.emit($event)"
+              (copyRecipe)="copyRecipe.emit($event)"
+            >
+            </app-recipe-card>
+          }
+        </div>
+      }
+    </div>
+
+    <footer class="pagination-footer">
+      <button
+        class="btn-secondary"
+        [disabled]="currentPage === 1"
+        (click)="executeSearch(currentPage - 1)"
+      >
+        Previous
+      </button>
+      <span class="page-indicator">Page {{ currentPage }} of {{ totalPages || 1 }}</span>
+      <button
+        class="btn-secondary"
+        [disabled]="currentPage >= totalPages"
+        (click)="executeSearch(currentPage + 1)"
+      >
+        Next
+      </button>
+    </footer>
+  </div>
+</div>

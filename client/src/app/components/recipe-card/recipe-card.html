@@ -1,0 +1,87 @@
+<article class="recipe-card" role="button" (click)="onViewClicked()" tabindex="0">
+  <header class="card-header">
+    <div class="title-group">
+      <h3 class="recipe-title">{{ recipe.title }}</h3>
+      <span class="type-badge" [ngClass]="recipe.recipeType.toLowerCase()">
+        {{ recipe.recipeType }}
+      </span>
+    </div>
+
+    <div class="action-menu">
+      <button
+        class="icon-btn favorite"
+        [class.active]="isFavorite"
+        (click)="onFavoriteClicked($event)"
+        title="Favorite Recipe"
+      >
+        {{ isFavorite ? '★' : '☆' }}
+      </button>
+      <button class="icon-btn copy" (click)="onCopyClicked($event)" title="Copy to My Recipes">
+        📋
+      </button>
+
+      @if (isOwner) {
+        <button
+          type="button"
+          class="icon-btn edit"
+          (click)="onEditClicked($event)"
+          title="Edit Recipe"
+        >
+          ✏️
+        </button>
+        <button
+          type="button"
+          class="icon-btn delete"
+          (click)="onDeleteClicked($event)"
+          title="Delete Recipe"
+        >
+          🗑️
+        </button>
+      }
+    </div>
+  </header>
+
+  <div class="meta-row">
+    <span class="meta-item"
+      >⏱️ {{ totalTimeMinutes > 0 ? totalTimeMinutes + ' min' : 'No time set' }}</span
+    >
+    <span class="meta-item"
+      >🍽️ {{ recipe.portions }} Portion{{ recipe.portions !== 1 ? 's' : '' }}</span
+    >
+    <span class="meta-item">{{ recipe.isPublic ? '🌍 Public' : '🔒 Private' }}</span>
+  </div>
+
+  @if (recipe.description) {
+    <p class="description">{{ recipe.description }}</p>
+  }
+
+  <div class="macros-container">
+    <div class="macro-header">Macros (Per Portion)</div>
+    <div class="macros-grid">
+      <div class="macro-stat">
+        <span class="value">{{ displayMacros.calories }}</span>
+        <span class="label">Cal</span>
+      </div>
+      <div class="macro-stat">
+        <span class="value">{{ displayMacros.protein }}g</span>
+        <span class="label">Pro</span>
+      </div>
+      <div class="macro-stat highlight">
+        <span class="value">{{ displayMacros.netCarbs }}g</span>
+        <span class="label">Net</span>
+      </div>
+      <div class="macro-stat">
+        <span class="value">{{ displayMacros.fat }}g</span>
+        <span class="label">Fat</span>
+      </div>
+    </div>
+  </div>
+
+  @if (recipe.tags && recipe.tags.length > 0) {
+    <div class="tags-container">
+      @for (tag of recipe.tags; track tag) {
+        <span class="tag-chip">{{ tag }}</span>
+      }
+    </div>
+  }
+</article>

@@ -9,7 +9,8 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IngredientService, Ingredient } from '../../services/ingredient';
+import { Ingredient, IngredientPayload } from '../../models/ingredient.model';
+import { IngredientService } from '../../services/ingredient';
 import { AuthService } from '../../services/auth';
 import { ToastService } from '../../services/toast';
 import { NumbersOnlyDirective } from '../../directives/numbers-only';
@@ -50,11 +51,19 @@ export class IngredientForm implements OnInit {
     'Soy-Free',
   ];
 
-  formData: Ingredient = {
+  formData: IngredientPayload = {
     name: '',
     servingSize: 100,
     servingUnit: 'g',
-    nutritionPerServing: { protein: 0, totalCarbs: 0, fiber: 0, sugarAlcohols: 0, fat: 0 },
+    nutritionPerServing: {
+      calories: 0,
+      protein: 0,
+      totalCarbs: 0,
+      fiber: 0,
+      sugarAlcohols: 0,
+      fat: 0,
+      netCarbs: 0,
+    },
     tags: [],
   };
 
@@ -136,7 +145,7 @@ export class IngredientForm implements OnInit {
       return;
     }
 
-    const payload = { ...this.formData };
+    const payload: IngredientPayload = { ...this.formData };
 
     if (this.isEditMode && this.ingredientId) {
       this.ingredientService.updateIngredient(this.ingredientId, payload).subscribe({

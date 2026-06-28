@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Recipe = require('../models/Recipe');
+const User = require('../models/User');
 const checkAuth = require('../middleware/auth');
 
 // GET /api/recipes - Search public recipes (ignoring deleted ones)
@@ -60,6 +61,23 @@ router.get('/me', checkAuth, async (req, res) => {
   }
 });
 
+// GET /api/recipes/favorites - Get populated favorite recipes
+router.get('/favorites', checkAuth, async (req, res) => {
+  try {
+    const user = await User.findById(req.userData.userId);
+    if (!user) return res.status(404).json({ message: 'User not found.' });
+
+    const favoriteRecipes = await Recipe.find({
+      _id: { $in: user.favoriteRecipes }
+    }).sort({ createdAt: -1 });
+
+    res.status(200).json({ data: favoriteRecipes });
+  } catch (err) {
+    console.error('Fetch Favorite Recipes API Error:', err);
+    res.status(500).json({ message: 'Failed to fetch favorite recipes.' });
+  }
+});
+
 // POST /api/recipes - Create a new recipe
 router.post('/', checkAuth, async (req, res) => {
   try {
@@ -88,10 +106,13 @@ router.post('/', checkAuth, async (req, res) => {
 // GET /api/recipes/:id - Fetch single recipe
 router.get('/:id', checkAuth, async (req, res) => {
   try {
+    const user = await User.findById(req.userData.userId);
     const recipe = await Recipe.findById(req.params.id);
 
     if (!recipe) return res.status(404).json({ message: 'Recipe not found.' });
-    if (recipe.isDeleted && recipe.createdBy.toString() !== req.userData.userId) {
+
+    const isFavorited = user.favoriteRecipes.includes(recipe._id.toString());
+    if (recipe.isDeleted && recipe.createdBy.toString() !== req.userData.userId && !isFavorited) {
       return res.status(404).json({ message: 'Recipe not found or has been deleted.' });
     }
 
@@ -153,13 +174,24 @@ router.delete('/:id', checkAuth, async (req, res) => {
 // POST /api/recipes/:id/fork - Copy an existing recipe
 router.post('/:id/fork', checkAuth, async (req, res) => {
   try {
+    const user = await User.findById(req.userData.userId);
     const originalRecipe = await Recipe.findById(req.params.id);
 
-    if (!originalRecipe || originalRecipe.isDeleted) {
+    if (!originalRecipe) {
       return res.status(404).json({ message: 'Recipe not found.' });
     }
 
-    if (!originalRecipe.isPublic && originalRecipe.createdBy.toString() !== req.userData.userId) {
+    // Block the fork if it's deleted AND the user DOES NOT have it in their favorites
+    const isFavorited = user.favoriteRecipes.includes(originalRecipe._id.toString());
+    if (originalRecipe.isDeleted && !isFavorited) {
+      return res.status(404).json({ message: 'This recipe has been deleted.' });
+    }
+
+    if (
+      !originalRecipe.isPublic &&
+      originalRecipe.createdBy.toString() !== req.userData.userId &&
+      !isFavorited
+    ) {
       return res.status(403).json({ message: 'This recipe is private.' });
     }
 
@@ -170,6 +202,7 @@ router.post('/:id/fork', checkAuth, async (req, res) => {
 
     forkedData.createdBy = req.userData.userId;
     forkedData.isPublic = false;
+    forkedData.isDeleted = false;
     forkedData.originalRecipeId = originalRecipe._id;
     forkedData.title = `${forkedData.title} (Copy)`;
 
