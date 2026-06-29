@@ -248,6 +248,7 @@ export class RecipesLibrary implements OnInit, OnDestroy {
           this.toastService.showSuccess('Recipe Saved!');
           this.closeBuilder();
           this.fetchMyRecipes();
+          this.fetchFavoriteRecipes();
           this.cdr.detectChanges();
         },
         error: (err) => {
@@ -284,7 +285,9 @@ export class RecipesLibrary implements OnInit, OnDestroy {
       next: () => {
         this.toastService.showSuccess(`Deleted "${this.recipeToDelete?.title}".`);
         this.recipeToDelete = undefined;
-        this.fetchMyRecipes(); // Refresh the grid
+        // Refresh the grid
+        this.fetchMyRecipes();
+        this.fetchFavoriteRecipes();
         this.cdr.detectChanges();
       },
       error: (err) => {

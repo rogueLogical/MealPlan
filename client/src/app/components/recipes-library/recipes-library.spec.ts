@@ -6,7 +6,7 @@ import { UserService } from '../../services/user';
 import { AuthService } from '../../services/auth';
 import { ToastService } from '../../services/toast';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { Recipe } from '../../models/recipe.model';
+import { Recipe, RecipePayload } from '../../models/recipe.model';
 
 describe('RecipesLibraryComponent', () => {
   interface MockUser {
@@ -23,6 +23,8 @@ describe('RecipesLibraryComponent', () => {
     deleteRecipe: ReturnType<typeof vi.fn>;
     getMyRecipes: ReturnType<typeof vi.fn>;
     getFavoriteRecipes: ReturnType<typeof vi.fn>;
+    updateRecipe: ReturnType<typeof vi.fn>;
+    createRecipe: ReturnType<typeof vi.fn>;
   };
   let mockToastService: {
     showSuccess: ReturnType<typeof vi.fn>;
@@ -46,9 +48,11 @@ describe('RecipesLibraryComponent', () => {
 
     mockRecipeService = {
       forkRecipe: vi.fn(),
-      deleteRecipe: vi.fn(),
+      deleteRecipe: vi.fn().mockReturnValue(of({ message: 'Recipe deleted.' })),
       getMyRecipes: vi.fn().mockReturnValue(of({ data: [] })),
       getFavoriteRecipes: vi.fn().mockReturnValue(of({ data: [] })),
+      updateRecipe: vi.fn().mockReturnValue(of({ message: 'Recipe Saved!' })),
+      createRecipe: vi.fn().mockReturnValue(of({ message: 'Recipe created successfully!' })),
     };
 
     mockToastService = {
@@ -75,6 +79,8 @@ describe('RecipesLibraryComponent', () => {
     vi.clearAllMocks();
   });
 
+  // --- Base Component Initialization & Utility Tests ---
+
   it('should initialize data and fetch macro targets on load', () => {
     fixture.detectChanges();
 
@@ -83,7 +89,6 @@ describe('RecipesLibraryComponent', () => {
   });
 
   it('should safely halt all execution if user logs out (null emission)', () => {
-    // Log out before the component initializes
     currentUserSubject.next(null);
     fixture.detectChanges();
     expect(mockUserService.getUserProfile).not.toHaveBeenCalled();
@@ -104,5 +109,79 @@ describe('RecipesLibraryComponent', () => {
     expect(mockToastService.showSuccess).toHaveBeenCalledWith(
       expect.stringMatching(/Successfully copied/),
     );
+  });
+
+  // --- Grid Synchronization & State Mutation Tests ---
+
+  describe('Grid Synchronization on Recipe Modifications', () => {
+    it('should sync both My Recipes and My Favorites grids when saving an edited recipe', () => {
+      // Trigger ngOnInit to execute initial data fetches
+      fixture.detectChanges();
+
+      // Reset spy call counts so we only track what happens inside the save method
+      mockRecipeService.getMyRecipes.mockClear();
+      mockRecipeService.getFavoriteRecipes.mockClear();
+
+      // Setup Edit Mode
+      component.editingRecipeId = 'existing-recipe-id';
+      const mockPayload = { title: 'Updated Recipe' } as RecipePayload;
+
+      // Execute save action
+      component.onSaveRecipeTest(mockPayload);
+
+      expect(mockRecipeService.updateRecipe).toHaveBeenCalledWith(
+        'existing-recipe-id',
+        mockPayload,
+      );
+      expect(mockToastService.showSuccess).toHaveBeenCalledWith('Recipe Saved!');
+
+      // Critical Assertion: Verify BOTH grids request fresh data
+      expect(mockRecipeService.getMyRecipes).toHaveBeenCalledTimes(1);
+      expect(mockRecipeService.getFavoriteRecipes).toHaveBeenCalledTimes(1);
+    });
+
+    it('should only sync My Recipes (and skip My Favorites) when creating a brand new recipe', () => {
+      fixture.detectChanges();
+
+      mockRecipeService.getMyRecipes.mockClear();
+      mockRecipeService.getFavoriteRecipes.mockClear();
+
+      // Setup Create Mode
+      component.editingRecipeId = null;
+      const mockPayload = { title: 'Brand New Recipe' } as RecipePayload;
+
+      // Execute save action
+      component.onSaveRecipeTest(mockPayload);
+
+      expect(mockRecipeService.createRecipe).toHaveBeenCalledWith(mockPayload);
+      expect(mockToastService.showSuccess).toHaveBeenCalledWith('Recipe created successfully!');
+
+      // Critical Assertion: Verify the optimization
+      // It MUST fetch My Recipes, but MUST NOT waste a call fetching Favorites
+      expect(mockRecipeService.getMyRecipes).toHaveBeenCalledTimes(1);
+      expect(mockRecipeService.getFavoriteRecipes).not.toHaveBeenCalled();
+    });
+
+    it('should sync both My Recipes and My Favorites grids when deleting a recipe', () => {
+      fixture.detectChanges();
+
+      mockRecipeService.getMyRecipes.mockClear();
+      mockRecipeService.getFavoriteRecipes.mockClear();
+
+      const mockRecipe = { _id: 'recipe-to-delete-123', title: 'Test Recipe' } as unknown as Recipe;
+
+      // Trigger the modal to open
+      component.onDeleteRecipe(mockRecipe);
+
+      // Execute the actual deletion confirmation
+      component.confirmDelete();
+
+      // Assert the API was called with the ID extracted from the staged recipe
+      expect(mockRecipeService.deleteRecipe).toHaveBeenCalledWith('recipe-to-delete-123');
+
+      // Verify BOTH grids request fresh data to get the updated isDeleted flag
+      expect(mockRecipeService.getMyRecipes).toHaveBeenCalledTimes(1);
+      expect(mockRecipeService.getFavoriteRecipes).toHaveBeenCalledTimes(1);
+    });
   });
 });

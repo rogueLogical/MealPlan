@@ -20,7 +20,7 @@
         📋
       </button>
 
-      @if (isOwner) {
+      @if (isOwner && !recipe.isDeleted) {
         <button
           type="button"
           class="icon-btn edit"
