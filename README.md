@@ -26,7 +26,7 @@ docker-compose -f docker-compose.dev.yml up --build
 
 #### Stop the containers only
 
-press `Ctrl +C` in the terminal where the logs are printing (if running in the foreground) to stop the containers.
+Press `Ctrl + C` in the terminal where the logs are printing (if running in the foreground) to stop the containers.
 
 #### Stop and clear data
 
@@ -91,13 +91,36 @@ Configure your IDE workspace settings to enable formatting automatically wheneve
 "editor.defaultFormatter": "esbenp.prettier-vscode"
 ```
 
+## Testing
+
+This project maintains test coverage to ensure application stability, utilizing modern testing frameworks tailored to both the frontend and backend architectures.
+
+### Backend (Node.js/Express)
+
+The backend API utilizes **Jest** and **Supertest** for isolated database unit testing and route integration testing.
+
+- Run backend tests: `npx --prefix server npm run test`
+
+### Frontend (Angular)
+
+The client utilizes **Vitest** for blazing-fast, Vite-native component testing, isolating UI logic from injected services via strict mock boundaries.
+
+- Run frontend tests: `npx --prefix client npm run test`
+
+## Documentation & Architecture
+
+Comprehensive documentation regarding the system architecture and API contracts is maintained within the repository.
+
+- **API Documentation:** View the complete endpoint specifications, payload requirements, and authorization rules in `/docs/api/endpoints.md`.
+- **Architecture Decision Records (ADRs):** Major architectural choices—such as our Soft-Delete data retention model, Centralized Reactive Auth State, and the Multi-Phase Macro Balancing Algorithm—are documented in the `/docs/adr/` directory. Review these records to understand the context and reasoning behind the codebase structure.
+
 ## The Ingredient Database Pipeline
 
 Our ingredient database is seeded using a custom, fault-tolerant, two-step pipeline that combines mathematical precision from the USDA with semantic intelligence from AI.
 
 This solution generates the ingredient seed file located at `/server/data/ingredient_foundation_seed.json`. Which is then used when the server first boots up to pre-load the ingredients database table with the ingredients contained within. (You can add more ingredients to that manually if you want them to also be included in the initial database)
 
-To completely rebuild the local database, run these scripts in order from within the /server directory:
+To completely rebuild the local database, run these scripts in order from within the `/server` directory:
 
 ### 1. The Mathematical Parser (`npm run seed:parse`)
 
@@ -106,9 +129,9 @@ This script (`server/scripts/parse_usda_csv.js`) streams the raw USDA Foundation
 - **Data Integrity:** It aggressively purges any food that lacks a reliable real-world serving size.
 - **Rule-Based Tagging:** It applies strictly calculated tags based on established nutritional science:
   - **Keto / Low-Carb:** Calculated directly from Net Carbs (Total Carbs - Fiber - Sugar Alcohols).
-  - **High-Protein:** Uses a "Two-Key Lock" system (Must be $\ge$ 30% of total calories AND $\ge$ 10g of absolute protein per serving) to filter out low-density foods like broccoli.
-  - **High-Fat:** $\ge$ 60% of total calories AND $\ge$ 15g per serving.
-  - **High-Fiber:** $\ge$ 5g per serving (FDA standard).
+  - **High-Protein:** Uses a "Two-Key Lock" system (Must be ≥ 30% of total calories AND ≥ 10g of absolute protein per serving) to filter out low-density foods like broccoli.
+  - **High-Fat:** ≥ 60% of total calories AND ≥ 15g per serving.
+  - **High-Fiber:** ≥ 5g per serving (FDA standard).
 
 ### 2. The Semantic AI Tagger (`npm run seed:tag`)
 
