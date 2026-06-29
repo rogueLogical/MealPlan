@@ -18,7 +18,7 @@
         >
           {{ isFavorite ? '★ Favorited' : '☆ Favorite' }}
         </button>
-        @if (isOwner) {
+        @if (isOwner && !recipe.isDeleted) {
           <button class="icon-btn edit-btn" (click)="onEdit()" title="Edit Recipe">✏️ Edit</button>
         }
         <button class="icon-btn copy-btn" (click)="onCopyClicked()" title="Copy to My Recipes">
