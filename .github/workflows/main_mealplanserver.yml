@@ -40,7 +40,8 @@ jobs:
         uses: artiomtr/jest-coverage-report-action@v2
         with:
           working-directory: server
-          run: npm run test
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          test-script: npm run test
 
       - name: Upload Server Coverage Report
         if: github.event_name == 'pull_request'
