@@ -67,6 +67,8 @@ describe('IngredientForm', () => {
       totalCarbs: 20,
       fiber: 5,
       sugarAlcohols: 5,
+      calories: 165,
+      netCarbs: 15,
     };
     expect(component.uiNetCarbs).toBe(10);
 
@@ -77,6 +79,8 @@ describe('IngredientForm', () => {
       totalCarbs: 10,
       fiber: 15,
       sugarAlcohols: 0,
+      calories: 165,
+      netCarbs: 15,
     };
     expect(component.uiNetCarbs).toBe(0);
   });
@@ -88,6 +92,8 @@ describe('IngredientForm', () => {
       totalCarbs: 5,
       fiber: 0,
       sugarAlcohols: 0,
+      calories: 165,
+      netCarbs: 15,
     };
     // Protein(2.5 * 4 = 10) + Fat(1.1 * 9 = 9.9) + NetCarbs(5 * 4 = 20) = 39.9
     expect(component.uiCalories).toBe(39.9);

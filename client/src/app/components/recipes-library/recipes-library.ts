@@ -48,30 +48,21 @@ export class RecipesLibrary implements OnInit, OnDestroy {
   recipeToDelete?: Recipe;
 
   ngOnInit(): void {
-    this.fetchUserTargets();
-    this.fetchMyRecipes();
-    this.fetchFavoriteRecipes();
-
-    // Listen to the global auth stream for the user's favorite IDs
+    // Listen to the global auth stream safely
     this.authSub = this.authService.currentUser$.subscribe((user) => {
-      // If the user is null (meaning they just logged out), stop immediately
+      // If logged out, stop completely! No data fetching allowed.
       if (!user) {
         return;
       }
 
+      // Fetch all required component data
+      this.fetchMyRecipes();
+      this.fetchFavoriteRecipes();
+      this.fetchUserTargets();
+
+      // Set favorite IDs for the UI
       if (user.favoriteRecipes) {
         this.favoriteRecipeIds = user.favoriteRecipes;
-      } else {
-        // Fallback: Only fetch if we have a logged-in user, but their array is missing
-        this.userService.getUserProfile().subscribe({
-          next: (res) => {
-            this.favoriteRecipeIds = res.user.favoriteRecipes || [];
-          },
-          error: (err) => {
-            // Fail silently on error so we don't trigger unnecessary toasts
-            console.error('Could not fetch user profile for favorites fallback.', err);
-          },
-        });
       }
     });
   }

@@ -120,7 +120,23 @@ describe('Recipe Management API Integration Contract Suites', () => {
     const recipe = await Recipe.create({
       title: 'Creator Secret Recipe',
       createdBy: creatorId,
-      portions: 1
+      portions: 1,
+      ingredients: [
+        {
+          ingredientId: mockIngredientId,
+          name: 'Test Flour',
+          weightInGrams: 100,
+          nutrition: {
+            calories: 100,
+            protein: 10,
+            totalCarbs: 70,
+            fiber: 5,
+            sugarAlcohols: 0,
+            netCarbs: 65,
+            fat: 2
+          }
+        }
+      ]
     });
 
     const res = await request(app)
@@ -137,7 +153,23 @@ describe('Recipe Management API Integration Contract Suites', () => {
       title: 'Recipe to Delete',
       createdBy: creatorId,
       isPublic: true,
-      portions: 1
+      portions: 1,
+      ingredients: [
+        {
+          ingredientId: mockIngredientId,
+          name: 'Test Flour',
+          weightInGrams: 100,
+          nutrition: {
+            calories: 100,
+            protein: 10,
+            totalCarbs: 70,
+            fiber: 5,
+            sugarAlcohols: 0,
+            netCarbs: 65,
+            fat: 2
+          }
+        }
+      ]
     });
 
     // Creator deletes it
@@ -166,14 +198,46 @@ describe('Recipe Management API Integration Contract Suites', () => {
       title: 'Public Masterpiece',
       createdBy: creatorId,
       isPublic: true,
-      portions: 4
+      portions: 4,
+      ingredients: [
+        {
+          ingredientId: mockIngredientId,
+          name: 'Test Flour',
+          weightInGrams: 100,
+          nutrition: {
+            calories: 100,
+            protein: 10,
+            totalCarbs: 70,
+            fiber: 5,
+            sugarAlcohols: 0,
+            netCarbs: 65,
+            fat: 2
+          }
+        }
+      ]
     });
 
     const privateRecipe = await Recipe.create({
       title: 'Private Family Secret',
       createdBy: creatorId,
       isPublic: false,
-      portions: 4
+      portions: 4,
+      ingredients: [
+        {
+          ingredientId: mockIngredientId,
+          name: 'Test Flour',
+          weightInGrams: 100,
+          nutrition: {
+            calories: 100,
+            protein: 10,
+            totalCarbs: 70,
+            fiber: 5,
+            sugarAlcohols: 0,
+            netCarbs: 65,
+            fat: 2
+          }
+        }
+      ]
     });
 
     // Stranger successfully forks the public recipe
@@ -194,5 +258,80 @@ describe('Recipe Management API Integration Contract Suites', () => {
 
     expect(failedForkRes.statusCode).toEqual(403);
     expect(failedForkRes.body.message).toContain('private');
+  });
+  describe('GET /api/recipes/favorites', () => {
+    it('should return a users favorited recipes, INCLUDING soft-deleted ones', async () => {
+      const mockUser = { _id: 'mockUserId123', favoriteRecipes: ['active1', 'deleted2'] };
+
+      const mockRecipes = [
+        { _id: 'active1', title: 'Active Recipe', isDeleted: false },
+        { _id: 'deleted2', title: 'Deleted Recipe', isDeleted: true }
+      ];
+
+      User.findById = jest.fn().mockResolvedValue(mockUser);
+      // Ensure the mock doesn't filter out isDeleted: true
+      Recipe.find = jest.fn().mockReturnValue({
+        sort: jest.fn().mockResolvedValue(mockRecipes)
+      });
+
+      const response = await request(app)
+        .get('/api/recipes/favorites')
+        .set('Authorization', `Bearer ${creatorToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.data.length).toBe(2);
+      expect(Recipe.find).toHaveBeenCalledWith({
+        _id: { $in: mockUser.favoriteRecipes }
+        // Verify isDeleted: false is NOT in the query constraints
+      });
+    });
+  });
+
+  describe('POST /api/recipes/:id/fork', () => {
+    it('should prevent forking a deleted recipe if the user does NOT have it favorited', async () => {
+      const mockUser = { _id: 'mockUserId123', favoriteRecipes: [] }; // Not favorited
+      const mockDeletedRecipe = { _id: 'recipe456', isDeleted: true };
+
+      User.findById = jest.fn().mockResolvedValue(mockUser);
+      Recipe.findById = jest.fn().mockResolvedValue(mockDeletedRecipe);
+
+      const response = await request(app)
+        .post('/api/recipes/recipe456/fork')
+        .set('Authorization', `Bearer ${creatorToken}`);
+
+      expect(response.status).toBe(404);
+      expect(response.body.message).toMatch(/deleted|not found/i);
+    });
+
+    it('should allow forking a deleted recipe if the user DOES have it favorited', async () => {
+      const mockUser = { _id: 'mockUserId123', favoriteRecipes: ['recipe456'] }; // Favorited!
+
+      const mockDeletedRecipe = {
+        _id: 'recipe456',
+        title: 'Old Recipe',
+        isDeleted: true,
+        createdBy: 'someCreatorId123',
+        ingredients: [],
+        toObject: jest.fn().mockReturnValue({
+          title: 'Old Recipe',
+          ingredients: [],
+          createdBy: 'someCreatorId123'
+        })
+      };
+
+      const mockSavedRecipe = { _id: 'newRecipe789', title: 'Old Recipe (Copy)' };
+
+      User.findById = jest.fn().mockResolvedValue(mockUser);
+      Recipe.findById = jest.fn().mockResolvedValue(mockDeletedRecipe);
+      Recipe.prototype.save = jest.fn().mockResolvedValue(mockSavedRecipe);
+
+      const response = await request(app)
+        .post('/api/recipes/recipe456/fork')
+        .set('Authorization', `Bearer ${creatorToken}`);
+
+      expect(response.status).toBe(201);
+      expect(response.body.recipe).toBeDefined();
+      expect(Recipe.prototype.save).toHaveBeenCalled();
+    });
   });
 });
