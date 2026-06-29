@@ -1,7 +1,8 @@
 import { Component, EventEmitter, OnInit, Output, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IngredientService, Ingredient } from '../../services/ingredient';
+import { Ingredient } from '../../models/ingredient.model';
+import { IngredientService } from '../../services/ingredient';
 import { ToastService } from '../../services/toast';
 import { IngredientForm } from '../ingredient-form/ingredient-form';
 import { UserService } from '../../services/user';

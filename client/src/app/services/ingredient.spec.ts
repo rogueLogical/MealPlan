@@ -2,7 +2,8 @@ import { TestBed } from '@angular/core/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { IngredientService, Ingredient, PaginatedResponse } from './ingredient';
+import { IngredientService } from './ingredient';
+import { Ingredient, IngredientSearchResponse } from '../models/ingredient.model';
 import { environment } from '../../environments/environment';
 
 describe('IngredientService', () => {
@@ -44,7 +45,7 @@ describe('IngredientService', () => {
   });
 
   it('should search ingredients with correct query parameters and pagination', () => {
-    const mockResponse: PaginatedResponse<Ingredient> = {
+    const mockResponse: IngredientSearchResponse = {
       data: [mockIngredient],
       meta: { totalItems: 1, currentPage: 2, itemsPerPage: 10, totalPages: 1 },
     };

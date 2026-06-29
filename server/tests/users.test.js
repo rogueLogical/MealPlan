@@ -1,8 +1,8 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const app = require('../server'); // Corrected relative path
-const User = require('../models/User'); // Corrected relative path
+const app = require('../server');
+const User = require('../models/User');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 
 let mongoServer;
@@ -42,7 +42,7 @@ describe('User Settings API Operations Contract Test Suite', () => {
   it('should successfully update measurement and macronutrient configuration targets when providing a valid token', async () => {
     const res = await request(app)
       .put('/api/users/settings')
-      .set('Authorization', `Bearer ${mockToken}`) // Attach our authorization interceptor token
+      .set('Authorization', `Bearer ${mockToken}`) // Attach authorization interceptor token
       .send({
         measurementSystem: 'metric',
         nutritionSettings: {
@@ -116,5 +116,45 @@ describe('User Settings API Operations Contract Test Suite', () => {
     expect(res.body.nutritionSettings.likedFoods).toHaveLength(3);
 
     expect(res.body.nutritionSettings.dislikedFoods).toContain('Pork');
+  });
+
+  it('should add a recipe to favorites if it is not already favorited', async () => {
+    const mockUser = {
+      _id: 'mockUserId123',
+      favoriteRecipes: [], // Empty initially
+      save: jest.fn().mockResolvedValue(true)
+    };
+
+    User.findById = jest.fn().mockResolvedValue(mockUser);
+
+    const response = await request(app)
+      .post('/api/users/favorites/recipe123')
+      .set('Authorization', `Bearer ${mockToken}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.isFavorite).toBe(true);
+    expect(mockUser.favoriteRecipes).toContain('recipe123');
+    expect(mockUser.save).toHaveBeenCalled();
+  });
+
+  it('should remove a recipe from favorites if it is already favorited', async () => {
+    const mockUser = {
+      _id: 'mockUserId123',
+      favoriteRecipes: ['recipe123'], // Already favorited
+      save: jest.fn().mockResolvedValue(true)
+    };
+
+    User.findById = jest.fn().mockResolvedValue(mockUser);
+
+    const response = await request(app)
+      .post('/api/users/favorites/recipe123')
+      .set('Authorization', `Bearer ${mockToken}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.isFavorite).toBe(false);
+    expect(mockUser.favoriteRecipes).not.toContain('recipe123');
+    expect(mockUser.save).toHaveBeenCalled();
   });
 });

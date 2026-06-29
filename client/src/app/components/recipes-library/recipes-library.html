@@ -1,22 +1,148 @@
-<div
-  style="
-    padding: 20px;
-    border: 2px dashed #ef4444;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    background-color: rgba(239, 68, 68, 0.05);
-  "
->
-  <h3 style="margin-top: 0; color: #ef4444">Dev Test Area</h3>
-  <button type="button" class="btn-primary" (click)="showIngredientSearch = true">
-    Open Ingredient Database
-  </button>
+<div class="library-workspace">
+  <div
+    class="workspace-header"
+    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem"
+  >
+    <h2 style="margin: 0">My Favorites</h2>
+  </div>
+
+  @if (isLoadingFavorites) {
+    <div class="loading-state" style="text-align: center; padding: 2rem; color: var(--text-muted)">
+      Loading favorites...
+    </div>
+  } @else if (favoriteRecipes.length === 0) {
+    <div
+      class="empty-state"
+      style="
+        text-align: center;
+        padding: 2rem;
+        background: var(--bg-card);
+        border-radius: 12px;
+        border: 1px dashed var(--border-color);
+        margin-bottom: 2rem;
+      "
+    >
+      <p style="color: var(--text-muted); margin: 0">You haven't favorited any recipes yet.</p>
+    </div>
+  } @else {
+    <div class="recipes-grid" style="margin-bottom: 2rem">
+      @for (recipe of favoriteRecipes; track recipe._id) {
+        <app-recipe-card
+          [recipe]="recipe"
+          [isFavorite]="true"
+          (view)="onViewRecipe($event)"
+          (edit)="onEditRecipe($event)"
+          (delete)="onDeleteRecipe($event)"
+          (toggleFavorite)="onToggleFavorite($event)"
+          (copyRecipe)="onCopyRecipe($event)"
+        >
+        </app-recipe-card>
+      }
+    </div>
+  }
+
+  <hr style="border: 1px solid var(--border-color); margin-bottom: 2rem" />
+
+  <div
+    class="workspace-header"
+    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem"
+  >
+    <h2 style="margin: 0">My Recipes</h2>
+    <div class="header-actions">
+      <button class="btn-secondary" style="margin-right: 1rem" (click)="openSearchModal()">
+        🔍 Search Community
+      </button>
+      <button class="btn-primary" (click)="toggleRecipeBuilder()">+ Create New Recipe</button>
+    </div>
+  </div>
+
+  @if (isLoadingRecipes) {
+    <div class="loading-state" style="text-align: center; padding: 3rem; color: var(--text-muted)">
+      Loading your recipes...
+    </div>
+  } @else if (myRecipes.length === 0) {
+    <div
+      class="empty-state"
+      style="
+        text-align: center;
+        padding: 4rem;
+        background: var(--bg-card);
+        border-radius: 12px;
+        border: 1px dashed var(--border-color);
+      "
+    >
+      <h3 style="margin-top: 0">No recipes found</h3>
+      <p style="color: var(--text-muted); margin-bottom: 1.5rem">
+        You haven't added any recipes to your library yet.
+      </p>
+      <button class="btn-primary" (click)="toggleRecipeBuilder()">Create Your First Recipe</button>
+    </div>
+  } @else {
+    <div class="recipes-grid">
+      @for (recipe of myRecipes; track recipe._id) {
+        <app-recipe-card
+          [recipe]="recipe"
+          [isFavorite]="favoriteRecipeIds.includes(recipe._id)"
+          (view)="onViewRecipe($event)"
+          (edit)="onEditRecipe($event)"
+          (delete)="onDeleteRecipe($event)"
+          (toggleFavorite)="onToggleFavorite($event)"
+          (copyRecipe)="onCopyRecipe($event)"
+        >
+        </app-recipe-card>
+      }
+    </div>
+  }
 </div>
 
-@if (showIngredientSearch) {
-  <app-ingredient-search
-    (closeForm)="showIngredientSearch = false"
-    (ingredientSelected)="onIngredientSelected($event)"
+@if (isSearchModalOpen) {
+  <app-recipe-search
+    [favoriteRecipeIds]="favoriteRecipeIds"
+    (closeSearch)="closeSearchModal()"
+    (view)="onViewRecipe($event)"
+    (toggleFavorite)="onToggleFavorite($event)"
+    (copyRecipe)="onCopyRecipe($event)"
   >
-  </app-ingredient-search>
+  </app-recipe-search>
+}
+
+@if (viewingRecipe) {
+  <app-recipe-detail
+    [recipe]="viewingRecipe"
+    [isFavorite]="favoriteRecipeIds.includes(viewingRecipe._id)"
+    (closeDetail)="closeView()"
+    (editRecipe)="onEditRecipe($event)"
+    (toggleFavorite)="onToggleFavorite($event)"
+    (copyRecipe)="onCopyRecipe($event)"
+  >
+  </app-recipe-detail>
+}
+
+@if (showRecipeBuilder) {
+  <app-recipe-builder
+    [targetMacros]="userTargets"
+    [initialRecipe]="selectedRecipeToEdit"
+    (saveRecipe)="onSaveRecipeTest($event)"
+    (closeBuilder)="closeBuilder()"
+  >
+  </app-recipe-builder>
+}
+
+@if (recipeToDelete) {
+  <div class="modal-container">
+    <button class="modal-backdrop" (click)="cancelDelete()" aria-label="Cancel deletion"></button>
+    <div class="modal-content" style="max-width: 400px; padding: 24px; text-align: center">
+      <h3 style="margin-top: 0; color: var(--text-main)">Delete Recipe?</h3>
+      <p style="color: var(--text-muted); margin-bottom: 24px; line-height: 1.5">
+        Are you sure you want to permanently delete "<strong>{{ recipeToDelete.title }}</strong
+        >"? This action cannot be undone.
+      </p>
+      <div style="display: flex; gap: 12px; justify-content: center">
+        <button class="btn-secondary" (click)="cancelDelete()">Cancel</button>
+        <button class="btn-primary" style="background-color: #ef4444" (click)="confirmDelete()">
+          Yes, Delete
+        </button>
+      </div>
+    </div>
+  </div>
 }

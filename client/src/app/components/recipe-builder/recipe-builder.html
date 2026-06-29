@@ -1,0 +1,203 @@
+<div class="modal-container">
+  <button
+    type="button"
+    class="modal-backdrop"
+    (click)="onClose()"
+    aria-label="Close builder"
+  ></button>
+
+  <div class="modal-content recipe-builder-modal">
+    <header class="modal-header">
+      <h2>{{ initialRecipe ? 'Edit Recipe' : 'Create New Recipe' }}</h2>
+      <button type="button" class="close-btn" (click)="onClose()">✕</button>
+    </header>
+
+    <form [formGroup]="recipeForm" (ngSubmit)="onSubmit()" class="recipe-builder">
+      <div class="modal-body">
+        <div class="header-section">
+          <input
+            formControlName="title"
+            type="text"
+            placeholder="Recipe Title (e.g. Avocado Toast)"
+            class="title-input"
+          />
+          <div class="header-toggles">
+            <div class="type-toggle">
+              <label class="radio-btn">
+                <input type="radio" formControlName="recipeType" value="Meal" />
+                <span>Meal</span>
+              </label>
+              <label class="radio-btn">
+                <input type="radio" formControlName="recipeType" value="Snack" />
+                <span>Snack</span>
+              </label>
+            </div>
+            <div class="type-toggle">
+              <label class="radio-btn">
+                <input type="checkbox" formControlName="isPublic" />
+                <span>{{ recipeForm.get('isPublic')?.value ? '🌍 Public' : '🔒 Private' }}</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="macro-banner">
+          <div class="comparison-row">
+            <div class="macro-block actual">
+              <h4>Macros Per Portion</h4>
+              <div class="macros-grid">
+                <span>Cal: {{ recipeTotalsPerPortion.calories }}</span>
+                <span>Pro: {{ recipeTotalsPerPortion.protein }}g</span>
+                <span>Fat: {{ recipeTotalsPerPortion.fat }}g</span>
+                <span style="color: #28a745"
+                  >Net Carbs: {{ recipeTotalsPerPortion.netCarbs }}g</span
+                >
+              </div>
+            </div>
+
+            @if (currentTargets) {
+              <div class="macro-block target">
+                <h4>Your {{ recipeForm.get('recipeType')?.value }} Target</h4>
+                <div class="macros-grid">
+                  <span>Cal: {{ currentTargets.calories }}</span>
+                  <span>Pro: {{ currentTargets.protein }}g</span>
+                  <span>Fat: {{ currentTargets.fat }}g</span>
+                  <span style="color: #28a745">Net Carbs: {{ currentTargets.netCarbs }}g</span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="form-section" formArrayName="ingredients">
+          <div class="section-header">
+            <h3>Ingredients</h3>
+            <button
+              type="button"
+              (click)="openIngredientSearchModal()"
+              class="btn-primary"
+              style="padding: 6px 12px; font-size: 0.9rem"
+            >
+              + Add Ingredient
+            </button>
+          </div>
+
+          @for (ingGroup of ingredients.controls; track $index) {
+            <div [formGroupName]="$index" class="ingredient-row">
+              <div class="ing-name">
+                <strong>{{ ingGroup.get('name')?.value }}</strong>
+              </div>
+
+              <div class="ing-input">
+                <label for="weightInGrams">Weight (g) *</label>
+                <input id="weightInGrams" formControlName="weightInGrams" type="number" min="1" />
+              </div>
+
+              <div class="ing-input">
+                <label for="displayAmount">Amount (Opt)</label>
+                <input
+                  id="displayAmount"
+                  formControlName="displayAmount"
+                  type="number"
+                  step="0.1"
+                />
+              </div>
+
+              <div class="ing-input">
+                <label for="displayUnit">Unit (Opt)</label>
+                <input id="displayUnit" formControlName="displayUnit" type="text" />
+              </div>
+
+              <button type="button" class="btn-remove" (click)="removeIngredient($index)">X</button>
+
+              @if (ingredientMacrosPerPortion[$index]; as mac) {
+                <div class="ing-breakdown">
+                  <em>Contributes per portion:</em>
+                  Protein: {{ mac.protein }}g | Fat: {{ mac.fat }}g |
+                  <span class="net-carb-text">Net Carbs: {{ mac.netCarbs }}g</span>
+                </div>
+              }
+            </div>
+          }
+
+          @if (ingredients.length === 0) {
+            <p class="empty-state">No ingredients added yet. The math begins when you add food!</p>
+          }
+        </div>
+
+        <div class="form-section">
+          <div class="row">
+            <div class="col">
+              <label for="portions">Portions</label>
+              <input id="portions" formControlName="portions" type="number" min="1" />
+            </div>
+            <div class="col">
+              <label for="prepTimeMinutes">Prep Time (min)</label>
+              <input id="prepTimeMinutes" formControlName="prepTimeMinutes" type="number" min="0" />
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col">
+              <label for="description">Description</label>
+              <textarea
+                id="description"
+                formControlName="description"
+                rows="2"
+                placeholder="A brief summary of this recipe..."
+              ></textarea>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col">
+              <label for="instructions">Instructions</label>
+              <textarea
+                id="instructions"
+                formControlName="instructions"
+                rows="5"
+                placeholder="Step 1: Preheat oven..."
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="section-header" style="border-bottom: none; margin-bottom: 0.5rem">
+            <h3>Dietary Tags</h3>
+          </div>
+          <div class="checkbox-grid">
+            @for (tag of availableTags; track tag; let i = $index) {
+              <label class="checkbox-label" [for]="'recipe-tag-' + i">
+                <input
+                  type="checkbox"
+                  [id]="'recipe-tag-' + i"
+                  [checked]="hasTag(tag)"
+                  (change)="toggleTag(tag, $event)"
+                />
+                {{ tag }}
+              </label>
+            }
+          </div>
+        </div>
+      </div>
+
+      <footer class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="onClose()">Cancel</button>
+        <button
+          type="submit"
+          class="btn-primary save-btn"
+          [disabled]="recipeForm.invalid || ingredients.length === 0"
+        >
+          Save Recipe
+        </button>
+      </footer>
+    </form>
+  </div>
+</div>
+
+@if (showIngredientSearch) {
+  <app-ingredient-search
+    (ingredientSelected)="addIngredientToRecipe($event)"
+    (closeForm)="showIngredientSearch = false"
+  >
+  </app-ingredient-search>
+}

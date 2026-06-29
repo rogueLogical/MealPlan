@@ -27,6 +27,7 @@ export interface BackendUserDocument {
     measurementSystem: 'metric' | 'imperial';
   };
   nutritionSettings?: NutritionSettings;
+  favoriteRecipes?: string[];
 }
 
 export interface UserSettingsPayload {
@@ -51,5 +52,19 @@ export class UserService {
   // Persist updated settings map to MongoDB
   updateUserSettings(payload: UserSettingsPayload): Observable<unknown> {
     return this.http.put<unknown>(`${this.apiUrl}/settings`, payload);
+  }
+
+  toggleFavoriteRecipe(recipeId: string): Observable<{
+    success: boolean;
+    isFavorite: boolean;
+    favoriteRecipes: string[];
+    message: string;
+  }> {
+    return this.http.post<{
+      success: boolean;
+      isFavorite: boolean;
+      favoriteRecipes: string[];
+      message: string;
+    }>(`${this.apiUrl}/favorites/${recipeId}`, {});
   }
 }

@@ -2,42 +2,11 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-
-export interface Macros {
-  calories?: number;
-  protein: number;
-  totalCarbs: number;
-  fiber: number;
-  sugarAlcohols: number;
-  netCarbs?: number;
-  fat: number;
-}
-
-export interface Ingredient {
-  _id?: string;
-  name: string;
-  createdBy?: string | null;
-
-  servingSize: number;
-  servingUnit: string;
-  nutritionPerServing: Macros;
-
-  standardAmount?: number;
-  standardUnit?: string;
-  nutrition?: Macros;
-
-  tags?: string[];
-}
-
-export interface PaginatedResponse<T> {
-  data: T[];
-  meta: {
-    totalItems: number;
-    currentPage: number;
-    itemsPerPage: number;
-    totalPages: number;
-  };
-}
+import {
+  Ingredient,
+  IngredientPayload,
+  IngredientSearchResponse,
+} from '../models/ingredient.model';
 
 @Injectable({
   providedIn: 'root',
@@ -52,13 +21,13 @@ export class IngredientService {
     tags?: string[],
     page = 1,
     limit = 50,
-  ): Observable<PaginatedResponse<Ingredient>> {
+  ): Observable<IngredientSearchResponse> {
     let params = new HttpParams().set('page', page.toString()).set('limit', limit.toString());
 
     if (query) params = params.set('q', query);
     if (tags && tags.length > 0) params = params.set('tags', tags.join(','));
 
-    return this.http.get<PaginatedResponse<Ingredient>>(this.apiUrl, { params });
+    return this.http.get<IngredientSearchResponse>(this.apiUrl, { params });
   }
 
   // READ (Single)
@@ -68,7 +37,7 @@ export class IngredientService {
 
   // CREATE
   createIngredient(
-    ingredient: Ingredient,
+    ingredient: IngredientPayload,
   ): Observable<{ message: string; ingredient: Ingredient }> {
     return this.http.post<{ message: string; ingredient: Ingredient }>(this.apiUrl, ingredient);
   }

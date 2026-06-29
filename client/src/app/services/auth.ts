@@ -10,6 +10,7 @@ export interface UserProfile {
   username: string;
   email: string;
   profilePicture: string;
+  favoriteRecipes?: string[];
 }
 
 export interface AuthResponse {

@@ -26,7 +26,7 @@ jobs:
       - name: Set up Node.js version
         uses: actions/setup-node@v6
         with:
-          node-version: '24.x'
+          node-version: '20.x'
 
       - name: npm install, lint, and build
         working-directory: ./server
@@ -40,7 +40,8 @@ jobs:
         uses: artiomtr/jest-coverage-report-action@v2
         with:
           working-directory: server
-          run: npm run test
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          test-script: npm run test
 
       - name: Upload Server Coverage Report
         if: github.event_name == 'pull_request'
