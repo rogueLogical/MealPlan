@@ -82,7 +82,7 @@
             </button>
           </div>
 
-          @for (ingGroup of ingredients.controls; track $index) {
+          @for (ingGroup of ingredients.controls; track ingGroup) {
             <div [formGroupName]="$index" class="ingredient-row">
               <div class="ing-name">
                 <strong>{{ ingGroup.get('name')?.value }}</strong>
