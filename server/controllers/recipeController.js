@@ -3,16 +3,19 @@ const { getAiSuggestions } = require('../utils/geminiClient');
 const { fetchUsdaMacros } = require('../utils/usdaClient');
 const Ingredient = require('../models/Ingredient');
 
-/**
- * POST /api/recipes/balance
- * Unifies mathematical balancing, AI intervention, and circuit-breaking logic.
- */
+// Escapes any characters that have special meaning in regular expressions
+const escapeRegExp = (string) => {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+};
+
+// POST /api/recipes/balance
+// Unifies mathematical balancing, AI intervention, and circuit-breaking logic.
 const balanceRecipe = async (req, res) => {
   try {
-    // 1. Extract payload from the Angular client
+    // Extract payload from the Angular client
     const { ingredients, targets, dietaryRestrictions, interventionCount = 0 } = req.body;
 
-    // 2. Attempt the core mathematical solve (+/- 10% tolerance band)
+    // Attempt the core mathematical solve (+/- 10% tolerance band)
     const solverResult = await solveMatrix(ingredients, targets);
 
     // STATE 1: Matrix solved successfully
@@ -33,7 +36,7 @@ const balanceRecipe = async (req, res) => {
       });
     }
 
-    // STATE 2: Matrix failed, and we need user intervention (SWAP or ADD)
+    // STATE 2: Matrix failed, and we need user intervention (SWAP or ADD or REMOVE)
 
     // INTERCEPT: If a strict zero constraint was violated, we bypass the AI entirely.
     if (solverResult.failureType === 'REMOVE') {
@@ -58,12 +61,15 @@ const balanceRecipe = async (req, res) => {
       currentIngredients: ingredients.map((ing) => ing.name)
     });
 
-    // THE FIX: Database First, USDA Second
+    // Look in Database for ingredient macros First, USDA Second
     const rawOptions = await Promise.all(
       aiConcepts.map(async (concept) => {
-        // 1. Search the local database first (case-insensitive)
+        // Sanitize the incoming string
+        const safeIngredientName = escapeRegExp(concept.ingredientName);
+
+        // Safely execute the case-insensitive lookup
         const localIngredient = await Ingredient.findOne({
-          name: { $regex: new RegExp(`^${concept.ingredientName}$`, 'i') }
+          name: { $regex: new RegExp(`^${safeIngredientName}$`, 'i') }
         });
 
         if (localIngredient) {
@@ -74,10 +80,10 @@ const balanceRecipe = async (req, res) => {
           };
         }
 
-        // 2. Not found in DB. Fallback to USDA API.
+        // Not found in DB. Fallback to USDA API.
         const verifiedMacros = await fetchUsdaMacros(concept.ingredientName);
 
-        // 3. AUTO-POPULATE: Save the newly verified ingredient to your database
+        // AUTO-POPULATE: Save the newly verified ingredient to your database
         // so the NEXT time the AI suggests it, we hit Step 1 instead!
         if (verifiedMacros.protein > 0 || verifiedMacros.fat > 0 || verifiedMacros.netCarbs > 0) {
           const finalIngredient = await Ingredient.create({
@@ -100,13 +106,14 @@ const balanceRecipe = async (req, res) => {
           };
         }
 
-        // 4. EDGE CASE: USDA found nothing (zero macros).
+        // EDGE CASE: USDA found nothing (zero macros).
         // The ingredient is useless for macro balancing, so we return null.
+        // This takes the option out of the selectable results for the user.
         return null;
       })
     );
 
-    // 5. Clean the array: Strip out any nulls where the USDA came up empty
+    // Clean the array: Strip out any nulls where USDA came up empty
     const verifiedOptions = rawOptions.filter((option) => option !== null);
 
     // Finally, return the strict schema the Angular frontend expects
@@ -117,7 +124,7 @@ const balanceRecipe = async (req, res) => {
         targetIngredient:
           solverResult.failureType === 'SWAP' ? solverResult.offendingIngredient : null,
         reasoning: solverResult.failureReason,
-        options: verifiedOptions // Only contains fully verified, macro-rich ingredients
+        options: verifiedOptions // Only contains fully verified, macro-filled ingredients
       }
     });
   } catch (error) {
