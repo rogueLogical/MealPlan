@@ -22,6 +22,8 @@ services:
       - PORT=3000
       - JWT_SECRET=local_docker_development_only_secret_key_12345
       - CLIENT_URL=http://localhost:4200
+    env_file:
+      - ./server/.env
     depends_on:
       - mongodb
 

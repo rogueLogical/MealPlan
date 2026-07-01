@@ -3,6 +3,7 @@ const router = express.Router();
 const Recipe = require('../models/Recipe');
 const User = require('../models/User');
 const checkAuth = require('../middleware/auth');
+const { balanceRecipe } = require('../controllers/recipeController');
 
 // GET /api/recipes - Search public recipes (ignoring deleted ones)
 router.get('/', checkAuth, async (req, res) => {
@@ -215,5 +216,8 @@ router.post('/:id/fork', checkAuth, async (req, res) => {
     res.status(500).json({ message: 'Failed to copy recipe.' });
   }
 });
+
+// POST /api/recipes/balance
+router.post('/balance', checkAuth, balanceRecipe);
 
 module.exports = router;
