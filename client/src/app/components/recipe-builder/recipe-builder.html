@@ -123,6 +123,16 @@
           @if (ingredients.length === 0) {
             <p class="empty-state">No ingredients added yet. The math begins when you add food!</p>
           }
+          <div style="display: flex; justify-content: flex-end; margin-top: 1rem">
+            <button
+              type="button"
+              class="btn-secondary"
+              (click)="openBalancerModal()"
+              [disabled]="ingredients.length === 0"
+            >
+              ⚖️ Balance Macros
+            </button>
+          </div>
         </div>
 
         <div class="form-section">
@@ -200,4 +210,13 @@
     (closeForm)="showIngredientSearch = false"
   >
   </app-ingredient-search>
+}
+
+@if (showBalancerModal) {
+  <app-recipe-macronutrient-balancer
+    [originalRecipe]="currentRecipePayload"
+    [mealTargets]="currentTargetsForBalancer"
+    (cancelBalancer)="showBalancerModal = false"
+    (updateRecipe)="onBalancedRecipeSaved($event)"
+  ></app-recipe-macronutrient-balancer>
 }

@@ -12,14 +12,22 @@ import {
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { NutritionMacros, Ingredient } from '../../models/ingredient.model';
-import { RecipePayload, RecipeIngredient, UserMacroTargets } from '../../models/recipe.model';
+import {
+  RecipePayload,
+  RecipeIngredient,
+  UserMacroTargets,
+  MacroTargets,
+} from '../../models/recipe.model';
 import { CommonModule } from '@angular/common';
 import { IngredientSearch } from '../ingredient-search/ingredient-search';
+import { RecipeMacronutrientBalancer } from '../recipe-macronutrient-balancer/recipe-macronutrient-balancer';
+import { IngredientService } from '../../services/ingredient';
+import { ToastService } from '../../services/toast';
 
 @Component({
   selector: 'app-recipe-builder',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, IngredientSearch],
+  imports: [ReactiveFormsModule, CommonModule, IngredientSearch, RecipeMacronutrientBalancer],
   templateUrl: './recipe-builder.html',
   styleUrls: ['./recipe-builder.scss'],
 })
@@ -30,8 +38,11 @@ export class RecipeBuilder implements OnInit, OnDestroy, OnChanges {
   @Output() closeBuilder = new EventEmitter<void>();
 
   private fb = inject(FormBuilder);
+  private ingredientService = inject(IngredientService);
+  private toastService = inject(ToastService);
   recipeForm!: FormGroup;
   private formSub?: Subscription;
+  private previousPortions = 1;
 
   // UI Math State (Everything rendered here is PER PORTION)
   recipeTotalsPerPortion: NutritionMacros = {
@@ -66,9 +77,34 @@ export class RecipeBuilder implements OnInit, OnDestroy, OnChanges {
   ];
 
   showIngredientSearch = false;
+  showBalancerModal = false;
 
   ngOnInit(): void {
     this.initForm();
+
+    // Listen for portion changes to auto-scale ingredient weights
+    this.recipeForm.get('portions')?.valueChanges.subscribe((newPortions: number) => {
+      if (!newPortions || newPortions < 1) return;
+
+      const ratio = newPortions / this.previousPortions;
+
+      // Loop through all ingredients and scale them
+      this.ingredients.controls.forEach((control) => {
+        const currentWeight = control.get('weightInGrams')?.value || 0;
+        const currentDisplay = control.get('displayAmount')?.value;
+
+        control.patchValue(
+          {
+            weightInGrams: Math.round(currentWeight * ratio * 10) / 10,
+            displayAmount: currentDisplay ? parseFloat((currentDisplay * ratio).toFixed(2)) : null,
+          },
+          { emitEvent: false }, // Prevent infinite recalculation loops
+        );
+      });
+
+      this.previousPortions = newPortions;
+    });
+
     this.setupReactiveMath();
 
     if (this.initialRecipe) {
@@ -135,6 +171,96 @@ export class RecipeBuilder implements OnInit, OnDestroy, OnChanges {
 
   removeIngredient(index: number): void {
     this.ingredients.removeAt(index);
+  }
+
+  openBalancerModal(): void {
+    if (this.ingredients.length > 0) {
+      this.showBalancerModal = true;
+    }
+  }
+
+  // Prepares the form data exactly how the Balancer component expects it
+  get currentRecipePayload(): RecipePayload {
+    const rawData = this.recipeForm.value;
+    const formattedIngredients: RecipeIngredient[] = rawData.ingredients.map(
+      (item: {
+        ingredientId: string;
+        name: string;
+        weightInGrams: number;
+        displayAmount: number | null;
+        displayUnit: string;
+        baselineNutrition: NutritionMacros;
+      }) => {
+        const multiplier = item.weightInGrams / 100;
+        const base = item.baselineNutrition || {
+          calories: 0,
+          protein: 0,
+          totalCarbs: 0,
+          fiber: 0,
+          sugarAlcohols: 0,
+          fat: 0,
+        };
+
+        return {
+          ingredientId: item.ingredientId,
+          name: item.name,
+          weightInGrams: item.weightInGrams,
+          displayAmount: item.displayAmount,
+          displayUnit: item.displayUnit,
+          baselineNutrition: base,
+          nutrition: {
+            calories: Math.round((base.calories || 0) * multiplier),
+            protein: (base.protein || 0) * multiplier,
+            totalCarbs: (base.totalCarbs || 0) * multiplier,
+            fiber: (base.fiber || 0) * multiplier,
+            sugarAlcohols: (base.sugarAlcohols || 0) * multiplier,
+            netCarbs:
+              ((base.totalCarbs || 0) - (base.fiber || 0) - (base.sugarAlcohols || 0)) * multiplier,
+            fat: (base.fat || 0) * multiplier,
+          },
+        };
+      },
+    );
+    return { ...rawData, ingredients: formattedIngredients };
+  }
+
+  // Filters the complex targets down to the strict MacroTargets format
+  get currentTargetsForBalancer(): MacroTargets {
+    if (!this.currentTargets) {
+      return { protein: 0, fat: 0, netCarbs: 0 };
+    }
+    return {
+      protein: this.currentTargets.protein,
+      fat: this.currentTargets.fat,
+      netCarbs: this.currentTargets.netCarbs,
+    };
+  }
+
+  onBalancedRecipeSaved(balancedIngredients: RecipeIngredient[]): void {
+    // Get the current yield size of the recipe
+    const currentPortions = this.recipeForm.get('portions')?.value || 1;
+
+    this.ingredients.clear();
+
+    balancedIngredients.forEach((ing) => {
+      // The balancer returns weights for ONE portion. Scale it back up to match the recipe yield.
+      const scaledWeight = Math.round(ing.weightInGrams * currentPortions * 10) / 10;
+      const scaledDisplay = ing.displayAmount
+        ? parseFloat((ing.displayAmount * currentPortions).toFixed(2))
+        : null;
+
+      const ingredientGroup = this.fb.group({
+        ingredientId: [ing.ingredientId, Validators.required],
+        name: [ing.name, Validators.required],
+        weightInGrams: [scaledWeight, [Validators.required, Validators.min(1)]],
+        displayAmount: [scaledDisplay],
+        displayUnit: [ing.displayUnit],
+        baselineNutrition: [ing.baselineNutrition],
+      });
+      this.ingredients.push(ingredientGroup);
+    });
+
+    this.showBalancerModal = false;
   }
 
   private setupReactiveMath(): void {
@@ -281,6 +407,8 @@ export class RecipeBuilder implements OnInit, OnDestroy, OnChanges {
 
   private patchInitialData(): void {
     if (!this.initialRecipe) return;
+
+    this.previousPortions = this.initialRecipe.portions || 1;
 
     this.recipeForm.patchValue({
       title: this.initialRecipe.title,

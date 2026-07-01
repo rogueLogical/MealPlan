@@ -242,7 +242,7 @@
   display: grid;
   // This grid aligns the columns perfectly: Name takes remaining space, inputs get fixed widths, button gets auto
   grid-template-columns: 1fr 120px 120px 120px auto;
-  align-items: end; // Aligns the bottoms of the inputs
+  align-items: center;
   gap: 1rem;
   padding: 1rem;
   background-color: var(--bg-card);
@@ -252,11 +252,12 @@
   transition: all 0.2s ease;
 
   .ing-name {
-    margin-bottom: 0.5rem; // aligns text visually with the inputs
     font-size: 1.1rem;
     color: var(--text-muted);
-    // Prevents incredibly long ingredient names from breaking the grid
-    white-space: nowrap;
+    // Allow up to 2 lines of text, then truncate with an ellipsis
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
   }

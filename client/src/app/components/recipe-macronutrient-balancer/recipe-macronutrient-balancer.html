@@ -1,0 +1,188 @@
+<div class="balancer-overlay">
+  <div class="balancer-modal">
+    <div class="modal-header">
+      <h2>Balance Recipe Macros</h2>
+      <button class="close-btn" (click)="onCancel()">×</button>
+    </div>
+
+    <div class="modal-body">
+      @switch (currentState) {
+        @case ('CONFIG') {
+          <div class="state-container config-state">
+            <p class="helper-text">
+              Review your current recipe and set dietary restrictions before balancing.
+            </p>
+
+            <div class="macro-banner" style="margin-bottom: 2rem">
+              <div class="comparison-row">
+                <div class="macro-block actual">
+                  <h4>Current Macros (Per Portion)</h4>
+                  <div class="macros-grid">
+                    <span>Cal: {{ currentMacrosPerPortion.calories }}</span>
+                    <span>Pro: {{ currentMacrosPerPortion.protein }}g</span>
+                    <span>Fat: {{ currentMacrosPerPortion.fat }}g</span>
+                    <span style="color: #28a745"
+                      >Net Carbs: {{ currentMacrosPerPortion.netCarbs }}g</span
+                    >
+                  </div>
+                </div>
+
+                <div class="macro-block target">
+                  <h4>Your Target</h4>
+                  <div class="macros-grid">
+                    <span>Cal: {{ targetCalories }}</span>
+                    <span>Pro: {{ mealTargets.protein }}g</span>
+                    <span>Fat: {{ mealTargets.fat }}g</span>
+                    <span style="color: #28a745">Net Carbs: {{ mealTargets.netCarbs }}g</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="ingredient-grid" style="margin-bottom: 2rem">
+              <div class="grid-header">
+                <span>Current Ingredients</span>
+                <span>Total Weight</span>
+              </div>
+              @for (ing of currentIngredients; track ing.name) {
+                <div class="grid-row">
+                  <span class="ing-name">{{ ing.name }}</span>
+                  <span class="ing-weight">{{ ing.weightInGrams }}g</span>
+                </div>
+              }
+            </div>
+
+            <div class="restrictions-group">
+              <h4>Dietary Restrictions</h4>
+              <div class="checkbox-grid">
+                @for (tag of availableDietaryTags; track tag) {
+                  <label class="checkbox-label">
+                    <input
+                      type="checkbox"
+                      [checked]="selectedDietaryRestrictions.includes(tag)"
+                      (change)="toggleRestriction(tag)"
+                    />
+                    {{ tag }}
+                  </label>
+                }
+              </div>
+            </div>
+
+            <div class="modal-actions">
+              <button class="btn btn-secondary" (click)="onCancel()">Cancel</button>
+              <button class="btn btn-primary" (click)="executeBalancer()">Run Balancer</button>
+            </div>
+          </div>
+        }
+
+        @case ('LOADING') {
+          <div class="state-container loading-state">
+            <div class="spinner"></div>
+            <h3>Crunching the numbers...</h3>
+            <p>Running the macronutrient solver and verifying ingredients.</p>
+          </div>
+        }
+
+        @case ('INTERVENTION') {
+          <div class="state-container intervention-state">
+            @if (currentIntervention) {
+              <div class="intervention-header">
+                <span
+                  class="type-badge"
+                  [class.swap]="currentIntervention.type === 'SWAP'"
+                  [class.add]="currentIntervention.type === 'ADD'"
+                  [class.remove]="currentIntervention.type === 'REMOVE'"
+                >
+                  {{
+                    currentIntervention.type === 'SWAP'
+                      ? 'Swap Required'
+                      : currentIntervention.type === 'ADD'
+                        ? 'Addition Required'
+                        : 'Removal Required'
+                  }}
+                </span>
+                <h3>Let's adjust your recipe</h3>
+                <p class="reasoning-text">{{ currentIntervention.reasoning }}</p>
+              </div>
+
+              @if (currentIntervention.type !== 'REMOVE') {
+                <div class="options-grid">
+                  @for (option of currentIntervention.options; track option.name) {
+                    <div
+                      class="option-card"
+                      (click)="selectInterventionOption(option)"
+                      (keydown.enter)="selectInterventionOption(option)"
+                      (keydown.space)="selectInterventionOption(option)"
+                      tabindex="0"
+                      role="button"
+                    >
+                      <h4>{{ option.name }}</h4>
+                      <p class="reason">{{ option.reasonForRecommendation }}</p>
+                      <div class="option-macros">
+                        <span>P: {{ option.nutritionPerServing.protein }}g</span>
+                        <span>F: {{ option.nutritionPerServing.fat }}g</span>
+                        <span>NC: {{ option.nutritionPerServing.netCarbs }}g</span>
+                      </div>
+                      <button tabindex="-1" class="btn btn-select">
+                        Select {{ currentIntervention.type === 'SWAP' ? 'Swap' : 'Addition' }}
+                      </button>
+                    </div>
+                  }
+                </div>
+              }
+
+              @if (currentIntervention.type === 'REMOVE') {
+                <div class="options-grid">
+                  <div class="option-card" style="text-align: center; border-color: #dc3545">
+                    <h4 style="color: #dc3545">
+                      Remove {{ currentIntervention.targetIngredient }}
+                    </h4>
+                    <p class="reason">
+                      This ingredient directly conflicts with your strict zero target.
+                    </p>
+                    <button
+                      class="btn btn-primary"
+                      style="background-color: #dc3545; width: 100%; margin-top: 1rem"
+                      (click)="executeRemoveIntervention()"
+                    >
+                      Remove Ingredient
+                    </button>
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        }
+
+        @case ('REVIEW') {
+          <div class="state-container review-state">
+            @if (isApproximateResult) {
+              <div class="warning-banner">
+                <strong>Approximate Match:</strong> We got as close to your targets as
+                mathematically possible without compromising the recipe structure.
+              </div>
+            }
+
+            <div class="ingredient-grid">
+              <div class="grid-header">
+                <span>Ingredient</span>
+                <span>Weight (Per Portion)</span>
+              </div>
+              @for (ing of currentIngredients; track ing.name) {
+                <div class="grid-row">
+                  <span class="ing-name">{{ ing.name }}</span>
+                  <span class="ing-weight">{{ ing.weightInGrams }}g</span>
+                </div>
+              }
+            </div>
+
+            <div class="modal-actions">
+              <button class="btn btn-secondary" (click)="onCancel()">Discard Changes</button>
+              <button class="btn btn-success" (click)="onSave()">Save to Recipe</button>
+            </div>
+          </div>
+        }
+      }
+    </div>
+  </div>
+</div>

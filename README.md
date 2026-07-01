@@ -10,6 +10,22 @@ This project uses Docker Compose to spin up a local development environment, inc
 
 - [Docker Desktop](https://docker.com) installed and running on the host machine.
 
+### Environment Variables Configuration
+
+Before spinning up the application, you must configure your local environment variables so the backend can securely communicate with the database and external APIs.
+
+1. Navigate to the `/server` directory.
+2. Create a new file named `.env`.
+3. Add the following required variables to the file, replacing the placeholder values with your actual keys:
+
+```sh
+# External Integrations
+USDA_API_KEY=your_usda_api_key_here
+GEMINI_API_KEY=your_gemini_api_key_here
+```
+
+> **Note:** You can obtain a free USDA API key from [Data.gov](https://api.data.gov/signup/) and a Gemini API key from [Google AI Studio](https://aistudio.google.com/). Ensure you never commit your `.env` file to version control.
+
 ### Spin Up the App
 
 Run the following command from the repository's root directory:

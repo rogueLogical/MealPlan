@@ -1,6 +1,6 @@
 **Title:** Multi-Phase Gating and Proportional Scaling for Automated Recipe Macro Balancing
 
-**Status:** Proposed
+**Status:** Deprecated (Replaced with ADR 005)
 
 **Context:** The application features an automated recipe balancing algorithm designed to scale ingredients so a recipe fits a user's exact per-meal macronutrient targets. Early iterations of this algorithm relying purely on weight-based or calorie-based heuristics failed due to the "Density Disconnect." Highly calorically dense micro-ingredients (like olive oil or butter) were either incorrectly classified as negligible "seasonings" by weight, or they violently skewed the fat macros when scaled. This resulted in mathematically impossible scaling constraints (e.g., the algorithm requiring "negative" amounts of chicken to balance the fat from the oil) and destroyed the culinary viability and flavor profile of the dish.
 
