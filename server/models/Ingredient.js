@@ -1,6 +1,50 @@
+// models/Ingredient.js
+
 const mongoose = require('mongoose');
+const { getDietaryTagsForIngredient } = require('../utils/geminiClient');
 
 const roundTo1Dec = (val) => Math.round(val * 10) / 10;
+
+// Mathematical tagging logic
+const applyMacroTags = (serving) => {
+  const tags = [];
+  const protein = serving.protein || 0;
+  const fat = serving.fat || 0;
+  const netCarbs = serving.netCarbs || 0;
+  const fiber = serving.fiber || 0;
+  const calories = serving.calories || 0;
+
+  // Carb Threshold Tagging
+  if (netCarbs <= 5) {
+    tags.push('Keto');
+    tags.push('Low-Carb');
+  } else if (netCarbs <= 10) {
+    tags.push('Low-Carb');
+  }
+
+  // Fiber Tagging
+  if (fiber >= 6) {
+    tags.push('High-Fiber');
+  }
+
+  // Calorie-Ratio Tagging
+  if (calories > 0) {
+    // High-Protein (>= 30% of calories from protein, and >= 10g of protein)
+    if ((protein * 4) / calories >= 0.3 && protein >= 10) {
+      tags.push('High-Protein');
+    }
+    // High-Fat (>= 60% of calories from fat, and >= 15g of fat)
+    if ((fat * 9) / calories >= 0.6 && fat >= 15) {
+      tags.push('High-Fat');
+    }
+    // High-Carb (>= 30% of calories from net carbs, and >= 10g of net carbs)
+    if ((netCarbs * 4) / calories >= 0.3 && netCarbs > 10) {
+      tags.push('High-Carb');
+    }
+  }
+
+  return tags;
+};
 
 const IngredientSchema = new mongoose.Schema(
   {
@@ -40,8 +84,8 @@ const IngredientSchema = new mongoose.Schema(
 IngredientSchema.index({ name: 'text' });
 IngredientSchema.index({ tags: 1 });
 
-// Auto-calculate Net Carbs, Calories, and 100g Baselines
-IngredientSchema.pre('save', function () {
+// Auto-calculate Net Carbs, Calories, 100g Baselines, and Apply Semantic + Math Tags
+IngredientSchema.pre('save', async function () {
   const serving = this.nutritionPerServing;
 
   // Calculate Net Carbs for the serving
@@ -65,6 +109,29 @@ IngredientSchema.pre('save', function () {
     netCarbs: normalize(serving.netCarbs),
     fat: normalize(serving.fat)
   };
+
+  // Tagging logic applied universally on initial creation
+  if (this.isNew) {
+    // Calculate and apply mathematical macro tags
+    const mathTags = applyMacroTags(serving);
+    const userTags = this.tags || [];
+    let combinedTags = [...new Set([...userTags, ...mathTags])];
+
+    // Fetch and apply AI semantic tags
+    try {
+      const aiTags = await getDietaryTagsForIngredient(this.name);
+      if (aiTags && aiTags.length > 0) {
+        combinedTags = [...new Set([...combinedTags, ...aiTags])];
+      }
+    } catch (err) {
+      console.warn(
+        `[AI Tagger Middleware] Failed to auto-tag new ingredient "${this.name}". ` +
+          `Saving document with manual/math tags only. Error: ${err.message}`
+      );
+    }
+
+    this.tags = combinedTags;
+  }
 });
 
 module.exports = mongoose.model('Ingredient', IngredientSchema);

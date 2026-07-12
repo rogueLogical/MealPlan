@@ -115,6 +115,7 @@ export class RecipeMacronutrientBalancer implements OnInit {
       .subscribe({
         next: (response) => {
           if (response.status === 'action_required' && response.intervention) {
+            this.currentIngredients = response.ingredients || [];
             this.currentIntervention = response.intervention;
             this.currentState = 'INTERVENTION';
             this.cdr.markForCheck();
@@ -144,7 +145,8 @@ export class RecipeMacronutrientBalancer implements OnInit {
     if (this.currentIntervention.type === 'SWAP') {
       // Find and replace the offending ingredient
       const targetIndex = this.currentIngredients.findIndex(
-        (ing) => ing.name === this.currentIntervention!.targetIngredient,
+        (ing) =>
+          ing.name.toLowerCase() === this.currentIntervention!.targetIngredient?.toLowerCase(),
       );
 
       if (targetIndex > -1) {
@@ -152,6 +154,9 @@ export class RecipeMacronutrientBalancer implements OnInit {
           ...this.currentIngredients[targetIndex],
           ingredientId: option._id,
           name: option.name,
+          weightInGrams: option.servingSize || 100,
+          displayAmount: null,
+          displayUnit: option.servingUnit || '',
           baselineNutrition: option.nutritionPerServing,
           nutrition: option.nutritionPerServing,
         };
@@ -163,7 +168,7 @@ export class RecipeMacronutrientBalancer implements OnInit {
         name: option.name,
         weightInGrams: option.servingSize || 100,
         displayAmount: null,
-        displayUnit: option.servingUnit || 'g',
+        displayUnit: option.servingUnit || '',
         baselineNutrition: option.nutritionPerServing,
         nutrition: option.nutritionPerServing,
       });
@@ -180,7 +185,7 @@ export class RecipeMacronutrientBalancer implements OnInit {
 
     // Filter out the offending ingredient entirely
     this.currentIngredients = this.currentIngredients.filter(
-      (ing) => ing.name !== this.currentIntervention!.targetIngredient,
+      (ing) => ing.name.toLowerCase() !== this.currentIntervention!.targetIngredient?.toLowerCase(),
     );
 
     // Increment the circuit breaker and run the math again

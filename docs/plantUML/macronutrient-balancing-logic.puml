@@ -1,0 +1,51 @@
+@startuml
+skinparam ArrowColor #2563EB
+skinparam ActivityBorderColor #10B981
+skinparam ActivityBackgroundColor #F3F4F6
+skinparam DecisionBorderColor #2563EB
+skinparam DecisionBackgroundColor #EFF6FF
+
+start
+:User requests balancing a recipe to match target macros;
+repeat
+if (Does the recipe already match target macros?) then (yes)
+  :Keep original ingredient quantities;
+  :Return Updated Recipe;
+else (no)
+  :Run mathmatic optimizer to scale ingredients;
+  if (Was a balanced solution found?) then (yes)
+    :Apply scaled quantities;
+    :Return Updated Recipe;
+  else (no)
+    if (Have we exceeded maximum attempts?) then (yes)
+      :Apply closest approximate quantities;
+      :Maximum Attempts Reached;
+      :Return Updated Recipe;
+    else (no)
+      :Analyze source of mathematical failure;
+      
+      if (Failure Type) then (Ingredient contains a forbidden macro)
+        :Request removal of conflicting ingredient;
+        :User confirms removal;
+        :Remove ingredient from recipe;
+      else (Ingredients cannot meet macro targets, 
+        Recipe is missing a good source for a macro)
+        :Request adding a new ingredient;
+        :Suggest compatible ingredients;
+        :User selects addition;
+        :Add ingredient to recipe;
+      endif
+      :Increment attempt counter and retry balancing;
+    endif
+  endif
+endif
+repeat while (is Recipe balanced? OR is maximum attempts reached?) is (no then retry balancing) not (yes)
+
+    :Display balanced recipe review;
+if (User accepts updated recipe?) then (yes)
+  :Save recipe;
+else (no)
+  :Discard changes;
+endif
+stop
+@enduml

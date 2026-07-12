@@ -105,7 +105,91 @@
                 <p class="reasoning-text">{{ currentIntervention.reasoning }}</p>
               </div>
 
+              <!-- Achieved Macros vs Target Macros comparison -->
+              <div class="macro-banner" style="margin-bottom: 1.5rem">
+                <div class="comparison-row">
+                  <div class="macro-block actual">
+                    <h4>Current Macros (Per Portion)</h4>
+                    <div class="macros-grid">
+                      <span>Cal: {{ currentMacrosPerPortion.calories }}</span>
+                      <span>Pro: {{ currentMacrosPerPortion.protein }}g</span>
+                      <span>Fat: {{ currentMacrosPerPortion.fat }}g</span>
+                      <span style="color: #28a745"
+                        >Net Carbs: {{ currentMacrosPerPortion.netCarbs }}g</span
+                      >
+                    </div>
+                  </div>
+
+                  <div class="macro-block target">
+                    <h4>Your Target</h4>
+                    <div class="macros-grid">
+                      <span>Cal: {{ targetCalories }}</span>
+                      <span>Pro: {{ mealTargets.protein }}g</span>
+                      <span>Fat: {{ mealTargets.fat }}g</span>
+                      <span style="color: #28a745">Net Carbs: {{ mealTargets.netCarbs }}g</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Ingredient List with Weights and Macro Contributions -->
+              <div class="ingredient-grid" style="margin-bottom: 2rem">
+                <div class="grid-header">
+                  <span>Ingredient</span>
+                  <span>Weight</span>
+                  <span>Macro Contributions</span>
+                </div>
+                @for (ing of currentIngredients; track ing.ingredientId) {
+                  <div class="grid-row">
+                    <span class="ing-name">{{ ing.name | titlecase }}</span>
+                    <span class="ing-weight">{{ ing.weightInGrams }}g</span>
+                    <span class="ing-contrib" style="font-size: 0.9rem; color: var(--text-muted)">
+                      P: {{ ing.nutrition?.protein?.toFixed(1) || 0 }}g | F:
+                      {{ ing.nutrition?.fat?.toFixed(1) || 0 }}g | NC:
+                      {{ ing.nutrition?.netCarbs?.toFixed(1) || 0 }}g
+                    </span>
+                  </div>
+                }
+              </div>
+
+              <!-- Early Exit Option to Accept Partial Quantities -->
+              <div class="partial-accept-banner" style="margin-bottom: 2rem">
+                <p style="margin: 0; font-size: 0.9rem; color: var(--text-muted)">
+                  If you prefer to stop adjusting, you can accept these current quantities as-is.
+                </p>
+                <button
+                  class="btn btn-secondary"
+                  style="
+                    margin-top: 8px;
+                    border-color: var(--accent-primary);
+                    color: var(--accent-primary);
+                  "
+                  (click)="onSave()"
+                >
+                  ✔️ Keep Current Quantities & Save
+                </button>
+              </div>
+
               @if (currentIntervention.type !== 'REMOVE') {
+                <!-- Dynamic Selection Header -->
+                <h4
+                  class="selection-heading"
+                  style="
+                    margin-top: 2rem;
+                    margin-bottom: 1rem;
+                    color: var(--accent-primary);
+                    font-size: 1.1rem;
+                    font-weight: 600;
+                  "
+                >
+                  @if (currentIntervention.type === 'ADD') {
+                    Select an ingredient to add:
+                  } @else if (currentIntervention.type === 'SWAP') {
+                    Select an ingredient to swap
+                    {{ currentIntervention.targetIngredient | titlecase }} for:
+                  }
+                </h4>
+
                 <div class="options-grid">
                   @for (option of currentIntervention.options; track option.name) {
                     <div
@@ -167,11 +251,17 @@
               <div class="grid-header">
                 <span>Ingredient</span>
                 <span>Weight (Per Portion)</span>
+                <span>Macro Contributions</span>
               </div>
-              @for (ing of currentIngredients; track ing.name) {
+              @for (ing of currentIngredients; track ing.ingredientId) {
                 <div class="grid-row">
-                  <span class="ing-name">{{ ing.name }}</span>
+                  <span class="ing-name">{{ ing.name | titlecase }}</span>
                   <span class="ing-weight">{{ ing.weightInGrams }}g</span>
+                  <span class="ing-contrib" style="font-size: 0.9rem; color: var(--text-muted)">
+                    P: {{ ing.nutrition?.protein?.toFixed(1) || 0 }}g | F:
+                    {{ ing.nutrition?.fat?.toFixed(1) || 0 }}g | NC:
+                    {{ ing.nutrition?.netCarbs?.toFixed(1) || 0 }}g
+                  </span>
                 </div>
               }
             </div>

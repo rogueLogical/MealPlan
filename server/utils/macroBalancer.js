@@ -5,11 +5,17 @@ const { nnls } = require('nnls');
 const TIER = 0.1; // +/- 10% variance band for macronutrient targets
 
 // Gating Logic: Determines if an ingredient is a locked seasoning.
-const isSeasoning = (ingredient) => {
+const isSeasoning = (ingredient, recipeCalories) => {
   const hasSpicesTag = ingredient.tags ? ingredient.tags.includes('Spices & Herbs') : false;
   const nutrition = ingredient.nutrition || {};
+  const calories =
+    (nutrition.protein || 0) * 4 + (nutrition.netCarbs || 0) * 4 + (nutrition.fat || 0) * 9;
+
   const isMicroNutrient =
-    (nutrition.fat || 0) < 1.5 && (nutrition.netCarbs || 0) < 3 && (nutrition.protein || 0) < 2;
+    (nutrition.fat || 0) < 1.5 &&
+    (nutrition.netCarbs || 0) < 3 &&
+    (nutrition.protein || 0) < 2 &&
+    calories < recipeCalories * 0.05;
   return hasSpicesTag || isMicroNutrient;
 };
 
@@ -25,17 +31,20 @@ const diagnoseFailure = (activeIngredients, adjustedTargets, achieved) => {
       failureType: 'ADD',
       targetMacro: primaryMacro,
       failureReason: `Empty Base: The recipe lacks any primary macro sources.`,
-      offendingIngredient: null
+      offendingIngredient: null,
+      zeroTargets: []
     };
   }
 
   // Strict Zero Conflicts (Needs REMOVE)
   const macros = ['protein', 'fat', 'netCarbs'];
+  let zeroTargets = [];
   for (const macro of macros) {
     if (adjustedTargets[macro] === 0) {
       // Find the ingredient that contributes the most of this zeroed macro
       let worstOffender = null;
       let maxMacroValue = 0;
+      zeroTargets.push(macro);
 
       for (const ing of activeIngredients) {
         const val = ing.nutrition?.[macro] || 0;
@@ -51,13 +60,15 @@ const diagnoseFailure = (activeIngredients, adjustedTargets, achieved) => {
           failureType: 'REMOVE',
           targetMacro: macro,
           offendingIngredient: worstOffender.name,
-          failureReason: `Strict Zero Conflict: You are targeting 0g of ${macro}, but '${worstOffender.name}' contains it. It must be removed to mathematically achieve your target.`
+          failureReason: `Strict Zero Conflict: You are targeting 0g of ${macro}, but '${worstOffender.name}' contains it. It must be removed to mathematically achieve your target.`,
+          zeroTargets: []
         };
       }
     }
   }
 
-  // Gap Analysis (Looking for massive shortfalls)
+  // If no zero target, then we need to add an ingredient that fills in the missing macro.
+  // Gap Analysis (Looking for largest shortfall)
   const shortfalls = [
     {
       macro: 'protein',
@@ -81,32 +92,13 @@ const diagnoseFailure = (activeIngredients, adjustedTargets, achieved) => {
 
   const worstShortfall = shortfalls[0];
 
-  // If we missed a significant target (> 5g) by more than 15%, NNLS hit a wall.
-  // We need a dedicated ingredient added to the recipe to unlock the math.
-  if (worstShortfall.target > 5 && worstShortfall.gap / worstShortfall.target > 0.15) {
-    return {
-      isFeasible: false,
-      failureType: 'ADD',
-      targetMacro: worstShortfall.macro,
-      failureReason: `Deficiency Conflict: The recipe cannot reach the ${worstShortfall.macro} target without overshooting other limits.`,
-      offendingIngredient: null
-    };
-  }
-
-  // Coupling Analysis (Needs a SWAP)
-  // If we don't have a massive gaping hole, it means our ingredients are fighting each other.
-  // (e.g., attempting a zero-carb target using beans as the protein source).
-  // Target the heaviest ingredient as the likely anchor dragging the math down.
-  const offendingIngredient = activeIngredients.reduce((prev, current) =>
-    (prev.weightInGrams || 0) > (current.weightInGrams || 0) ? prev : current
-  );
-
   return {
     isFeasible: false,
-    failureType: 'SWAP',
-    offendingIngredient: offendingIngredient.name,
-    targetMacro: null,
-    failureReason: `Coupled Variable Conflict: The macro profile of '${offendingIngredient.name}' prevents balanced scaling.`
+    failureType: 'ADD',
+    targetMacro: worstShortfall.macro,
+    failureReason: `Deficiency Conflict: The recipe cannot reach the ${worstShortfall.macro} target without overshooting other limits.`,
+    offendingIngredient: null,
+    zeroTargets: zeroTargets
   };
 };
 
@@ -130,12 +122,47 @@ const solveMatrix = async (ingredients, targets) => {
   console.log(`[MacroBalancer] Targets Received:`, targets);
   console.log(`[MacroBalancer] Total Ingredients Received: ${ingredients.length}`);
 
+  const recipeMacros = calculateDelivery(ingredients, new Array(ingredients.length).fill(1));
+
+  const targetProtein = targets?.protein || 0;
+  const targetFat = targets?.fat || 0;
+  const targetNetCarbs = targets?.netCarbs || 0;
+
+  // Pre-Check: Determine if current macros are already within acceptable bounds
+  const pTol = targetProtein * TIER + 0.1;
+  const fTol = targetFat * TIER + 0.1;
+  const cTol = targetNetCarbs * TIER + 0.1;
+
+  const isProteinAlreadyValid = Math.abs(recipeMacros.protein - targetProtein) <= pTol;
+  const isFatAlreadyValid = Math.abs(recipeMacros.fat - targetFat) <= fTol;
+  const isCarbsAlreadyValid = Math.abs(recipeMacros.netCarbs - targetNetCarbs) <= cTol;
+
+  if (isProteinAlreadyValid && isFatAlreadyValid && isCarbsAlreadyValid) {
+    console.log(
+      `[MacroBalancer] Recipe is ALREADY within the acceptable macro range.\n` +
+        `  Protein  : ${recipeMacros.protein.toFixed(1)}g / Target: ${targetProtein}g\n` +
+        `  Fat      : ${recipeMacros.fat.toFixed(1)}g / Target: ${targetFat}g\n` +
+        `  NetCarbs : ${recipeMacros.netCarbs.toFixed(1)}g / Target: ${targetNetCarbs}g\n` +
+        `Skipping NNLS optimization and returning original quantities.`
+    );
+    console.log(`======================================================\n`);
+    return {
+      isFeasible: true,
+      scaledIngredients: ingredients
+    };
+  }
+
+  // take out seasonings from the NNLS optimization (only scale main ingredients)
+  // this avoids the math blowing up a seasoning to fill a NetCarbs target for example.
   const seasonings = [];
   const activeIngredients = [];
   const seasoningMacros = { protein: 0, fat: 0, netCarbs: 0 };
 
+  const recipeCalories =
+    recipeMacros.protein * 4 + recipeMacros.netCarbs * 4 + recipeMacros.fat * 9;
+
   ingredients.forEach((ing) => {
-    if (isSeasoning(ing)) {
+    if (isSeasoning(ing, recipeCalories)) {
       seasonings.push(ing);
       seasoningMacros.protein += ing.nutrition?.protein || 0;
       seasoningMacros.fat += ing.nutrition?.fat || 0;
@@ -146,14 +173,13 @@ const solveMatrix = async (ingredients, targets) => {
   });
 
   const adjustedTargets = {
-    protein: Math.max(0, targets.protein - seasoningMacros.protein),
-    fat: Math.max(0, targets.fat - seasoningMacros.fat),
-    netCarbs: Math.max(0, targets.netCarbs - seasoningMacros.netCarbs)
+    protein: Math.max(0, targetProtein - seasoningMacros.protein),
+    fat: Math.max(0, targetFat - seasoningMacros.fat),
+    netCarbs: Math.max(0, targetNetCarbs - seasoningMacros.netCarbs)
   };
 
   if (activeIngredients.length === 0) {
     console.warn(`[MacroBalancer] WARNING: No active ingredients found after seasoning gate.`);
-    // Pass a dummy achieved object of 0s so the diagnostic engine forces an ADD
     return diagnoseFailure(activeIngredients, adjustedTargets, { protein: 0, fat: 0, netCarbs: 0 });
   }
 
@@ -167,18 +193,18 @@ const solveMatrix = async (ingredients, targets) => {
   const b_arr = [adjustedTargets.protein, adjustedTargets.fat, adjustedTargets.netCarbs];
 
   // Apply Tikhonov Regularization (Ridge Regression)
-  // This pads the matrix to make it taller than it is wide (m > n) to satisfy ml-matrix SVD,
-  // and gives the matrix full column rank to prevent NNLS infinite iteration loops.
+  // append an identity matrix with size equal to the
+  // number of ingredients, and set the new rows equal
+  // to 0 in the target macros vector b.
   const lambda = 0.0001;
   activeIngredients.forEach((_, i) => {
     const regRow = new Array(activeIngredients.length).fill(0);
     regRow[i] = lambda;
 
     A_arr.push(regRow);
-    b_arr.push(0); // The target for the regularization penalty is 0
+    b_arr.push(0);
   });
 
-  // Compile the final strictly-feasible matrices
   const A = new Matrix(A_arr);
   const b = Matrix.columnVector(b_arr);
 
@@ -186,34 +212,42 @@ const solveMatrix = async (ingredients, targets) => {
 
   try {
     const result = nnls(A, b);
-    multipliers = result.x.to1DArray().map((val) => (val < 1e-10 ? 0 : val));
+    multipliers = result.x.to1DArray().map((val) => {
+      if (isNaN(val) || val < 1e-10) {
+        return 0;
+      }
+      return val;
+    });
   } catch (err) {
-    console.error(`[MacroBalancer] Phase 4 Error: NNLS failure.`, err.message);
-    multipliers = new Array(activeIngredients.length).fill(0);
+    console.warn(
+      `[MacroBalancer] NNLS Solver exceeded iterations or failed. Falling back to original ingredient weights to preserve recipe state. Error:`,
+      err.message
+    );
+    multipliers = new Array(activeIngredients.length).fill(1);
   }
 
   // Re-calculate the achieved macros
   const achieved = calculateDelivery(activeIngredients, multipliers);
 
-  const pTol = adjustedTargets.protein * TIER + 0.1;
-  const fTol = adjustedTargets.fat * TIER + 0.1;
-  const cTol = adjustedTargets.netCarbs * TIER + 0.1;
+  const activePTol = adjustedTargets.protein * TIER + 0.1;
+  const activeFTol = adjustedTargets.fat * TIER + 0.1;
+  const activeCTol = adjustedTargets.netCarbs * TIER + 0.1;
 
-  const isProteinValid = Math.abs(achieved.protein - adjustedTargets.protein) <= pTol;
-  const isFatValid = Math.abs(achieved.fat - adjustedTargets.fat) <= fTol;
-  const isCarbsValid = Math.abs(achieved.netCarbs - adjustedTargets.netCarbs) <= cTol;
+  const isProteinValid = Math.abs(achieved.protein - adjustedTargets.protein) <= activePTol;
+  const isFatValid = Math.abs(achieved.fat - adjustedTargets.fat) <= activeFTol;
+  const isCarbsValid = Math.abs(achieved.netCarbs - adjustedTargets.netCarbs) <= activeCTol;
 
   const isFeasible = isProteinValid && isFatValid && isCarbsValid;
 
   console.log(`[MacroBalancer] Phase 5: Achieved Macros vs Targets:`);
   console.log(
-    `   Protein:  ${achieved.protein.toFixed(1)} / ${adjustedTargets.protein}  (Tol: ±${pTol.toFixed(1)}) -> ${isProteinValid ? 'PASS' : 'FAIL'}`
+    `   Protein:  ${achieved.protein.toFixed(1)} / ${adjustedTargets.protein}  (Tol: ±${activePTol.toFixed(1)}) -> ${isProteinValid ? 'PASS' : 'FAIL'}`
   );
   console.log(
-    `   Fat:      ${achieved.fat.toFixed(1)} / ${adjustedTargets.fat}  (Tol: ±${fTol.toFixed(1)}) -> ${isFatValid ? 'PASS' : 'FAIL'}`
+    `   Fat:      ${achieved.fat.toFixed(1)} / ${adjustedTargets.fat}  (Tol: ±${activeFTol.toFixed(1)}) -> ${isFatValid ? 'PASS' : 'FAIL'}`
   );
   console.log(
-    `   NetCarbs: ${achieved.netCarbs.toFixed(1)} / ${adjustedTargets.netCarbs}  (Tol: ±${cTol.toFixed(1)}) -> ${isCarbsValid ? 'PASS' : 'FAIL'}`
+    `   NetCarbs: ${achieved.netCarbs.toFixed(1)} / ${adjustedTargets.netCarbs}  (Tol: ±${activeCTol.toFixed(1)}) -> ${isCarbsValid ? 'PASS' : 'FAIL'}`
   );
 
   // Package the resulting scaled ingredients
@@ -244,7 +278,6 @@ const solveMatrix = async (ingredients, targets) => {
     };
   }
 
-  // Pass the achieved data into the diagnostic engine for accurate gap analysis
   const diagnostic = diagnoseFailure(activeIngredients, adjustedTargets, achieved);
 
   console.log(`[MacroBalancer] Phase 6: APPROXIMATE - Tolerance exceeded.`);

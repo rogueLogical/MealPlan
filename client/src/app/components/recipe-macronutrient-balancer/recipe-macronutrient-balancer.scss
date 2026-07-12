@@ -329,8 +329,8 @@ h4 {
   gap: 0.75rem;
 
   .grid-header {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 2fr 1fr 2fr;
     padding: 0 16px 8px 16px;
     border-bottom: 2px solid var(--border-color);
     font-weight: 600;
@@ -341,8 +341,8 @@ h4 {
   }
 
   .grid-row {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 2fr 1fr 2fr;
     align-items: center;
     padding: 16px;
     background-color: var(--bg-card);
@@ -363,7 +363,20 @@ h4 {
       color: var(--text-muted);
       font-weight: 500;
     }
+    .ing-contrib {
+      text-align: right;
+    }
   }
+}
+
+/* Early Exit / Acceptance Banner */
+.partial-accept-banner {
+  background-color: rgba(37, 99, 235, 0.05);
+  border: 1px dashed var(--accent-primary);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  box-sizing: border-box;
 }
 
 /* --- Animations (Inherited) --- */
