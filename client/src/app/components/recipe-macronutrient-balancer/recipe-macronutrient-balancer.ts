@@ -232,4 +232,23 @@ export class RecipeMacronutrientBalancer implements OnInit {
   get targetCalories(): number {
     return this.mealTargets.protein * 4 + this.mealTargets.netCarbs * 4 + this.mealTargets.fat * 9;
   }
+
+  getMacroClass(key: 'calories' | 'protein' | 'fat' | 'netCarbs'): string {
+    if (!this.mealTargets) return '';
+
+    const actual = this.currentMacrosPerPortion[key] || 0;
+    const target = key === 'calories' ? this.targetCalories : this.mealTargets[key] || 0;
+
+    if (target === 0) return '';
+
+    const tolerance = target * 0.1;
+
+    if (actual > target + tolerance) {
+      return 'macro-over';
+    } else if (actual < target - tolerance) {
+      return 'macro-under';
+    } else {
+      return 'macro-within';
+    }
+  }
 }

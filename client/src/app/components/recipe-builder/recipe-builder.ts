@@ -405,6 +405,25 @@ export class RecipeBuilder implements OnInit, OnDestroy, OnChanges {
     this.closeBuilder.emit();
   }
 
+  getMacroClass(key: 'calories' | 'protein' | 'fat' | 'netCarbs'): string {
+    if (!this.currentTargets) return '';
+
+    const actual = this.recipeTotalsPerPortion[key] || 0;
+    const target = this.currentTargets[key] || 0;
+
+    if (target === 0) return '';
+
+    const tolerance = target * 0.1;
+
+    if (actual > target + tolerance) {
+      return 'macro-over';
+    } else if (actual < target - tolerance) {
+      return 'macro-under';
+    } else {
+      return 'macro-within';
+    }
+  }
+
   private patchInitialData(): void {
     if (!this.initialRecipe) return;
 

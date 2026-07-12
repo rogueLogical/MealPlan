@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Recipe } from '../../models/recipe.model';
+import { Recipe, UserMacroTargets } from '../../models/recipe.model';
 import { AuthService } from '../../services/auth';
 
 @Component({
@@ -13,6 +13,7 @@ import { AuthService } from '../../services/auth';
 export class RecipeDetail implements OnInit {
   @Input({ required: true }) recipe!: Recipe;
   @Input() isFavorite = false;
+  @Input() targetMacros?: UserMacroTargets;
 
   @Output() toggleFavorite = new EventEmitter<Recipe>();
   @Output() copyRecipe = new EventEmitter<Recipe>();
@@ -52,5 +53,28 @@ export class RecipeDetail implements OnInit {
 
   onCopyClicked(): void {
     this.copyRecipe.emit(this.recipe);
+  }
+
+  getMacroClass(key: 'calories' | 'protein' | 'fat' | 'netCarbs'): string {
+    if (!this.targetMacros) return '';
+
+    const targets =
+      this.recipe.recipeType === 'Snack' ? this.targetMacros.snack : this.targetMacros.meal;
+    if (!targets) return '';
+
+    const actual = this.displayMacros[key] || 0;
+    const target = targets[key] || 0;
+
+    if (target === 0) return '';
+
+    const tolerance = target * 0.1;
+
+    if (actual > target + tolerance) {
+      return 'macro-over';
+    } else if (actual < target - tolerance) {
+      return 'macro-under';
+    } else {
+      return 'macro-within';
+    }
   }
 }

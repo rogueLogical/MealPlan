@@ -18,10 +18,16 @@
                 <div class="macro-block actual">
                   <h4>Current Macros (Per Portion)</h4>
                   <div class="macros-grid">
-                    <span>Cal: {{ currentMacrosPerPortion.calories }}</span>
-                    <span>Pro: {{ currentMacrosPerPortion.protein }}g</span>
-                    <span>Fat: {{ currentMacrosPerPortion.fat }}g</span>
-                    <span style="color: #28a745"
+                    <span [ngClass]="getMacroClass('calories')"
+                      >Cal: {{ currentMacrosPerPortion.calories }}</span
+                    >
+                    <span [ngClass]="getMacroClass('protein')"
+                      >Pro: {{ currentMacrosPerPortion.protein }}g</span
+                    >
+                    <span [ngClass]="getMacroClass('fat')"
+                      >Fat: {{ currentMacrosPerPortion.fat }}g</span
+                    >
+                    <span [ngClass]="getMacroClass('netCarbs')"
                       >Net Carbs: {{ currentMacrosPerPortion.netCarbs }}g</span
                     >
                   </div>
@@ -33,7 +39,7 @@
                     <span>Cal: {{ targetCalories }}</span>
                     <span>Pro: {{ mealTargets.protein }}g</span>
                     <span>Fat: {{ mealTargets.fat }}g</span>
-                    <span style="color: #28a745">Net Carbs: {{ mealTargets.netCarbs }}g</span>
+                    <span>Net Carbs: {{ mealTargets.netCarbs }}g</span>
                   </div>
                 </div>
               </div>
@@ -111,10 +117,16 @@
                   <div class="macro-block actual">
                     <h4>Current Macros (Per Portion)</h4>
                     <div class="macros-grid">
-                      <span>Cal: {{ currentMacrosPerPortion.calories }}</span>
-                      <span>Pro: {{ currentMacrosPerPortion.protein }}g</span>
-                      <span>Fat: {{ currentMacrosPerPortion.fat }}g</span>
-                      <span style="color: #28a745"
+                      <span [ngClass]="getMacroClass('calories')"
+                        >Cal: {{ currentMacrosPerPortion.calories }}</span
+                      >
+                      <span [ngClass]="getMacroClass('protein')"
+                        >Pro: {{ currentMacrosPerPortion.protein }}g</span
+                      >
+                      <span [ngClass]="getMacroClass('fat')"
+                        >Fat: {{ currentMacrosPerPortion.fat }}g</span
+                      >
+                      <span [ngClass]="getMacroClass('netCarbs')"
                         >Net Carbs: {{ currentMacrosPerPortion.netCarbs }}g</span
                       >
                     </div>
@@ -126,7 +138,7 @@
                       <span>Cal: {{ targetCalories }}</span>
                       <span>Pro: {{ mealTargets.protein }}g</span>
                       <span>Fat: {{ mealTargets.fat }}g</span>
-                      <span style="color: #28a745">Net Carbs: {{ mealTargets.netCarbs }}g</span>
+                      <span>Net Carbs: {{ mealTargets.netCarbs }}g</span>
                     </div>
                   </div>
                 </div>
@@ -144,9 +156,9 @@
                     <span class="ing-name">{{ ing.name | titlecase }}</span>
                     <span class="ing-weight">{{ ing.weightInGrams }}g</span>
                     <span class="ing-contrib" style="font-size: 0.9rem; color: var(--text-muted)">
-                      P: {{ ing.nutrition?.protein?.toFixed(1) || 0 }}g | F:
-                      {{ ing.nutrition?.fat?.toFixed(1) || 0 }}g | NC:
-                      {{ ing.nutrition?.netCarbs?.toFixed(1) || 0 }}g
+                      P: {{ ing.nutrition.protein.toFixed(1) }}g | F:
+                      {{ ing.nutrition.fat.toFixed(1) }}g | NC:
+                      {{ ing.nutrition.netCarbs.toFixed(1) }}g
                     </span>
                   </div>
                 }
@@ -258,9 +270,9 @@
                   <span class="ing-name">{{ ing.name | titlecase }}</span>
                   <span class="ing-weight">{{ ing.weightInGrams }}g</span>
                   <span class="ing-contrib" style="font-size: 0.9rem; color: var(--text-muted)">
-                    P: {{ ing.nutrition?.protein?.toFixed(1) || 0 }}g | F:
-                    {{ ing.nutrition?.fat?.toFixed(1) || 0 }}g | NC:
-                    {{ ing.nutrition?.netCarbs?.toFixed(1) || 0 }}g
+                    P: {{ ing.nutrition.protein.toFixed(1) }}g | F:
+                    {{ ing.nutrition.fat.toFixed(1) }}g | NC:
+                    {{ ing.nutrition.netCarbs.toFixed(1) }}g
                   </span>
                 </div>
               }

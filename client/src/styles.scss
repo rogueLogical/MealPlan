@@ -35,6 +35,17 @@ html.dark-mode {
   --shadow-sm: 2px 2px 3px rgba(0, 0, 0, 0.5);
 }
 
+/* --- Macro summary coloring definitions --- */
+.macro-within {
+  color: #10b981 !important; /* Green (Within +/- 10% of target) */
+}
+.macro-over {
+  color: #ef4444 !important; /* Red (Over target) */
+}
+.macro-under {
+  color: #eab308 !important; /* Yellow (Under target) */
+}
+
 /* --- Base Layout Resets --- */
 html,
 body {

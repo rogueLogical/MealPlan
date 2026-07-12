@@ -30,6 +30,7 @@
         <app-recipe-card
           [recipe]="recipe"
           [isFavorite]="true"
+          [targetMacros]="userTargets"
           (view)="onViewRecipe($event)"
           (edit)="onEditRecipe($event)"
           (delete)="onDeleteRecipe($event)"
@@ -83,6 +84,7 @@
         <app-recipe-card
           [recipe]="recipe"
           [isFavorite]="favoriteRecipeIds.includes(recipe._id)"
+          [targetMacros]="userTargets"
           (view)="onViewRecipe($event)"
           (edit)="onEditRecipe($event)"
           (delete)="onDeleteRecipe($event)"
@@ -98,6 +100,7 @@
 @if (isSearchModalOpen) {
   <app-recipe-search
     [favoriteRecipeIds]="favoriteRecipeIds"
+    [targetMacros]="userTargets"
     (closeSearch)="closeSearchModal()"
     (view)="onViewRecipe($event)"
     (toggleFavorite)="onToggleFavorite($event)"
@@ -110,6 +113,7 @@
   <app-recipe-detail
     [recipe]="viewingRecipe"
     [isFavorite]="favoriteRecipeIds.includes(viewingRecipe._id)"
+    [targetMacros]="userTargets"
     (closeDetail)="closeView()"
     (editRecipe)="onEditRecipe($event)"
     (toggleFavorite)="onToggleFavorite($event)"

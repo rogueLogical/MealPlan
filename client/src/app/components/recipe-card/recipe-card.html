@@ -59,19 +59,23 @@
     <div class="macro-header">Macros (Per Portion)</div>
     <div class="macros-grid">
       <div class="macro-stat">
-        <span class="value">{{ displayMacros.calories }}</span>
+        <span class="value" [ngClass]="getMacroClass('calories')">{{
+          displayMacros.calories
+        }}</span>
         <span class="label">Cal</span>
       </div>
       <div class="macro-stat">
-        <span class="value">{{ displayMacros.protein }}g</span>
+        <span class="value" [ngClass]="getMacroClass('protein')">{{ displayMacros.protein }}g</span>
         <span class="label">Pro</span>
       </div>
-      <div class="macro-stat highlight">
-        <span class="value">{{ displayMacros.netCarbs }}g</span>
+      <div class="macro-stat">
+        <span class="value" [ngClass]="getMacroClass('netCarbs')"
+          >{{ displayMacros.netCarbs }}g</span
+        >
         <span class="label">Net</span>
       </div>
       <div class="macro-stat">
-        <span class="value">{{ displayMacros.fat }}g</span>
+        <span class="value" [ngClass]="getMacroClass('fat')">{{ displayMacros.fat }}g</span>
         <span class="label">Fat</span>
       </div>
     </div>

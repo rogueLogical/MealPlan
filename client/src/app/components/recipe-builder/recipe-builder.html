@@ -46,10 +46,14 @@
             <div class="macro-block actual">
               <h4>Macros Per Portion</h4>
               <div class="macros-grid">
-                <span>Cal: {{ recipeTotalsPerPortion.calories }}</span>
-                <span>Pro: {{ recipeTotalsPerPortion.protein }}g</span>
-                <span>Fat: {{ recipeTotalsPerPortion.fat }}g</span>
-                <span style="color: #28a745"
+                <span [ngClass]="getMacroClass('calories')"
+                  >Cal: {{ recipeTotalsPerPortion.calories }}</span
+                >
+                <span [ngClass]="getMacroClass('protein')"
+                  >Pro: {{ recipeTotalsPerPortion.protein }}g</span
+                >
+                <span [ngClass]="getMacroClass('fat')">Fat: {{ recipeTotalsPerPortion.fat }}g</span>
+                <span [ngClass]="getMacroClass('netCarbs')"
                   >Net Carbs: {{ recipeTotalsPerPortion.netCarbs }}g</span
                 >
               </div>
@@ -62,7 +66,7 @@
                   <span>Cal: {{ currentTargets.calories }}</span>
                   <span>Pro: {{ currentTargets.protein }}g</span>
                   <span>Fat: {{ currentTargets.fat }}g</span>
-                  <span style="color: #28a745">Net Carbs: {{ currentTargets.netCarbs }}g</span>
+                  <span>Net Carbs: {{ currentTargets.netCarbs }}g</span>
                 </div>
               </div>
             }
@@ -114,7 +118,7 @@
                 <div class="ing-breakdown">
                   <em>Contributes per portion:</em>
                   Protein: {{ mac.protein }}g | Fat: {{ mac.fat }}g |
-                  <span class="net-carb-text">Net Carbs: {{ mac.netCarbs }}g</span>
+                  <span>Net Carbs: {{ mac.netCarbs }}g</span>
                 </div>
               }
             </div>
