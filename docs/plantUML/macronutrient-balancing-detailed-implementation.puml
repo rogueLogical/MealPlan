@@ -1,0 +1,115 @@
+@startuml
+skinparam ArrowColor #2563EB
+skinparam ActivityBorderColor #10B981
+skinparam ActivityBackgroundColor #F3F4F6
+skinparam DecisionBorderColor #2563EB
+skinparam DecisionBackgroundColor #EFF6FF
+
+start
+:User requests Macro Balancing;
+:Client constructs payload and calls **POST /api/recipes/balance**;
+note right
+  Includes current ingredients, targets,
+  dietary restrictions, and interventionCount
+end note
+
+partition "solveMatrix (Backend Solver)" {
+  :Calculate current total delivery using dynamically sized multipliers;
+  
+  if (Current recipe macros already within targets +/- 10%?) then (yes)
+    :Set isFeasible = true;
+    :scaledIngredients = original ingredients;
+  else (no)
+    :Filter seasonings and active ingredients;
+    :Subtract seasoning macros from targets to yield adjustedTargets;
+    :Construct Matrix A and Vector b;
+    :Apply Tikhonov Regularization (lambda = 0.0001);
+    
+    if (Run NNLS Solver successfully?) then (yes)
+      :Map multipliers (guard against NaN and values < 1e-10);
+    else (no (Solver Exception / Max Iterations))
+      :Fallback to identity multipliers (fill with 1.0);
+      note right
+        Preserves original weights 
+        and prevents the zero-out cascade
+      end note
+    endif
+    
+    :Compute achieved macros and check active feasibility;
+    
+    if (Achieved macros are within +/- 10% of active targets?) then (yes)
+      :Set isFeasible = true;
+      :Package scaled ingredients + original seasonings;
+    else (no)
+      :Set isFeasible = false;
+      
+      partition "diagnoseFailure() Logic" {
+        if (Are active ingredients empty?) then (yes)
+          :Set failureType = 'ADD';
+          :Identify primary macro;
+          :Return Deficiency Conflict (ADD);
+        else (no)
+          if (Does any active ingredient contain a macro targeted at 0g?) then (yes)
+            :Set failureType = 'REMOVE';
+            :Identify heaviest contributor as offendingIngredient;
+            :Return Strict Zero Conflict (REMOVE);
+          else (no)
+            :Calculate target shortfall gaps (adjustedTargets - achieved);
+            :Identify macro with the worst relative gap;
+            :Set failureType = 'ADD';
+            :Return Deficiency Conflict (ADD);
+          endif
+        endif
+      }
+      
+    endif
+  endif
+}
+
+partition "balanceRecipe (Controller Routing)" {
+  if (isFeasible?) then (yes)
+    :Return **status: 'success'** with scaled ingredients;
+  else (no)
+    if (interventionCount >= 4?) then (yes (Circuit Breaker))
+      :Return **status: 'approximate_success'**;
+    else (no)
+      if (failureType is REMOVE?) then (yes)
+        :Construct REMOVE intervention payload;
+      else (no (ADD))
+        :Query Gemini AI for 3 culinary suggestions;
+        :Resolve suggestions (Local MongoDB -> USDA API Fallback);
+        :Auto-populate newly verified USDA ingredients in DB;
+        :Construct ADD intervention options;
+      endif
+      :Return **status: 'action_required'** with intervention details;
+    endif
+  endif
+}
+
+partition "Client-Side Response Handling" {
+  if (Response Status) then ('success' or 'approximate_success')
+    :Display **REVIEW** state in modal;
+    if (User saves changes?) then (yes)
+      :Save scaled ingredients back to Recipe Builder;
+    else (no)
+      :Discard changes;
+    endif
+    stop
+  else ('action_required')
+    :Display **INTERVENTION** state in modal;
+    
+    if (Intervention Type) then (REMOVE)
+      :User confirms removal;
+      :Filter out target ingredient using case-insensitive check;
+    else (ADD)
+      :User selects an alternative;
+      :Append new ingredient with baseline serving size weight;
+    endif
+    
+    :Increment **interventionCount++**;
+    :Clear current intervention state;
+    :Recursively re-run balancer sequence;
+    detach
+  endif
+}
+@enduml

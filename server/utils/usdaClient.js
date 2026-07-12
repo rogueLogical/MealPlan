@@ -10,14 +10,82 @@ const NUTRIENT_IDS = {
 };
 
 // Helper function to extract a specific nutrient value from the USDA payload.
-// Returns 0 if the nutrient is not found to prevent NaN math errors.
-const extractNutrient = (foodItems, nutrientId) => {
-  const nutrient = foodItems.foodNutrients.find((n) => n.nutrientId === nutrientId);
+const extractNutrient = (foodItem, nutrientId) => {
+  const nutrient = foodItem.foodNutrients.find((n) => n.nutrientId === nutrientId);
   return nutrient ? nutrient.value : 0;
+};
+
+// Normalizes strings by lowercasing and cleaning punctuation for uniform comparison
+const normalizeString = (str) => {
+  return (str || '')
+    .toLowerCase()
+    .replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, ' ') // Replace punctuation with space
+    .replace(/\s+/g, ' ') // Collapse multiple spaces
+    .trim();
+};
+
+// Computes a similarity score based on keyword overlap and macro validation
+const calculateMatchScore = (query, food) => {
+  const description = food.description;
+  const normalizedQuery = normalizeString(query);
+  const normalizedDesc = normalizeString(description);
+
+  const queryWords = normalizedQuery.split(' ');
+  const descWords = normalizedDesc.split(' ');
+
+  // Count how many unique query words are present in the item description
+  let matchCount = 0;
+  queryWords.forEach((word) => {
+    if (descWords.includes(word)) {
+      matchCount++;
+    }
+  });
+
+  const queryCoverage = matchCount / queryWords.length;
+  let score = queryCoverage * 100;
+
+  // Exact Match Bonus
+  if (normalizedQuery === normalizedDesc) {
+    score += 50;
+  }
+
+  // Substring Match Bonus
+  if (normalizedDesc.includes(normalizedQuery) || normalizedQuery.includes(normalizedDesc)) {
+    score += 20;
+  }
+
+  // Sorted Word Match Bonus (e.g. "Avocado Oil" matches "Oil, avocado" exactly when sorted)
+  const sortedQuery = [...queryWords].sort().join(' ');
+  const sortedDesc = [...descWords].sort().join(' ');
+  if (sortedQuery === sortedDesc) {
+    score += 40;
+  }
+
+  // --- Domain-Specific Nutritional Safeguards ---
+  const fatKeywords = ['fat', 'oil', 'lard', 'tallow', 'butter', 'ghee', 'shortening'];
+  const hasFatKeywordInQuery = fatKeywords.some((keyword) => normalizedQuery.includes(keyword));
+  const hasFatKeywordInDesc = fatKeywords.some((keyword) => normalizedDesc.includes(keyword));
+
+  if (hasFatKeywordInQuery) {
+    const protein = extractNutrient(food, NUTRIENT_IDS.PROTEIN);
+    const fat = extractNutrient(food, NUTRIENT_IDS.FAT);
+
+    // Safeguard 1: If looking for fat/oil, penalize non-fatty items (e.g. meat, raw fruits)
+    if (fat < 50 || protein > fat) {
+      score -= 150;
+    }
+  } else if (hasFatKeywordInDesc) {
+    // Safeguard 2: If the query does NOT ask for fat/oil, but the description is a fat/oil,
+    // penalize it so the whole food (like raw avocado) is preferred.
+    score -= 100;
+  }
+
+  return score;
 };
 
 /**
  * Queries the USDA API for an ingredient and returns verified macros per 100g.
+ * Filters the top 30 matches to find the mathematically closest name match.
  * @param {string} query - The ingredient name to search for.
  * @returns {Promise<Object>} { protein, fat, netCarbs }
  */
@@ -27,20 +95,14 @@ const fetchUsdaMacros = async (query) => {
   }
 
   try {
-    // Construct the query targeting standard, single-ingredient foods
-    // We prioritize "Foundation" and "SR Legacy" data types as they contain
-    // the most accurate, unbranded raw ingredient data.
     const url = new URL(USDA_SEARCH_URL);
     url.searchParams.append('api_key', USDA_API_KEY);
     url.searchParams.append('query', query);
     url.searchParams.append('dataType', 'Foundation,SR Legacy');
-    url.searchParams.append('pageSize', '1'); // We only need the top match
+    url.searchParams.append('pageSize', '30'); // Fix: Increased search results to expand candidate recall pool
 
-    // Execute the fetch request
     const response = await fetch(url.toString());
 
-    // Catch 400 Bad Request (or any non-200 status) and return a zeroed fallback
-    // instead of throwing an error that crashes the Promise.all array.
     if (!response.ok) {
       console.warn(
         `USDA API responded with status: ${response.status} for query "${query}". Returning zeroed fallback.`
@@ -50,16 +112,27 @@ const fetchUsdaMacros = async (query) => {
 
     const data = await response.json();
 
-    // Handle zero-results scenario
     if (!data.foods || data.foods.length === 0) {
       console.warn(`No USDA data found for: ${query}. Returning zeroed fallback.`);
-      // If the AI hallucinates a food that doesn't exist, we return zeroes
-      // rather than crashing the server.
       return { protein: 0, fat: 0, netCarbs: 0 };
     }
 
-    // Extract the exact math from the top matched food item
-    const topMatch = data.foods[0];
+    // Map each returned food item with its computed match score
+    const scoredFoods = data.foods.map((food) => {
+      const score = calculateMatchScore(query, food);
+      return { food, score };
+    });
+
+    // Sort descending by match score to bubble the most accurate description to the top
+    scoredFoods.sort((a, b) => b.score - a.score);
+
+    // Pick the best match determined by our scoring algorithm
+    const topMatch = scoredFoods[0].food;
+
+    console.log(
+      `[USDA Search] Query "${query}" matched with item "${topMatch.description}" ` +
+        ` (Score: ${scoredFoods[0].score.toFixed(1)})`
+    );
 
     const protein = extractNutrient(topMatch, NUTRIENT_IDS.PROTEIN);
     const fat = extractNutrient(topMatch, NUTRIENT_IDS.FAT);
@@ -69,9 +142,7 @@ const fetchUsdaMacros = async (query) => {
     // Calculate Net Carbs
     const netCarbs = Math.max(0, totalCarbs - fiber);
 
-    // Return the normalized payload to the Express controller
     return {
-      // USDA values are universally provided per 100g
       protein: parseFloat(protein.toFixed(2)),
       fat: parseFloat(fat.toFixed(2)),
       totalCarbs: parseFloat(totalCarbs.toFixed(2)),

@@ -15,6 +15,32 @@ const balanceRecipe = async (req, res) => {
     // Extract payload from the Angular client
     const { ingredients, targets, dietaryRestrictions, interventionCount = 0 } = req.body;
 
+    // Log request contents for debugging purposes
+    console.log('\n=========================================');
+    console.log('[DEBUG] INCOMING RECIPE BALANCER REQUEST');
+    console.log('=========================================');
+    console.log(`Intervention Count : ${interventionCount}`);
+    console.log(
+      `Target Macros      : P: ${targets.protein}g | F: ${targets.fat}g | NC: ${targets.netCarbs}g`
+    );
+    console.log(
+      `Dietary Filters    : [${dietaryRestrictions && dietaryRestrictions.length > 0 ? dietaryRestrictions.join(', ') : 'None'}]`
+    );
+    console.log('Ingredients:');
+    if (ingredients && ingredients.length > 0) {
+      ingredients.forEach((ing, i) => {
+        const nut = ing.nutrition || {};
+        console.log(
+          `  [${i + 1}] Name: "${ing.name}"` +
+            ` | Weight: ${ing.weightInGrams}g` +
+            ` | Macros (Scaled): P: ${nut.protein || 0}g, F: ${nut.fat || 0}g, NC: ${nut.netCarbs || 0}g`
+        );
+      });
+    } else {
+      console.log('  (No ingredients provided in request)');
+    }
+    console.log('=========================================\n');
+
     // Attempt the core mathematical solve (+/- 10% tolerance band)
     const solverResult = await solveMatrix(ingredients, targets);
 
@@ -36,12 +62,13 @@ const balanceRecipe = async (req, res) => {
       });
     }
 
-    // STATE 2: Matrix failed, and we need user intervention (SWAP or ADD or REMOVE)
+    // STATE 2: Matrix failed, and we need user intervention (ADD or REMOVE)
 
     // INTERCEPT: If a strict zero constraint was violated, we bypass the AI entirely.
     if (solverResult.failureType === 'REMOVE') {
       return res.status(200).json({
         status: 'action_required',
+        ingredients: solverResult.scaledIngredients,
         intervention: {
           type: 'REMOVE',
           targetIngredient: solverResult.offendingIngredient,
@@ -58,7 +85,8 @@ const balanceRecipe = async (req, res) => {
       offendingIngredient: solverResult.offendingIngredient,
       targetMacro: solverResult.targetMacro,
       dietaryRestrictions: dietaryRestrictions,
-      currentIngredients: ingredients.map((ing) => ing.name)
+      currentIngredients: ingredients.map((ing) => ing.name),
+      zeroTargets: solverResult.zeroTargets
     });
 
     // Look in Database for ingredient macros First, USDA Second
@@ -83,8 +111,8 @@ const balanceRecipe = async (req, res) => {
         // Not found in DB. Fallback to USDA API.
         const verifiedMacros = await fetchUsdaMacros(concept.ingredientName);
 
-        // AUTO-POPULATE: Save the newly verified ingredient to your database
-        // so the NEXT time the AI suggests it, we hit Step 1 instead!
+        // AUTO-POPULATE: Save the newly verified ingredient to the database
+        // so the NEXT time the AI suggests it, we hit Step 1 instead
         if (verifiedMacros.protein > 0 || verifiedMacros.fat > 0 || verifiedMacros.netCarbs > 0) {
           const finalIngredient = await Ingredient.create({
             name: concept.ingredientName,
@@ -119,6 +147,7 @@ const balanceRecipe = async (req, res) => {
     // Finally, return the strict schema the Angular frontend expects
     return res.status(200).json({
       status: 'action_required',
+      ingredients: solverResult.scaledIngredients,
       intervention: {
         type: solverResult.failureType, // 'SWAP' or 'ADD'
         targetIngredient:

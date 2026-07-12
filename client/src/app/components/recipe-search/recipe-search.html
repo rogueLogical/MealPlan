@@ -41,6 +41,7 @@
             <app-recipe-card
               [recipe]="result"
               [isFavorite]="favoriteRecipeIds.includes(result._id)"
+              [targetMacros]="targetMacros"
               (view)="view.emit($event)"
               (toggleFavorite)="toggleFavorite.emit($event)"
               (copyRecipe)="copyRecipe.emit($event)"

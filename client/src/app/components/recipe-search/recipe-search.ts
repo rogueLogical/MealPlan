@@ -11,7 +11,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { Recipe } from '../../models/recipe.model';
+import { Recipe, UserMacroTargets } from '../../models/recipe.model';
 import { RecipeService } from '../../services/recipe';
 import { RecipeCard } from '../recipe-card/recipe-card';
 
@@ -24,6 +24,7 @@ import { RecipeCard } from '../recipe-card/recipe-card';
 })
 export class RecipeSearch implements OnInit, OnDestroy {
   @Input() favoriteRecipeIds: string[] = [];
+  @Input() targetMacros?: UserMacroTargets;
 
   @Output() closeSearch = new EventEmitter<void>();
   @Output() view = new EventEmitter<Recipe>();
