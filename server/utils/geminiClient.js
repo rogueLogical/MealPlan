@@ -1,8 +1,9 @@
 const { GoogleGenAI, Type } = require('@google/genai');
 
-// Initialize the new unified client
-// It will automatically pick up process.env.GEMINI_API_KEY
-const ai = new GoogleGenAI({});
+// Initialize the google genAI client
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY || 'test_dummy_gemini_api_key'
+});
 
 // Dietary restriction tags matching the allowed tag rules
 const ALLOWED_TAGS = [

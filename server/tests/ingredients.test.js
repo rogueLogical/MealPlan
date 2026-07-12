@@ -6,6 +6,11 @@ const Ingredient = require('../models/Ingredient');
 const User = require('../models/User');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 
+jest.mock('../utils/geminiClient', () => ({
+  getDietaryTagsForIngredient: jest.fn().mockResolvedValue(['Gluten-Free', 'Vegan']),
+  getAiSuggestions: jest.fn().mockResolvedValue([])
+}));
+
 let mongoServer;
 let creatorToken;
 let otherUserToken;
