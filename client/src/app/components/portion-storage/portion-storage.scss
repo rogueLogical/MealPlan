@@ -1,0 +1,115 @@
+.storage-workspace {
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.workspace-header {
+  margin-bottom: 2rem;
+  text-align: left;
+  h2 {
+    color: var(--text-main);
+    margin: 0 0 6px 0;
+  }
+  .description {
+    color: var(--text-muted);
+    margin: 0;
+    font-size: 0.95rem;
+  }
+}
+
+.loading-state,
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px dashed var(--border-color);
+  color: var(--text-muted);
+
+  h3 {
+    margin-top: 0;
+    color: var(--text-main);
+  }
+}
+
+.storage-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.storage-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent-primary);
+  }
+}
+
+.card-body {
+  padding: 1.5rem;
+  flex-grow: 1;
+  text-align: center;
+
+  .recipe-title {
+    margin: 0 0 1rem 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+
+  .portions-count {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+
+    .count-number {
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--accent-primary);
+      line-height: 1;
+    }
+
+    .count-label {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
+  }
+}
+
+.card-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+  background: rgba(37, 99, 235, 0.02);
+}
+
+.btn-eat {
+  width: 100%;
+  padding: 10px;
+  background: var(--form-control-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: var(--accent-primary);
+    color: #ffffff;
+    border-color: var(--accent-primary);
+  }
+}

@@ -10,6 +10,7 @@ import { GroceryList } from './components/grocery-list/grocery-list';
 import { Settings } from './components/settings/settings';
 import { Register } from './components/register/register';
 import { ForgotPassword } from './components/forgot-password/forgot-password';
+import { PortionStorage } from './components/portion-storage/portion-storage';
 
 export const routes: Routes = [
   { path: 'login', component: Login, canActivate: [guestGuard] },
@@ -25,6 +26,7 @@ export const routes: Routes = [
       { path: 'meals', component: MealsPlanner },
       { path: 'recipes', component: RecipesLibrary },
       { path: 'groceries', component: GroceryList },
+      { path: 'storage', component: PortionStorage },
       { path: 'settings', component: Settings },
       { path: '', redirectTo: 'home', pathMatch: 'full' }, // Default dashboard view
     ],

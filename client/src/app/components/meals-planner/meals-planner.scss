@@ -1,0 +1,695 @@
+/* src/app/components/meals-planner/meals-planner.scss */
+
+.planner-workspace {
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.workspace-header {
+  margin-bottom: 2rem;
+  text-align: left;
+  h2 {
+    color: var(--text-main);
+    margin: 0 0 6px 0;
+  }
+  .description {
+    color: var(--text-muted);
+    margin: 0;
+    font-size: 0.95rem;
+  }
+}
+
+.loading-state,
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px dashed var(--border-color);
+  color: var(--text-muted);
+
+  h3 {
+    margin-top: 0;
+    color: var(--text-main);
+  }
+}
+
+.btn {
+  padding: 10px 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+
+  &.btn-primary {
+    background: var(--accent-primary);
+    color: #ffffff;
+    &:hover {
+      background: #1d4ed8;
+    }
+  }
+
+  &.btn-secondary {
+    background: var(--form-control-bg);
+    border-color: var(--border-color);
+    color: var(--text-main);
+    &:hover {
+      border-color: var(--accent-primary);
+      background: rgba(37, 99, 235, 0.05);
+    }
+  }
+}
+
+/* Static Card Styles for Active Workspace */
+.active-plan-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  text-align: left;
+
+  .card-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.25rem;
+    }
+
+    h3 {
+      margin: 0;
+      color: var(--text-main);
+    }
+
+    .plan-header-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    .header-actions-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+
+      @media (max-width: 768px) {
+        width: 100%;
+        justify-content: flex-start;
+        gap: 8px;
+
+        .btn {
+          flex-grow: 1; /* Stretches buttons proportionally on mobile */
+          text-align: center;
+          font-size: 0.9rem;
+          padding: 8px 12px;
+        }
+      }
+    }
+  }
+
+  .card-body {
+    padding: 1.5rem;
+  }
+}
+
+/* Modal Window Styles for Creator/Editor */
+.plan-form-card {
+  width: 95%;
+  max-width: 650px; /* Slightly wider for form elements layout */
+  max-height: 90vh; /* Lets the modal expand naturally as selections increase */
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  padding: 0 !important;
+  text-align: left;
+  animation: modalPopIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+
+  .modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+
+    h3 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      line-height: 1;
+      padding: 0;
+      transition: color 0.15s ease;
+
+      &:hover {
+        color: var(--text-main);
+      }
+    }
+  }
+
+  .modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex-grow: 1;
+  }
+
+  .modal-footer {
+    padding: 20px 24px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between; /* Keeps checkbox left, buttons right */
+    align-items: center;
+    flex-shrink: 0;
+    background: rgba(0, 0, 0, 0.01);
+  }
+}
+
+.recipes-selection-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 220px; /* Lock selection pool's height to keep it readable */
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.recipe-selection-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--form-control-bg);
+
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+    color: var(--text-main);
+    cursor: pointer;
+
+    input[type='checkbox'] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      background-color: var(--form-control-bg);
+      border: 2px solid var(--border-color);
+      border-radius: 6px;
+      cursor: pointer;
+      flex-shrink: 0;
+      display: grid;
+      place-content: center;
+      transition: all 0.15s ease-in-out;
+
+      &::before {
+        content: '';
+        width: 10px;
+        height: 10px;
+        transform: scale(0);
+        transition: 120ms transform ease-in-out;
+        background-color: #ffffff;
+        clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+      }
+
+      &:hover {
+        border-color: var(--accent-primary);
+        background-color: rgba(37, 99, 235, 0.04);
+      }
+
+      &:checked {
+        background-color: var(--accent-primary);
+        border-color: var(--accent-primary);
+
+        &::before {
+          transform: scale(1.1);
+        }
+      }
+    }
+  }
+
+  .portions-input-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    .small-input {
+      width: 80px;
+      padding: 6px 10px;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+.plan-header-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+
+  .active-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+  }
+}
+
+.planned-recipes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.planned-recipe-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--form-control-bg);
+  transition: all 0.2s ease;
+
+  &.completed {
+    border-left: 5px solid #10b981;
+    background: rgba(16, 185, 129, 0.02);
+  }
+
+  .planned-recipe-meta {
+    h4 {
+      margin: 0 0 4px 0;
+      color: var(--text-main);
+    }
+    .portions-badge {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+  }
+
+  .planned-recipe-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .status-logged {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #10b981;
+    }
+  }
+}
+
+.form-control-input {
+  padding: 10px 14px;
+  background-color: var(--form-control-bg);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s ease;
+
+  &:focus {
+    border-color: var(--accent-primary);
+  }
+}
+
+.modal-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  border: none;
+  cursor: default;
+}
+
+.modal-content {
+  position: relative;
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  width: 90%;
+}
+
+.history-plan-row {
+  transition: all 0.2s ease;
+
+  &.active-border {
+    border-left: 6px solid var(--accent-primary) !important;
+    background: rgba(37, 99, 235, 0.02) !important;
+  }
+
+  &:hover {
+    border-color: var(--accent-primary);
+  }
+}
+
+/* --- Portion Log Sub-Dialog Overlay Styles --- */
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+}
+
+.dialog-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.55);
+  border: none;
+  padding: 0;
+  cursor: default;
+  animation: backdropFadeIn 0.2s ease-out forwards;
+}
+
+.dialog-box {
+  position: relative;
+  z-index: 1101; /* Renders above the dialog backdrop layer */
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 420px;
+  box-shadow:
+    0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  animation: modalPopIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+
+  h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+
+  .dialog-close-btn {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    transition: color 0.15s ease;
+
+    &:hover {
+      color: var(--text-main);
+    }
+  }
+}
+
+.dialog-body {
+  padding: 20px;
+  font-size: 0.95rem;
+  color: var(--text-main);
+  line-height: 1.5;
+  text-align: left;
+
+  p {
+    margin: 0 0 16px 0;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+}
+
+.dialog-footer {
+  padding: 14px 20px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  background: rgba(0, 0, 0, 0.01);
+}
+
+/* --- Scaled Recipe Detail Style Overrides --- */
+.scaled-recipe-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+}
+
+.scaled-recipe-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  border: none;
+  cursor: default;
+}
+
+.scaled-recipe-modal {
+  position: relative;
+  z-index: 951;
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  width: 95%;
+  max-width: 900px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sm);
+  animation: modalPopIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  padding: 0 !important;
+}
+
+.scaled-recipe-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 24px;
+  border-bottom: 1px solid var(--border-color);
+
+  .scaled-title-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+
+    h2 {
+      margin: 0;
+      font-size: 1.75rem;
+      color: var(--text-main);
+      line-height: 1.2;
+      font-weight: 700;
+    }
+  }
+
+  .scaled-header-actions {
+    display: flex;
+    align-items: center;
+
+    .scaled-close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+    }
+  }
+}
+
+.scaled-type-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+  width: fit-content;
+
+  &.meal {
+    background-color: rgba(37, 99, 235, 0.15);
+    color: var(--accent-primary);
+  }
+  &.snack {
+    background-color: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+  }
+}
+
+.scaled-recipe-body {
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.scaled-meta-strip {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding: 12px;
+  background-color: var(--form-control-bg);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.scaled-description {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--text-main);
+}
+
+.scaled-recipe-content-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 2rem;
+  margin-top: 1rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+
+  h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.2rem;
+    color: var(--accent-primary);
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 0.5rem;
+  }
+}
+
+.scaled-ingredient-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  li {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed var(--border-color);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .scaled-ing-amount {
+      font-size: 0.95rem;
+      color: var(--text-main);
+      strong {
+        margin-right: 4px;
+      }
+      .scaled-ing-weight {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+      }
+    }
+    .scaled-ing-name {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-main);
+    }
+  }
+}
+
+.scaled-instructions-text {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: var(--text-main);
+  white-space: pre-wrap;
+}
+
+.scaled-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  .scaled-tag-chip {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+    padding: 0.3rem 0.8rem;
+    border-radius: 16px;
+  }
+}

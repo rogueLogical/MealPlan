@@ -11,6 +11,13 @@
       </div>
       <div class="header-actions">
         <button
+          class="icon-btn storage-btn"
+          (click)="openPortionDialog()"
+          title="Add Prepared Portions to Storage"
+        >
+          📦 Add to Storage
+        </button>
+        <button
           class="icon-btn favorite-btn"
           [class.active]="isFavorite"
           (click)="onFavoriteClicked()"
@@ -105,4 +112,42 @@
       }
     </div>
   </div>
+  @if (showPortionDialog) {
+    <div class="dialog-overlay" style="z-index: 1100">
+      <button
+        class="dialog-backdrop"
+        (click)="closePortionDialog()"
+        aria-label="Cancel portions selection"
+      ></button>
+      <div class="dialog-box">
+        <header class="dialog-header">
+          <h3>Log Cooked Portions</h3>
+          <button class="dialog-close-btn" (click)="closePortionDialog()">✕</button>
+        </header>
+        <div class="dialog-body">
+          <p>
+            Select how many portions you prepared. This must scale in batches matching the recipe
+            yield ({{ recipe.portions }} portions).
+          </p>
+          <div class="form-group" style="margin-top: 1rem">
+            <label for="portionDelta">Number of Portions:</label>
+            <input
+              type="number"
+              id="portionDelta"
+              [(ngModel)]="selectedDelta"
+              [step]="recipe.portions"
+              [min]="recipe.portions"
+              class="form-control-input"
+            />
+          </div>
+        </div>
+        <footer class="dialog-footer">
+          <button class="btn btn-secondary" (click)="closePortionDialog()">Cancel</button>
+          <button class="btn btn-primary" (click)="submitPortionsToStorage()">
+            Add to Storage
+          </button>
+        </footer>
+      </div>
+    </div>
+  }
 </div>

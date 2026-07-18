@@ -45,11 +45,15 @@ const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const ingredientRoutes = require('./routes/ingredients');
 const recipeRoutes = require('./routes/recipes');
+const mealPlanRoutes = require('./routes/mealPlans');
+const shoppingListRoutes = require('./routes/shoppingList');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/ingredients', ingredientRoutes);
 app.use('/api/recipes', recipeRoutes);
+app.use('/api/meal-plans', mealPlanRoutes);
+app.use('/api/shopping-list', shoppingListRoutes);
 
 // Export the app for supertest
 module.exports = app;

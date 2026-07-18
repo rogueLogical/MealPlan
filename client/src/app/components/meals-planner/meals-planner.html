@@ -1,1 +1,580 @@
-<p>meals-planner works!</p>
+<div class="planner-workspace">
+  @if (isLoading) {
+    <div class="loading-state">Loading planner dashboard...</div>
+  } @else {
+    <!-- ACTIVE WORKSPACE CARD -->
+    @if (activePlan) {
+      <div class="active-plan-card" style="margin-bottom: 2.5rem">
+        <header class="card-header">
+          <div class="plan-header-meta">
+            <span class="active-badge">Active Plan</span>
+            <h3>{{ activePlan.name }}</h3>
+          </div>
+          <div class="header-actions-group">
+            <button class="btn btn-secondary" (click)="appendPlanIngredientsToList(activePlan)">
+              🛒 Add to Shopping List
+            </button>
+            <button class="btn btn-secondary" (click)="initiatePlanEditing(activePlan)">
+              ✏️ Edit Plan
+            </button>
+            <button class="btn btn-secondary btn-deactivate" (click)="openDeactivateDialog()">
+              Deactivate Plan
+            </button>
+            <button class="btn btn-secondary btn-reset" (click)="openResetDialog()">
+              Reset Prep Progress
+            </button>
+          </div>
+        </header>
+        <div class="card-body">
+          <div class="planned-recipes-list">
+            @for (pr of activePlan.recipes; track getRecipeId(pr.recipeId)) {
+              <div class="planned-recipe-card" [class.completed]="pr.isCompleted">
+                <div class="planned-recipe-meta">
+                  <h4>{{ getRecipeTitle(pr.recipeId) }}</h4>
+                  <p class="portions-badge">{{ pr.plannedPortions }} Portions Planned</p>
+                </div>
+                <div class="planned-recipe-actions">
+                  <button class="btn btn-secondary" (click)="viewPlannedRecipe(pr)">
+                    🔍 View scaled Recipe
+                  </button>
+                  @if (!pr.isCompleted) {
+                    <button
+                      class="btn btn-primary btn-complete"
+                      (click)="
+                        initiateRecipeCompletion(
+                          getRecipeId(pr.recipeId),
+                          getRecipeTitle(pr.recipeId),
+                          pr.plannedPortions
+                        )
+                      "
+                    >
+                      ✔️ Mark Cooked
+                    </button>
+                  } @else {
+                    <span class="status-logged">Logged to Storage</span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- PLANS CHRONOLOGICAL FEED -->
+    <div class="plans-history-section">
+      <div
+        class="workspace-header"
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 2rem;
+          border-bottom: 1px solid var(--border-color);
+        "
+      >
+        <div>
+          <h3>All Plans</h3>
+        </div>
+        <button class="btn btn-primary" (click)="initiatePlanCreation()">+ Create New Plan</button>
+      </div>
+
+      @if (allPlans.length === 0) {
+        <div class="empty-state">
+          <h3>No Meal Plans Found</h3>
+          <p>
+            You haven't planned any meal preparation cycles yet. Click "Create New Plan" to begin.
+          </p>
+        </div>
+      } @else {
+        <div class="plans-history-list" style="display: flex; flex-direction: column; gap: 1.5rem">
+          @for (plan of allPlans; track plan._id) {
+            <article
+              class="history-plan-row"
+              [class.active-border]="plan.isActive"
+              style="
+                background: var(--bg-card);
+                border: 1px solid var(--border-color);
+                border-radius: 12px;
+                padding: 1.5rem;
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+                text-align: left;
+              "
+            >
+              <header
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  border-bottom: 1px dashed var(--border-color);
+                  padding-bottom: 10px;
+                "
+              >
+                <div>
+                  <h4 style="margin: 0; font-size: 1.2rem; color: var(--text-main)">
+                    {{ plan.name }}
+                  </h4>
+                  <span style="font-size: 0.8rem; color: var(--text-muted)"
+                    >Last Updated: {{ plan.updatedAt | date: 'mediumDate' }}</span
+                  >
+                </div>
+                <span class="type-badge" [class.meal]="plan.isActive" style="margin: 0">{{
+                  plan.isActive ? 'Active Plan' : 'Inactive'
+                }}</span>
+              </header>
+              <div class="history-plan-body" style="font-size: 0.95rem; color: var(--text-main)">
+                <strong>Planned Recipes:</strong>
+                <ul
+                  style="
+                    list-style: none;
+                    padding: 0;
+                    margin: 8px 0 0 0;
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+                    gap: 10px;
+                  "
+                >
+                  @for (pr of plan.recipes; track getRecipeId(pr.recipeId)) {
+                    <li
+                      style="
+                        background: var(--form-control-bg);
+                        padding: 8px 12px;
+                        border-radius: 6px;
+                        border: 1px solid var(--border-color);
+                      "
+                    >
+                      {{ getRecipeTitle(pr.recipeId) }} ({{ pr.plannedPortions }} portions)
+                    </li>
+                  }
+                </ul>
+              </div>
+              <footer
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  margin-top: 8px;
+                  border-top: 1px solid var(--border-color);
+                  padding-top: 12px;
+                "
+              >
+                <div>
+                  @if (!plan.isActive) {
+                    <button
+                      class="btn btn-primary"
+                      style="margin-right: 10px"
+                      (click)="activatePlan(plan)"
+                    >
+                      ⚡ Activate Plan
+                    </button>
+                  }
+                  <button
+                    class="btn btn-secondary"
+                    style="margin-right: 10px"
+                    (click)="appendPlanIngredientsToList(plan)"
+                  >
+                    🛒 Add to Shopping List
+                  </button>
+                  <button class="btn btn-secondary" (click)="initiatePlanEditing(plan)">
+                    ✏️ Edit Plan
+                  </button>
+                </div>
+                @if (!plan.isActive) {
+                  <button
+                    class="btn-remove"
+                    (click)="openDeleteDialog(plan)"
+                    title="Delete Plan"
+                    style="
+                      background: none;
+                      border: none;
+                      font-size: 1.2rem;
+                      color: #ef4444;
+                      cursor: pointer;
+                    "
+                  >
+                    🗑️ Delete
+                  </button>
+                }
+              </footer>
+            </article>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- --- MODALS SECTION --- -->
+
+  <!-- Create/Edit Plan Modal -->
+  @if (isCreating) {
+    <div class="modal-container" style="z-index: 1050">
+      <button class="modal-backdrop" (click)="cancelPlan()" aria-label="Cancel planning"></button>
+      <div class="modal-content plan-form-card">
+        <header class="modal-header">
+          <h3>{{ editingPlanId ? 'Edit Meal Prep Plan' : 'Create Meal Prep Plan' }}</h3>
+          <button class="close-btn" (click)="cancelPlan()">✕</button>
+        </header>
+        <div class="modal-body">
+          <div class="form-group" style="margin-bottom: 1.5rem">
+            <label
+              for="planTitle"
+              style="
+                margin-bottom: 0.75rem;
+                color: var(--text-main);
+                font-size: 0.95rem;
+                font-weight: 600;
+                letter-spacing: 0.5px;
+              "
+            >
+              Plan Name:
+            </label>
+            <input
+              type="text"
+              id="planTitle"
+              [(ngModel)]="planName"
+              placeholder="e.g. Weekend Meal Prep"
+              class="form-control-input"
+            />
+          </div>
+
+          <!-- Section A: Non-scrollable Selected Recipes List -->
+          @if (selectedPlanRecipes.length > 0) {
+            <div class="selected-plan-section" style="margin-bottom: 1.5rem">
+              <h4
+                style="
+                  margin-bottom: 0.75rem;
+                  color: var(--text-main);
+                  font-size: 0.95rem;
+                  font-weight: 600;
+                  letter-spacing: 0.5px;
+                "
+              >
+                Selected Recipes:
+              </h4>
+              <div
+                class="selected-recipes-container"
+                style="display: flex; flex-direction: column; gap: 10px"
+              >
+                @for (item of selectedPlanRecipes; track item.recipe._id) {
+                  <div
+                    class="recipe-selection-row"
+                    style="border-color: var(--accent-primary); background: rgba(37, 99, 235, 0.02)"
+                  >
+                    <label class="checkbox-label">
+                      <input type="checkbox" [(ngModel)]="item.isSelected" />
+                      <strong>{{ item.recipe.title }}</strong>
+                    </label>
+                    <div class="portions-input-group">
+                      <label [for]="'portion-' + item.recipe._id">Portions:</label>
+                      <input
+                        type="number"
+                        [id]="'portion-' + item.recipe._id"
+                        [(ngModel)]="item.plannedPortions"
+                        [step]="item.recipe.portions"
+                        [min]="item.recipe.portions"
+                        class="form-control-input small-input"
+                      />
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Section B: Scrollable Unselected Recipes pool -->
+          <div class="selection-pool-section">
+            <h4
+              style="
+                margin-bottom: 0.75rem;
+                color: var(--text-main);
+                font-size: 0.95rem;
+                font-weight: 600;
+                letter-spacing: 0.5px;
+              "
+            >
+              Add Recipes:
+            </h4>
+            <div class="recipes-selection-list">
+              @for (item of unselectedPlanRecipes; track item.recipe._id) {
+                <div class="recipe-selection-row">
+                  <label class="checkbox-label">
+                    <input type="checkbox" [(ngModel)]="item.isSelected" />
+                    {{ item.recipe.title }}
+                  </label>
+                </div>
+              }
+              @if (unselectedPlanRecipes.length === 0) {
+                <p
+                  style="
+                    font-size: 0.9rem;
+                    color: var(--text-muted);
+                    font-style: italic;
+                    text-align: center;
+                    margin: 1.5rem 0;
+                  "
+                >
+                  All recipes selected!
+                </p>
+              }
+            </div>
+          </div>
+        </div>
+        <footer
+          class="modal-footer"
+          style="display: flex; justify-content: space-between; align-items: center; width: 100%"
+        >
+          <label
+            class="checkbox-label"
+            style="justify-content: flex-start; margin: 0; font-size: 0.95rem; font-weight: 600"
+          >
+            <input type="checkbox" [(ngModel)]="setAsActiveOnSave" />
+            Set as my Active Plan
+          </label>
+          <div class="footer-buttons" style="display: flex; gap: 12px">
+            <button class="btn btn-secondary" (click)="cancelPlan()">Cancel</button>
+            <button class="btn btn-primary" (click)="savePlan()">Save Plan</button>
+          </div>
+        </footer>
+      </div>
+    </div>
+  }
+
+  <!-- Planned Recipe Scaling Modal -->
+  @if (viewingPlannedRecipe) {
+    <div class="scaled-recipe-container">
+      <button
+        class="scaled-recipe-backdrop"
+        (click)="closePlannedRecipe()"
+        aria-label="Close scaled recipe"
+      ></button>
+      <div class="scaled-recipe-modal">
+        <header class="scaled-recipe-header">
+          <div class="scaled-title-group">
+            <h2>Scaled: {{ viewingPlannedRecipe.recipe.title }}</h2>
+            <span
+              class="scaled-type-badge"
+              [ngClass]="viewingPlannedRecipe.recipe.recipeType.toLowerCase()"
+            >
+              {{ viewingPlannedRecipe.recipe.recipeType }}
+            </span>
+          </div>
+          <div class="scaled-header-actions">
+            <button class="scaled-close-btn" (click)="closePlannedRecipe()" title="Close">✕</button>
+          </div>
+        </header>
+        <div class="scaled-recipe-body">
+          <div class="scaled-meta-strip">
+            <span class="scaled-meta-item"
+              >⏱️ Prep: {{ viewingPlannedRecipe.recipe.prepTimeMinutes || 0 }}m</span
+            >
+            <span class="scaled-meta-item"
+              >🍽️ Scaled Portions:
+              {{
+                viewingPlannedRecipe.recipe.portions * viewingPlannedRecipe.multiplier
+                  | number: '1.0-1'
+              }}</span
+            >
+            <span class="scaled-meta-item">{{
+              viewingPlannedRecipe.recipe.isPublic ? '🌍 Public' : '🔒 Private'
+            }}</span>
+          </div>
+
+          @if (viewingPlannedRecipe.recipe.description) {
+            <p class="scaled-description">{{ viewingPlannedRecipe.recipe.description }}</p>
+          }
+
+          <div class="scaled-recipe-content-grid">
+            <div class="scaled-ingredients-section">
+              <h3>Ingredients (Scaled {{ viewingPlannedRecipe.multiplier | number: '1.0-1' }}x)</h3>
+              <ul class="scaled-ingredient-list">
+                @for (ing of viewingPlannedRecipe.recipe.ingredients; track ing.ingredientId) {
+                  <li>
+                    <div class="scaled-ing-amount">
+                      @if (ing.displayAmount) {
+                        <strong
+                          >{{
+                            ing.displayAmount * viewingPlannedRecipe.multiplier | number: '1.0-2'
+                          }}
+                          {{ ing.displayUnit }}</strong
+                        >
+                      }
+                      <span class="scaled-ing-weight"
+                        >({{
+                          ing.weightInGrams * viewingPlannedRecipe.multiplier | number: '1.0-1'
+                        }}g)</span
+                      >
+                    </div>
+                    <div class="scaled-ing-name">{{ ing.name | titlecase }}</div>
+                  </li>
+                }
+              </ul>
+            </div>
+
+            <div class="scaled-instructions-section">
+              <h3>Instructions</h3>
+              @if (viewingPlannedRecipe.recipe.instructions) {
+                <div class="scaled-instructions-text">
+                  {{ viewingPlannedRecipe.recipe.instructions }}
+                </div>
+              } @else {
+                <p class="scaled-empty-state">No instructions provided.</p>
+              }
+            </div>
+          </div>
+
+          @if (viewingPlannedRecipe.recipe.tags && viewingPlannedRecipe.recipe.tags.length > 0) {
+            <div class="scaled-tags-container">
+              @for (tag of viewingPlannedRecipe.recipe.tags; track tag) {
+                <span class="scaled-tag-chip">{{ tag }}</span>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Recipe Completion Confirmation Dialog Modal -->
+  @if (showCompletionDialog) {
+    <div class="dialog-overlay" style="z-index: 1100">
+      <button
+        class="dialog-backdrop"
+        (click)="closeCompletionDialog()"
+        aria-label="Cancel portions selection"
+      ></button>
+      <div class="dialog-box">
+        <header class="dialog-header">
+          <h3>Log Cooked Recipe</h3>
+          <button class="dialog-close-btn" (click)="closeCompletionDialog()">✕</button>
+        </header>
+        <div class="dialog-body">
+          <p>
+            Would you like to log the prepared portions for "<strong>{{
+              recipeTitleToComplete
+            }}</strong
+            >" into your Portion Storage tracker?
+          </p>
+          <div class="form-group" style="margin-top: 1rem">
+            <label for="completionPortions">Number of Portions to Add:</label>
+            <input
+              type="number"
+              id="completionPortions"
+              [(ngModel)]="completionPortions"
+              min="0"
+              class="form-control-input"
+            />
+          </div>
+        </div>
+        <footer class="dialog-footer" style="flex-wrap: wrap; justify-content: flex-end; gap: 8px">
+          <button class="btn btn-secondary" (click)="closeCompletionDialog()">Cancel</button>
+          <button
+            class="btn btn-secondary"
+            style="border-color: var(--accent-primary); color: var(--accent-primary)"
+            (click)="confirmRecipeCompletion(true)"
+          >
+            Mark Cooked Only
+          </button>
+
+          <button class="btn btn-primary" (click)="confirmRecipeCompletion(false)">
+            Mark Cooked & Add to Storage
+          </button>
+        </footer>
+      </div>
+    </div>
+  }
+
+  <!-- Restart Active Progress Confirmation Modal -->
+  @if (showResetConfirmDialog) {
+    <div class="dialog-overlay" style="z-index: 1100">
+      <button
+        class="dialog-backdrop"
+        (click)="closeResetDialog()"
+        aria-label="Cancel progress reset"
+      ></button>
+      <div class="dialog-box">
+        <header class="dialog-header">
+          <h3>Restart Cooking Plan?</h3>
+          <button class="dialog-close-btn" (click)="closeResetDialog()">✕</button>
+        </header>
+        <div class="dialog-body">
+          <p>
+            Are you sure you want to restart your active cooking plan? This will reset all recipes'
+            cooked statuses back to un-completed.
+          </p>
+        </div>
+        <footer class="dialog-footer">
+          <button class="btn btn-secondary" (click)="closeResetDialog()">Cancel</button>
+          <button
+            class="btn btn-primary"
+            style="background-color: #ef4444"
+            (click)="confirmResetActivePlan()"
+          >
+            Reset Prep Progress
+          </button>
+        </footer>
+      </div>
+    </div>
+  }
+
+  <!-- Active Plan Deactivation Confirmation Modal -->
+  @if (showDeactivateConfirmDialog) {
+    <div class="dialog-overlay" style="z-index: 1100">
+      <button
+        class="dialog-backdrop"
+        (click)="closeDeactivateDialog()"
+        aria-label="Cancel deactivation"
+      ></button>
+      <div class="dialog-box">
+        <header class="dialog-header">
+          <h3>Deactivate Active Plan?</h3>
+          <button class="dialog-close-btn" (click)="closeDeactivateDialog()">✕</button>
+        </header>
+        <div class="dialog-body">
+          <p>
+            Are you sure you want to deactivate your active plan? This will remove it from the
+            active workspace, but keep it in plan list.
+          </p>
+        </div>
+        <footer class="dialog-footer">
+          <button class="btn btn-secondary" (click)="closeDeactivateDialog()">Cancel</button>
+          <button class="btn btn-primary" (click)="confirmDeactivatePlan()">Deactivate</button>
+        </footer>
+      </div>
+    </div>
+  }
+
+  <!-- Inactive Plan Deletion Confirmation Modal -->
+  @if (showDeleteConfirmDialog) {
+    <div class="dialog-overlay" style="z-index: 1100">
+      <button
+        class="dialog-backdrop"
+        (click)="closeDeleteDialog()"
+        aria-label="Cancel deletion"
+      ></button>
+      <div class="dialog-box">
+        <header class="dialog-header">
+          <h3>Delete Prep Plan?</h3>
+          <button class="dialog-close-btn" (click)="closeDeleteDialog()">✕</button>
+        </header>
+        <div class="dialog-body">
+          <p>
+            Are you sure you want to permanently delete "<strong>{{ planNameToDelete }}</strong
+            >"? This action cannot be undone.
+          </p>
+        </div>
+        <footer class="dialog-footer">
+          <button class="btn btn-secondary" (click)="closeDeleteDialog()">Cancel</button>
+          <button
+            class="btn btn-primary"
+            style="background-color: #ef4444"
+            (click)="confirmDeletePlan()"
+          >
+            Delete Plan
+          </button>
+        </footer>
+      </div>
+    </div>
+  }
+</div>
