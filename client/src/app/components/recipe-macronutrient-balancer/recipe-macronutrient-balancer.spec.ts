@@ -80,12 +80,10 @@ describe('RecipeMacronutrientBalancer Component State Machine', () => {
     } as RecipePayload;
 
     component.mealTargets = { protein: 50, fat: 20, netCarbs: 10 };
-
-    fixture.detectChanges();
-    await fixture.whenStable();
   });
 
   it('should initialize and deeply clone the ingredients to prevent mutating the parent builder', () => {
+    fixture.detectChanges();
     expect(component.currentState).toBe('CONFIG');
     expect(component.currentIngredients.length).toBe(1);
 
@@ -97,6 +95,7 @@ describe('RecipeMacronutrientBalancer Component State Machine', () => {
   });
 
   it('should toggle dietary restrictions correctly', () => {
+    fixture.detectChanges();
     // Currently contains 'Keto'
     component.toggleRestriction('Dairy-Free');
     expect(component.selectedDietaryRestrictions).toContain('Dairy-Free');
@@ -107,6 +106,7 @@ describe('RecipeMacronutrientBalancer Component State Machine', () => {
   });
 
   it('should transition to REVIEW state when the solver successfully balances the recipe', () => {
+    fixture.detectChanges();
     const successResponse: BalanceRecipeResponse = {
       status: 'success',
       ingredients: [
@@ -124,6 +124,7 @@ describe('RecipeMacronutrientBalancer Component State Machine', () => {
   });
 
   it('should transition to INTERVENTION state when the solver hits a mathematical conflict', () => {
+    fixture.detectChanges();
     const interventionResponse: BalanceRecipeResponse = {
       status: 'action_required',
       intervention: {
@@ -142,6 +143,7 @@ describe('RecipeMacronutrientBalancer Component State Machine', () => {
   });
 
   it('should replace the target ingredient and recursively re-run the solver when a SWAP is selected', () => {
+    fixture.detectChanges();
     // Setup an active SWAP intervention state
     component.currentIntervention = {
       type: 'SWAP',
@@ -185,6 +187,7 @@ describe('RecipeMacronutrientBalancer Component State Machine', () => {
   });
 
   it('should push a new ingredient and recursively re-run the solver when an ADD is selected', () => {
+    fixture.detectChanges();
     // Setup an active ADD intervention state
     component.currentIntervention = {
       type: 'ADD',
@@ -225,6 +228,7 @@ describe('RecipeMacronutrientBalancer Component State Machine', () => {
   });
 
   it('should emit the finalized ingredient array when saved, and emit cancel when cancelled', () => {
+    fixture.detectChanges();
     const saveSpy = vi.spyOn(component.updateRecipe, 'emit');
     const cancelSpy = vi.spyOn(component.cancelBalancer, 'emit');
 
@@ -236,11 +240,103 @@ describe('RecipeMacronutrientBalancer Component State Machine', () => {
   });
 
   it('should handle API errors gracefully by catching the error and returning to the CONFIG state', () => {
+    fixture.detectChanges();
     mockBalancerService.balanceRecipe.mockReturnValue(throwError(() => new Error('API Down')));
 
     component.executeBalancer();
 
     expect(mockToastService.showError).toHaveBeenCalled();
     expect(component.currentState).toBe('CONFIG'); // Should bounce back to config so user can try again
+  });
+
+  it('should calculate accurate getMacroClass highlights based on targets', () => {
+    fixture.detectChanges();
+    component.mealTargets = { protein: 50, fat: 20, netCarbs: 10 };
+
+    // 1. Within 10% bounds (Target Protein = 50, tolerance = 5.1 -> range [44.9, 55.1])
+    vi.spyOn(component, 'currentMacrosPerPortion', 'get').mockReturnValue({
+      protein: 51,
+      fat: 20,
+      netCarbs: 10,
+      calories: 420,
+    });
+    expect(component.getMacroClass('protein')).toBe('macro-within');
+
+    // 2. Over bounds (actual = 60, target = 50)
+    vi.spyOn(component, 'currentMacrosPerPortion', 'get').mockReturnValue({
+      protein: 60,
+      fat: 20,
+      netCarbs: 10,
+      calories: 420,
+    });
+    expect(component.getMacroClass('protein')).toBe('macro-over');
+
+    // 3. Under bounds (actual = 40, target = 50)
+    vi.spyOn(component, 'currentMacrosPerPortion', 'get').mockReturnValue({
+      protein: 40,
+      fat: 20,
+      netCarbs: 10,
+      calories: 420,
+    });
+    expect(component.getMacroClass('protein')).toBe('macro-under');
+  });
+
+  it('should render CONFIG state correctly in the HTML template', () => {
+    component.currentState = 'CONFIG';
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.querySelector('.config-state')).toBeTruthy();
+    expect(compiled.textContent).toContain('Review your current recipe');
+  });
+
+  it('should render LOADING state correctly in the HTML template', () => {
+    component.currentState = 'LOADING';
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.querySelector('.loading-state')).toBeTruthy();
+    expect(compiled.textContent).toContain('Crunching the numbers');
+  });
+
+  it('should render INTERVENTION state (SWAP) and display the dynamic prompt header', () => {
+    component.currentState = 'INTERVENTION';
+    component.currentIntervention = {
+      type: 'SWAP',
+      targetIngredient: 'Chicken Breast',
+      reasoning: 'Too much protein',
+      options: [
+        {
+          name: 'Turkey Breast',
+          nutritionPerServing: { protein: 30, fat: 1, netCarbs: 0 },
+        } as unknown as InterventionOption,
+      ],
+    };
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.querySelector('.intervention-state')).toBeTruthy();
+    expect(compiled.textContent).toContain('Select an ingredient to swap');
+    expect(compiled.textContent).toContain('Chicken Breast');
+  });
+
+  it('should render INTERVENTION state (ADD) and display the dynamic prompt header', () => {
+    component.currentState = 'INTERVENTION';
+    component.currentIntervention = {
+      type: 'ADD',
+      targetIngredient: null,
+      reasoning: 'Lacking carbs',
+      options: [],
+    };
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.textContent).toContain('Select an ingredient to add');
+  });
+
+  it('should render REVIEW state with approximate success warning banner', () => {
+    component.currentState = 'REVIEW';
+    component.isApproximateResult = true;
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.querySelector('.review-state')).toBeTruthy();
+    expect(compiled.querySelector('.warning-banner')).toBeTruthy();
+    expect(compiled.textContent).toContain('Approximate Match');
   });
 });
