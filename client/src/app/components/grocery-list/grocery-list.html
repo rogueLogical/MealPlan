@@ -1,1 +1,175 @@
-<p>grocery-list works!</p>
+<div class="grocery-workspace">
+  <!-- Manual Item Creator -->
+  <form (ngSubmit)="addItem()" class="add-item-card">
+    <div class="card-body add-grid">
+      <input
+        #nameInput
+        type="text"
+        [(ngModel)]="newItemName"
+        name="itemName"
+        placeholder="Add custom item... (e.g. Napkins)"
+        class="form-control-input"
+        required
+      />
+      <input
+        type="number"
+        [(ngModel)]="newItemQty"
+        name="itemQty"
+        min="1"
+        class="form-control-input qty-input"
+      />
+      <input
+        type="text"
+        [(ngModel)]="newItemUnit"
+        name="itemUnit"
+        placeholder="Unit (e.g. box)"
+        class="form-control-input unit-input"
+      />
+      <button type="submit" class="btn btn-primary">+ Add</button>
+    </div>
+  </form>
+
+  @if (isLoading) {
+    <div class="loading-state">Loading your list...</div>
+  } @else if (allItems.length === 0) {
+    <div class="empty-state">
+      <h3>No Items in List</h3>
+      <p>
+        Items will populate here when you add them from a Meal Prep Plan or when you manually add
+        items above.
+      </p>
+    </div>
+  } @else {
+    <!-- Unchecked list equipped with Drag-Drop ordering -->
+    <div class="section-title">
+      <div
+        class="workspace-header"
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 2rem;
+          border-bottom: 1px solid var(--border-color);
+        "
+      >
+        <div>
+          <h3>Shopping List</h3>
+        </div>
+        <!-- Clear List Button -->
+        <button
+          class="btn btn-secondary"
+          style="border-color: #ef4444; color: #ef4444; background-color: var(--form-control-bg)"
+          (click)="openClearConfirmDialog()"
+          [disabled]="allItems.length === 0"
+        >
+          🗑️ Clear List
+        </button>
+      </div>
+      <div class="items-drop-list">
+        @for (item of uncheckedItems; track item._id; let i = $index) {
+          <div
+            draggable="true"
+            (dragstart)="onDragStart(i)"
+            (dragover)="onDragOver($event, i)"
+            (dragleave)="onDragLeave()"
+            (drop)="onDrop(i)"
+            class="item-row"
+            [class.drag-over]="dragOverIndex === i"
+          >
+            <label
+              class="item-checkbox-label"
+              (dragstart)="$event.preventDefault()"
+              draggable="false"
+            >
+              <input
+                type="checkbox"
+                [(ngModel)]="item.isChecked"
+                (ngModelChange)="toggleItemCheck(item, $event)"
+              />
+              <span class="item-name">{{ item.name | titlecase }}</span>
+            </label>
+            <div class="item-meta-actions">
+              <span class="item-quantity">
+                @if (item.unit === 'g') {
+                  {{ item.quantity | number: '1.0-1' }}g
+                } @else {
+                  {{ item.quantity | number: '1.0-2' }} {{ item.unit }}
+                  @if (item.weightInGrams) {
+                    ({{ item.weightInGrams | number: '1.0-1' }}g)
+                  }
+                }
+              </span>
+              <button class="btn-remove" (click)="removeItem(item)" title="Delete Item">✕</button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Checked items anchored statically below unchecked items -->
+    @if (checkedItems.length > 0) {
+      <div class="list-section checked-section" style="margin-top: 2rem">
+        <h3 class="section-title">Checked Off</h3>
+        <div class="items-static-list">
+          @for (item of checkedItems; track item._id) {
+            <div class="item-row checked-row">
+              <label class="item-checkbox-label">
+                <input
+                  type="checkbox"
+                  [(ngModel)]="item.isChecked"
+                  (ngModelChange)="toggleItemCheck(item, $event)"
+                />
+                <span class="item-name strikethrough">{{ item.name | titlecase }}</span>
+              </label>
+              <div class="item-meta-actions">
+                <span class="item-quantity">
+                  @if (item.unit === 'g') {
+                    {{ item.quantity | number: '1.0-1' }}g
+                  } @else {
+                    {{ item.quantity | number: '1.0-2' }} {{ item.unit }}
+                    @if (item.weightInGrams) {
+                      ({{ item.weightInGrams | number: '1.0-1' }}g)
+                    }
+                  }
+                </span>
+                <button class="btn-remove" (click)="removeItem(item)" title="Delete Item">✕</button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  }
+  <!-- Clear List Confirmation Modal Overlay -->
+  @if (showClearConfirmDialog) {
+    <div class="dialog-overlay" style="z-index: 1100">
+      <button
+        class="dialog-backdrop"
+        (click)="closeClearConfirmDialog()"
+        aria-label="Cancel clear list"
+      ></button>
+      <div class="dialog-box">
+        <header class="dialog-header">
+          <h3>Clear Shopping List?</h3>
+          <button class="dialog-close-btn" (click)="closeClearConfirmDialog()">✕</button>
+        </header>
+        <div class="dialog-body">
+          <p>
+            Are you sure you want to permanently clear all items from your shopping list? This
+            action cannot be undone.
+          </p>
+        </div>
+        <footer class="dialog-footer">
+          <button class="btn btn-secondary" (click)="closeClearConfirmDialog()">Cancel</button>
+          <button
+            class="btn btn-primary"
+            style="background-color: #ef4444"
+            (click)="confirmClearList()"
+          >
+            Clear List
+          </button>
+        </footer>
+      </div>
+    </div>
+  }
+</div>

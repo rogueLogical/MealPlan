@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const checkAuth = require('../middleware/auth');
+const PortionStorage = require('../models/PortionStorage');
 
 // PUT /api/users/settings
 router.put('/settings', checkAuth, async (req, res) => {
@@ -150,6 +151,43 @@ router.post('/favorites/:recipeId', checkAuth, async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// GET /api/users/storage - Fetch user's portion storage
+router.get('/storage', checkAuth, async (req, res) => {
+  try {
+    const storage = await PortionStorage.find({ userId: req.userData.userId });
+    res.status(200).json({ storage });
+  } catch (err) {
+    console.error('Fetch Storage Error:', err);
+    res.status(500).json({ message: 'Failed to fetch portion storage.' });
+  }
+});
+
+// POST /api/users/storage/adjust - Increment or decrement portions
+router.post('/storage/adjust', checkAuth, async (req, res) => {
+  try {
+    const { recipeId, recipeTitle, delta } = req.body;
+
+    const storageItem = await PortionStorage.findOneAndUpdate(
+      { userId: req.userData.userId, recipeId },
+      {
+        $inc: { portionsInStorage: delta },
+        $setOnInsert: { recipeTitle }
+      },
+      { upsert: true, returnDocument: 'after' }
+    );
+
+    if (storageItem.portionsInStorage < 0) {
+      storageItem.portionsInStorage = 0;
+      await storageItem.save();
+    }
+
+    res.status(200).json({ message: 'Portion storage adjusted.', storageItem });
+  } catch (err) {
+    console.error('Adjust Storage Error:', err);
+    res.status(500).json({ message: 'Failed to adjust portion storage.' });
   }
 });
 

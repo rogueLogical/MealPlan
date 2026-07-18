@@ -26,6 +26,8 @@ export class PageHeader implements OnInit {
     meals: { title: 'Meal Prep Planner', icon: '📅' },
     recipes: { title: 'Recipes', icon: '🍳' },
     settings: { title: 'Settings', icon: '⚙️' },
+    groceries: { title: 'Shopping List', icon: '🛒' },
+    storage: { title: 'Portion Storage', icon: '📦' },
   };
 
   private router = inject(Router);

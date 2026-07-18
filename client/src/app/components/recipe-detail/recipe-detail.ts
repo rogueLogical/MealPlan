@@ -1,12 +1,15 @@
 import { Component, Input, Output, EventEmitter, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Recipe, UserMacroTargets } from '../../models/recipe.model';
 import { AuthService } from '../../services/auth';
+import { MealPrepService } from '../../services/meal-prep';
+import { ToastService } from '../../services/toast';
 
 @Component({
   selector: 'app-recipe-detail',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './recipe-detail.html',
   styleUrls: ['./recipe-detail.scss'],
 })
@@ -21,13 +24,47 @@ export class RecipeDetail implements OnInit {
   @Output() editRecipe = new EventEmitter<Recipe>();
 
   private authService = inject(AuthService);
+  private prepService = inject(MealPrepService);
+  private toastService = inject(ToastService);
+
   currentUserId?: string;
 
+  // Portions dialog overlay state
+  showPortionDialog = false;
+  selectedDelta = 0;
+
   ngOnInit(): void {
-    // Keep track of the logged-in user to determine ownership
     this.authService.currentUser$.subscribe((user) => {
       this.currentUserId = user?.id;
     });
+  }
+
+  openPortionDialog(): void {
+    this.selectedDelta = this.recipe.portions || 1;
+    this.showPortionDialog = true;
+  }
+
+  closePortionDialog(): void {
+    this.showPortionDialog = false;
+  }
+
+  submitPortionsToStorage(): void {
+    if (this.selectedDelta <= 0) return;
+
+    this.prepService
+      .adjustPortionStorage(this.recipe._id, this.recipe.title, this.selectedDelta)
+      .subscribe({
+        next: () => {
+          this.toastService.showSuccess(
+            `Added ${this.selectedDelta} portions of "${this.recipe.title}" to storage.`,
+          );
+          this.closePortionDialog();
+        },
+        error: (err) => {
+          console.error('Adjust Storage Error', err);
+          this.toastService.showError('Failed to add portions to storage.');
+        },
+      });
   }
 
   get isOwner(): boolean {
@@ -44,7 +81,7 @@ export class RecipeDetail implements OnInit {
 
   onEdit(): void {
     this.editRecipe.emit(this.recipe);
-    this.closeDetail.emit(); // Close the detail view to open the builder
+    this.closeDetail.emit();
   }
 
   onFavoriteClicked(): void {
