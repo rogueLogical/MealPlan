@@ -162,7 +162,7 @@ export class RecipeBuilder implements OnInit, OnDestroy, OnChanges {
       ],
       displayAmount: [null],
       displayUnit: [''],
-      baselineNutrition: [selectedIngredient.nutritionPerServing],
+      baselineNutrition: [selectedIngredient.nutrition],
     });
 
     this.ingredients.push(ingredientGroup);
