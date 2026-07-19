@@ -25,6 +25,15 @@ describe('RecipeBuilder Component Math & Form Logic', () => {
       sugarAlcohols: 0,
       netCarbs: 0,
     },
+    nutrition: {
+      calories: 165,
+      protein: 31,
+      fat: 3.6,
+      totalCarbs: 0,
+      fiber: 0,
+      sugarAlcohols: 0,
+      netCarbs: 0,
+    },
   };
 
   beforeEach(async () => {
