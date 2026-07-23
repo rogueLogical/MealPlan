@@ -50,6 +50,9 @@
   >
     <h2 style="margin: 0">My Recipes</h2>
     <div class="header-actions">
+      <button class="btn-secondary" style="margin-right: 1rem" (click)="openGeneratorModal()">
+        🧑‍🍳 Generate with AI
+      </button>
       <button class="btn-secondary" style="margin-right: 1rem" (click)="openSearchModal()">
         🔍 Search Community
       </button>
@@ -149,4 +152,12 @@
       </div>
     </div>
   </div>
+}
+
+@if (isGeneratorOpen) {
+  <app-recipe-generator
+    (closeGenerator)="closeGeneratorModal()"
+    (recipeGenerated)="onRecipeGenerated($event)"
+  >
+  </app-recipe-generator>
 }

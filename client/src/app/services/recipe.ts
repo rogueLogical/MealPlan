@@ -90,4 +90,16 @@ export class RecipeService {
       {},
     );
   }
+
+  /**
+   * Request structured AI recipe generation matching user parameters.
+   */
+  generateRecipe(payload: {
+    description: string;
+    recipeType: 'Meal' | 'Snack';
+    useMacroTargets: boolean;
+    dietaryRestrictions: string[];
+  }): Observable<RecipePayload> {
+    return this.http.post<RecipePayload>(`${this.apiUrl}/generate`, payload);
+  }
 }

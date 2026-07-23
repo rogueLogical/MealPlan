@@ -88,7 +88,8 @@
 
           @for (ingGroup of ingredients.controls; track ingGroup) {
             <div [formGroupName]="$index" class="ingredient-row">
-              <div class="ing-name">
+              <!-- Dynamically apply the zero-weight class if weight is less than the minimum of 1 -->
+              <div class="ing-name" [class.zero-weight]="ingGroup.get('weightInGrams')?.value < 1">
                 <strong>{{ ingGroup.get('name')?.value }}</strong>
               </div>
 

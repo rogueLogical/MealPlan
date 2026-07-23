@@ -10,19 +10,17 @@ describe('USDA Client Utility', () => {
   });
 
   it('should throw an error immediately if the USDA_API_KEY is not defined', async () => {
-    // Fix: Clear module cache and environment variables specifically for this isolation block
     jest.resetModules();
     delete process.env.USDA_API_KEY;
     const { fetchUsdaMacros: fetchMacrosWithNoKey } = require('../utils/usdaClient');
 
     await expect(fetchMacrosWithNoKey('Avocado')).rejects.toThrow('Missing USDA_API_KEY');
 
-    // Restore environment variables
     process.env.USDA_API_KEY = 'test_usda_key_12345';
     jest.resetModules();
   });
 
-  it('should return a zeroed fallback structure when the API response is not OK', async () => {
+  it('should return null when the API response is not OK', async () => {
     global.fetch.mockResolvedValue({
       ok: false,
       status: 500
@@ -30,10 +28,10 @@ describe('USDA Client Utility', () => {
 
     const result = await fetchUsdaMacros('Avocado');
 
-    expect(result).toEqual({ protein: 0, fat: 0, totalCarbs: 0, fiber: 0, netCarbs: 0 });
+    expect(result).toBeNull();
   });
 
-  it('should return a zeroed fallback structure when the search returns empty results', async () => {
+  it('should return null when the search returns empty results', async () => {
     global.fetch.mockResolvedValue({
       ok: true,
       json: jest.fn().mockResolvedValue({
@@ -43,7 +41,7 @@ describe('USDA Client Utility', () => {
 
     const result = await fetchUsdaMacros('Nonexistent Food');
 
-    expect(result).toEqual({ protein: 0, fat: 0, netCarbs: 0 });
+    expect(result).toBeNull();
   });
 
   it('should correctly select the best matching item and calculate net carbs', async () => {

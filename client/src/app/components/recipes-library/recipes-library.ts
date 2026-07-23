@@ -11,11 +11,12 @@ import { AuthService } from '../../services/auth';
 import { RecipeSearch } from '../recipe-search/recipe-search';
 import { ToastService } from '../../services/toast';
 import { Subscription } from 'rxjs';
+import { RecipeGenerator } from '../recipe-generator/recipe-generator';
 
 @Component({
   selector: 'app-recipes',
   standalone: true,
-  imports: [CommonModule, RecipeBuilder, RecipeCard, RecipeDetail, RecipeSearch],
+  imports: [CommonModule, RecipeBuilder, RecipeCard, RecipeDetail, RecipeSearch, RecipeGenerator],
   templateUrl: './recipes-library.html',
   styleUrls: ['./recipes-library.scss'],
 })
@@ -46,6 +47,8 @@ export class RecipesLibrary implements OnInit, OnDestroy {
   editingRecipeId: string | null = null;
   selectedRecipeToEdit?: Recipe;
   recipeToDelete?: Recipe;
+
+  isGeneratorOpen = false;
 
   ngOnInit(): void {
     // Listen to the global auth stream safely
@@ -338,5 +341,24 @@ export class RecipesLibrary implements OnInit, OnDestroy {
         this.toastService.showError('Failed to copy recipe. Please try again.');
       },
     });
+  }
+
+  openGeneratorModal(): void {
+    this.isGeneratorOpen = true;
+  }
+
+  closeGeneratorModal(): void {
+    this.isGeneratorOpen = false;
+  }
+
+  onRecipeGenerated(generatedRecipe: RecipePayload): void {
+    this.isGeneratorOpen = false;
+
+    // Wipe editingRecipeId to trigger Create Mode in the builder
+    this.editingRecipeId = null;
+    this.selectedRecipeToEdit = generatedRecipe as Recipe;
+    this.showRecipeBuilder = true;
+
+    this.cdr.detectChanges();
   }
 }

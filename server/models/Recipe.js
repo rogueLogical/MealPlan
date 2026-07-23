@@ -18,7 +18,7 @@ const MacroSchema = new mongoose.Schema(
 // Subdocument schema for the immutable ingredient snapshot
 const RecipeIngredientSchema = new mongoose.Schema(
   {
-    ingredientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Ingredient', required: true },
+    ingredientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Ingredient', required: false },
     name: { type: String, required: true },
 
     // The absolute truth used for macro calculation

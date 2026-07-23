@@ -233,6 +233,50 @@ export class RecipeMacronutrientBalancer implements OnInit {
     return this.mealTargets.protein * 4 + this.mealTargets.netCarbs * 4 + this.mealTargets.fat * 9;
   }
 
+  getWeightChange(
+    ing: RecipeIngredient,
+  ): { diff: number; formatted: string; class: string } | null {
+    const originalPortions = this.originalRecipe.portions || 1;
+
+    // Search for a matching original ingredient by ID or name
+    const originalIng = this.originalRecipe.ingredients.find(
+      (o) =>
+        (o.ingredientId && o.ingredientId === ing.ingredientId) ||
+        o.name.toLowerCase().trim() === ing.name.toLowerCase().trim(),
+    );
+
+    // If it's a completely new ingredient added during an ADD intervention
+    if (!originalIng) {
+      return {
+        diff: ing.weightInGrams,
+        formatted: `(+${ing.weightInGrams}g)`,
+        class: 'weight-increase',
+      };
+    }
+
+    const originalWeightPerPortion = originalIng.weightInGrams / originalPortions;
+    const newWeightPerPortion = ing.weightInGrams;
+
+    const diff = newWeightPerPortion - originalWeightPerPortion;
+    const roundedDiff = Math.round(diff * 10) / 10;
+
+    if (roundedDiff > 0) {
+      return {
+        diff: roundedDiff,
+        formatted: `(+${roundedDiff}g)`,
+        class: 'weight-increase',
+      };
+    } else if (roundedDiff < 0) {
+      return {
+        diff: roundedDiff,
+        formatted: `(${roundedDiff}g)`, // roundedDiff is already negative (e.g. -15)
+        class: 'weight-decrease',
+      };
+    }
+
+    return null; // No significant change
+  }
+
   getMacroClass(key: 'calories' | 'protein' | 'fat' | 'netCarbs'): string {
     if (!this.mealTargets) return '';
 

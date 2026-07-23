@@ -1,0 +1,136 @@
+<div class="modal-container">
+  <button
+    class="modal-backdrop"
+    (click)="onCancel()"
+    aria-label="Close generator modal"
+    [disabled]="isGenerating"
+  ></button>
+
+  <div class="modal-content generator-modal">
+    <header class="modal-header">
+      <h2>Generate AI Recipe</h2>
+      <button class="close-btn" (click)="onCancel()" [disabled]="isGenerating">✕</button>
+    </header>
+
+    <div class="modal-body">
+      @if (!isGenerating) {
+        <div class="form-container">
+          <p class="helper-text">
+            Describe the recipe you want to create, select its category, and specify any dietary
+            restrictions.
+          </p>
+
+          <div class="form-group" style="margin-bottom: 1.5rem">
+            <label for="recipeDescription">Recipe Idea / Description (Max 256 characters) *</label>
+            <textarea
+              id="recipeDescription"
+              [(ngModel)]="description"
+              maxlength="256"
+              rows="4"
+              placeholder="e.g., Creamy garlic chicken with asparagus and brown rice..."
+              class="form-control-input"
+            ></textarea>
+            <div
+              class="char-counter"
+              style="
+                text-align: right;
+                font-size: 0.8rem;
+                color: var(--text-muted);
+                margin-top: 4px;
+              "
+            >
+              {{ description.trim().length }}/256
+            </div>
+          </div>
+
+          <div
+            class="form-toggles"
+            style="display: flex; flex-direction: column; gap: 1.25rem; margin-bottom: 1.5rem"
+          >
+            <div class="toggle-group">
+              <span class="section-title">Recipe Type</span>
+              <div class="type-toggle" style="display: flex; gap: 1rem; margin-top: 6px">
+                <label class="radio-btn" [class.active]="recipeType === 'Meal'">
+                  <input type="radio" name="recipeType" value="Meal" [(ngModel)]="recipeType" />
+                  <span>Meal</span>
+                </label>
+                <label class="radio-btn" [class.active]="recipeType === 'Snack'">
+                  <input type="radio" name="recipeType" value="Snack" [(ngModel)]="recipeType" />
+                  <span>Snack</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="toggle-group">
+              <span class="section-title">Macro Target Matching</span>
+              <div style="margin-top: 6px">
+                <label
+                  class="checkbox-label"
+                  style="display: inline-flex; width: auto; font-weight: 600"
+                >
+                  <input type="checkbox" [(ngModel)]="useMacroTargets" />
+                  <span>{{
+                    useMacroTargets
+                      ? '🎯 Target My User Settings Macros'
+                      : '🔓 Ignore Macro Targets'
+                  }}</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="restrictions-group" style="margin-bottom: 2rem">
+            <span class="section-title">Dietary Restrictions</span>
+            <div class="checkbox-grid" style="margin-top: 8px">
+              @for (tag of availableRestrictions; track tag) {
+                <label class="checkbox-label" [class.checked]="dietaryRestrictions.includes(tag)">
+                  <input
+                    type="checkbox"
+                    [checked]="dietaryRestrictions.includes(tag)"
+                    (change)="toggleRestriction(tag)"
+                  />
+                  {{ tag }}
+                </label>
+              }
+            </div>
+          </div>
+
+          <div
+            class="modal-actions"
+            style="
+              display: flex;
+              justify-content: center;
+              width: 100%;
+              border-top: 1px solid var(--border-color);
+              padding-top: 20px;
+            "
+          >
+            <button class="btn btn-secondary" style="margin-right: 12px" (click)="onCancel()">
+              Cancel
+            </button>
+            <button
+              class="btn btn-primary"
+              (click)="generateRecipe()"
+              [disabled]="!description.trim()"
+            >
+              🧑‍🍳 Generate Recipe
+            </button>
+          </div>
+        </div>
+      } @else {
+        <div class="loading-state">
+          <div class="emoji-spinner">
+            <span class="emoji e-0">🍄‍🟫</span>
+            <span class="emoji e-1">🍳</span>
+            <span class="emoji e-2">🍲</span>
+            <span class="emoji e-3">🥕</span>
+            <span class="emoji e-4">🥩</span>
+            <span class="emoji e-5">🧑‍🍳</span>
+          </div>
+          <h3>Crafting your recipe...</h3>
+          <p class="status-msg">{{ statusText }}</p>
+        </div>
+      }
+    </div>
+  </div>
+</div>

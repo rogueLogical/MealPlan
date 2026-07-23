@@ -3,7 +3,7 @@ const router = express.Router();
 const Recipe = require('../models/Recipe');
 const User = require('../models/User');
 const checkAuth = require('../middleware/auth');
-const { balanceRecipe } = require('../controllers/recipeController');
+const { balanceRecipe, generateRecipe } = require('../controllers/recipeController');
 
 // GET /api/recipes - Search public recipes (ignoring deleted ones)
 router.get('/', checkAuth, async (req, res) => {
@@ -219,5 +219,8 @@ router.post('/:id/fork', checkAuth, async (req, res) => {
 
 // POST /api/recipes/balance
 router.post('/balance', checkAuth, balanceRecipe);
+
+// POST /api/recipes/generate
+router.post('/generate', checkAuth, generateRecipe);
 
 module.exports = router;
