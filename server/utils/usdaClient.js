@@ -85,7 +85,17 @@ const calculateMatchScore = (query, food) => {
     'pot pie',
     'lasagna',
     'macaroni and cheese',
-    'casserole'
+    'casserole',
+    'bagel',
+    'bread',
+    'biscuit',
+    'muffin',
+    'cookie',
+    'cracker',
+    'powder',
+    'dried',
+    'pasta',
+    'noodles'
   ];
   const hasCompositeInDesc = compositeKeywords.some((keyword) => normalizedDesc.includes(keyword));
   const hasCompositeInQuery = compositeKeywords.some((keyword) =>
