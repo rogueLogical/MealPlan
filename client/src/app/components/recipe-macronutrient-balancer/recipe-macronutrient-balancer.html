@@ -154,7 +154,14 @@
                 @for (ing of currentIngredients; track ing.ingredientId) {
                   <div class="grid-row">
                     <span class="ing-name">{{ ing.name | titlecase }}</span>
-                    <span class="ing-weight">{{ ing.weightInGrams }}g</span>
+                    <span class="ing-weight">
+                      {{ ing.weightInGrams }}g
+                      @if (getWeightChange(ing); as change) {
+                        <span class="weight-change" [ngClass]="change.class">{{
+                          change.formatted
+                        }}</span>
+                      }
+                    </span>
                     <span class="ing-contrib" style="font-size: 0.9rem; color: var(--text-muted)">
                       P: {{ ing.nutrition.protein.toFixed(1) }}g | F:
                       {{ ing.nutrition.fat.toFixed(1) }}g | NC:
@@ -268,7 +275,14 @@
               @for (ing of currentIngredients; track ing.ingredientId) {
                 <div class="grid-row">
                   <span class="ing-name">{{ ing.name | titlecase }}</span>
-                  <span class="ing-weight">{{ ing.weightInGrams }}g</span>
+                  <span class="ing-weight">
+                    {{ ing.weightInGrams }}g
+                    @if (getWeightChange(ing); as change) {
+                      <span class="weight-change" [ngClass]="change.class">{{
+                        change.formatted
+                      }}</span>
+                    }
+                  </span>
                   <span class="ing-contrib" style="font-size: 0.9rem; color: var(--text-muted)">
                     P: {{ ing.nutrition.protein.toFixed(1) }}g | F:
                     {{ ing.nutrition.fat.toFixed(1) }}g | NC:

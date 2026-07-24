@@ -359,10 +359,28 @@ h4 {
       color: var(--text-muted);
       font-size: 1.05rem;
     }
+
     .ing-weight {
       color: var(--text-muted);
       font-weight: 500;
+
+      // Styling definitions for the weight changes badges
+      .weight-change {
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin-left: 6px;
+        display: inline-block;
+
+        &.weight-increase {
+          color: #10b981 !important; // Green for weight increases
+        }
+
+        &.weight-decrease {
+          color: #ef4444 !important; // Red for weight decreases
+        }
+      }
     }
+
     .ing-contrib {
       text-align: right;
     }

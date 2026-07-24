@@ -240,7 +240,6 @@
 // Complex Grid for Ingredient Rows
 .ingredient-row {
   display: grid;
-  // This grid aligns the columns perfectly: Name takes remaining space, inputs get fixed widths, button gets auto
   grid-template-columns: 1fr 120px 120px 120px auto;
   align-items: center;
   gap: 1rem;
@@ -254,12 +253,16 @@
   .ing-name {
     font-size: 1.1rem;
     color: var(--text-muted);
-    // Allow up to 2 lines of text, then truncate with an ellipsis
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    &.zero-weight {
+      color: #ef4444 !important;
+      text-decoration: line-through !important;
+    }
   }
 
   .ing-input {

@@ -154,7 +154,7 @@ export class RecipeBuilder implements OnInit, OnDestroy, OnChanges {
 
   addIngredientToRecipe(selectedIngredient: Ingredient): void {
     const ingredientGroup = this.fb.group({
-      ingredientId: [selectedIngredient._id, Validators.required],
+      ingredientId: [selectedIngredient._id || null],
       name: [selectedIngredient.name, Validators.required],
       weightInGrams: [
         selectedIngredient.servingSize || 100,
@@ -237,20 +237,52 @@ export class RecipeBuilder implements OnInit, OnDestroy, OnChanges {
   }
 
   onBalancedRecipeSaved(balancedIngredients: RecipeIngredient[]): void {
-    // Get the current yield size of the recipe
     const currentPortions = this.recipeForm.get('portions')?.value || 1;
+
+    // Create a lookup map of the original weights and display amounts before clearing
+    const originalIngredientsMap = new Map<
+      string,
+      { weight: number; displayAmount: number | null }
+    >();
+    this.ingredients.controls.forEach((control) => {
+      const id = control.get('ingredientId')?.value;
+      const name = control.get('name')?.value;
+      const weight = control.get('weightInGrams')?.value || 0;
+      const display = control.get('displayAmount')?.value;
+
+      // Build key using ingredientId if present, fallback to name
+      const key = id ? id.toString() : name.toLowerCase().trim();
+      originalIngredientsMap.set(key, { weight, displayAmount: display });
+    });
 
     this.ingredients.clear();
 
     balancedIngredients.forEach((ing) => {
       // The balancer returns weights for ONE portion. Scale it back up to match the recipe yield.
       const scaledWeight = Math.round(ing.weightInGrams * currentPortions * 10) / 10;
-      const scaledDisplay = ing.displayAmount
-        ? parseFloat((ing.displayAmount * currentPortions).toFixed(2))
-        : null;
+
+      const key = ing.ingredientId ? ing.ingredientId.toString() : ing.name.toLowerCase().trim();
+      const original = originalIngredientsMap.get(key);
+
+      let scaledDisplay = ing.displayAmount;
+
+      if (original) {
+        const originalWeight = original.weight;
+        const originalDisplay = original.displayAmount;
+
+        if (originalWeight > 0 && originalDisplay !== null && originalDisplay !== undefined) {
+          // Mathematically derive the multiplier ratio (New Total Weight / Original Total Weight)
+          const multiplier = scaledWeight / originalWeight;
+          scaledDisplay = parseFloat((originalDisplay * multiplier).toFixed(2));
+        }
+      } else {
+        // Fallback: If the ingredient was newly added during an ADD intervention,
+        // use the default display amount returned by the server
+        scaledDisplay = ing.displayAmount;
+      }
 
       const ingredientGroup = this.fb.group({
-        ingredientId: [ing.ingredientId, Validators.required],
+        ingredientId: [ing.ingredientId || null],
         name: [ing.name, Validators.required],
         weightInGrams: [scaledWeight, [Validators.required, Validators.min(1)]],
         displayAmount: [scaledDisplay],
@@ -455,7 +487,7 @@ export class RecipeBuilder implements OnInit, OnDestroy, OnChanges {
       };
 
       const ingredientGroup = this.fb.group({
-        ingredientId: [ing.ingredientId, Validators.required],
+        ingredientId: [ing.ingredientId || null],
         name: [ing.name, Validators.required],
         weightInGrams: [ing.weightInGrams, [Validators.required, Validators.min(1)]],
         displayAmount: [ing.displayAmount],

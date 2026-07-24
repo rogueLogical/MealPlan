@@ -317,6 +317,123 @@ Performs a "soft-delete" on a recipe. Sets the `isDeleted` flag to `true` rather
 
 - Success Response (200): Returns a deletion confirmation message.
 
+`POST /recipes/generate`
+
+Generates a complete, structured recipe based on a natural language text description, classified by category (meal/snack), and optionally targeted to match the user's personal dietary restrictions and macro settings splits. Resolves ingredients through a sequential waterfall of local database checks, USDA lookups, and AI estimation fallbacks.
+
+- Auth Required: Yes
+- Body:
+  ```JSON
+  {
+    "description": "Creamy garlic chicken with asparagus and brown rice",
+    "recipeType": "Meal", // "Meal" | "Snack"
+    "useMacroTargets": true,
+    "dietaryRestrictions": ["Dairy-Free"]
+  }
+  ```
+- Success Response (200): Returns a complete structured recipe payload, suitable to be patched directly into the client-side `recipe-builder`:
+  ```JSON
+  {
+    "title": "Creamy Garlic Chicken with Asparagus",
+    "recipeType": "Meal",
+    "isPublic": false,
+    "description": "A delicious garlic chicken dish paired with fresh asparagus.",
+    "instructions": "1. Preheat the oven to 375°F.\n\n2. Sauté garlic and onions in olive oil.\n\n3. Bake chicken until temperature hits 165°F.",
+    "prepTimeMinutes": 10,
+    "cookTimeMinutes": 20,
+    "portions": 4,
+    "tags": ["Low-Carb", "Gluten-Free", "Dairy-Free"],
+    "ingredients": [
+      {
+        "ingredientId": "60d5ecb8b392d7...", // ObjectID if matched locally or via USDA. Otherwise null.
+        "name": "chicken breast",
+        "weightInGrams": 450,
+        "displayAmount": 1,
+        "displayUnit": "lb",
+        "nutrition": {
+          "calories": 742,
+          "protein": 140,
+          "totalCarbs": 0,
+          "fiber": 0,
+          "sugarAlcohols": 0,
+          "netCarbs": 0,
+          "fat": 16
+        }
+      }
+    ]
+  }
+  ```
+
+`POST /recipes/balance`
+
+Executes the mathematical Non-Negative Least Squares (NNLS) optimizer to scale active recipe ingredients so they align with a user's exact per-portion macronutrient targets.
+
+- Auth Required: Yes
+- Body:
+  ```JSON
+  {
+    "ingredients": [
+      {
+        "ingredientId": "60d5ecb8b392d7...",
+        "name": "chicken breast",
+        "weightInGrams": 150,
+        "nutrition": {
+          "calories": 247,
+          "protein": 46,
+          "totalCarbs": 0,
+          "fiber": 0,
+          "sugarAlcohols": 0,
+          "netCarbs": 0,
+          "fat": 5
+        }
+      }
+    ],
+    "targets": {
+      "protein": 50,
+      "fat": 15,
+      "netCarbs": 10
+    },
+    "dietaryRestrictions": ["Dairy-Free"],
+    "interventionCount": 0
+  }
+  ```
+- Success Response (200): Depending on mathematical feasibility, returns one of three states:
+  - **State A: Success (strictly feasible)**
+    ```JSON
+    {
+      "status": "success",
+      "ingredients": [ /* scaled ingredients array */ ]
+    }
+    ```
+  - **State B: Action Required (mathematically infeasible, requests swap/addition)**
+    ```JSON
+    {
+      "status": "action_required",
+      "ingredients": [ /* partially scaled ingredients */ ],
+      "intervention": {
+        "type": "ADD", // "ADD" | "SWAP" | "REMOVE"
+        "targetIngredient": null,
+        "reasoning": "Deficiency Conflict: Missing a source of netCarbs.",
+        "options": [
+          {
+            "_id": "60d5ecb8b392d8...",
+            "name": "Brown Rice",
+            "servingSize": 100,
+            "nutritionPerServing": { "calories": 111, "protein": 3, "totalCarbs": 23, "fiber": 2, "sugarAlcohols": 0, "netCarbs": 21, "fat": 1 },
+            "reasonForRecommendation": "Excellent source of complex carbs."
+          }
+        ]
+      }
+    }
+    ```
+  - **State C: Approximate Success (circuit-breaker tripped at 4 attempts)**
+    ```JSON
+    {
+      "status": "approximate_success",
+      "ingredients": [ /* closest approximate scaled ingredients */ ]
+    }
+    ```
+
 ---
 
 ## Meal Prep Plans (`/meal-plans`)

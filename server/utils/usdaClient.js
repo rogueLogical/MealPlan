@@ -24,7 +24,7 @@ const normalizeString = (str) => {
     .trim();
 };
 
-// Computes a similarity score based on keyword overlap and macro validation
+// Computes a similarity score based on keyword overlap, length penalties, and macro validation
 const calculateMatchScore = (query, food) => {
   const description = food.description;
   const normalizedQuery = normalizeString(query);
@@ -41,6 +41,7 @@ const calculateMatchScore = (query, food) => {
     }
   });
 
+  // Query words coverage of the description
   const queryCoverage = matchCount / queryWords.length;
   let score = queryCoverage * 100;
 
@@ -61,6 +62,50 @@ const calculateMatchScore = (query, food) => {
     score += 40;
   }
 
+  // Description Coverage Scaling: penalizes long, cluttered descriptions (prepared products)
+  const descCoverage = matchCount / descWords.length;
+  score = score * (0.6 + 0.4 * descCoverage);
+
+  // Semantic Prepared-Food Safeguard: penalizes prepared/composite foods when searching for base items
+  const compositeKeywords = [
+    'taco',
+    'dinner',
+    'babyfood',
+    'baby food',
+    'sandwich',
+    'burger',
+    'pizza',
+    'soup',
+    'restaurant',
+    'fast food',
+    'prepared',
+    'beverage',
+    'snack bar',
+    'candy bar',
+    'pot pie',
+    'lasagna',
+    'macaroni and cheese',
+    'casserole',
+    'bagel',
+    'bread',
+    'biscuit',
+    'muffin',
+    'cookie',
+    'cracker',
+    'powder',
+    'dried',
+    'pasta',
+    'noodles'
+  ];
+  const hasCompositeInDesc = compositeKeywords.some((keyword) => normalizedDesc.includes(keyword));
+  const hasCompositeInQuery = compositeKeywords.some((keyword) =>
+    normalizedQuery.includes(keyword)
+  );
+
+  if (hasCompositeInDesc && !hasCompositeInQuery) {
+    score -= 50; // Heavily penalize composite prepared foods
+  }
+
   // --- Domain-Specific Nutritional Safeguards ---
   const fatKeywords = ['fat', 'oil', 'lard', 'tallow', 'butter', 'ghee', 'shortening'];
   const hasFatKeywordInQuery = fatKeywords.some((keyword) => normalizedQuery.includes(keyword));
@@ -70,13 +115,10 @@ const calculateMatchScore = (query, food) => {
     const protein = extractNutrient(food, NUTRIENT_IDS.PROTEIN);
     const fat = extractNutrient(food, NUTRIENT_IDS.FAT);
 
-    // Safeguard 1: If looking for fat/oil, penalize non-fatty items (e.g. meat, raw fruits)
     if (fat < 50 || protein > fat) {
       score -= 150;
     }
   } else if (hasFatKeywordInDesc) {
-    // Safeguard 2: If the query does NOT ask for fat/oil, but the description is a fat/oil,
-    // penalize it so the whole food (like raw avocado) is preferred.
     score -= 100;
   }
 
@@ -87,7 +129,7 @@ const calculateMatchScore = (query, food) => {
  * Queries the USDA API for an ingredient and returns verified macros per 100g.
  * Filters the top 30 matches to find the mathematically closest name match.
  * @param {string} query - The ingredient name to search for.
- * @returns {Promise<Object>} { protein, fat, netCarbs }
+ * @returns {Promise<Object|null>} { protein, fat, netCarbs } or null if no reliable match
  */
 const fetchUsdaMacros = async (query) => {
   if (!USDA_API_KEY) {
@@ -99,22 +141,24 @@ const fetchUsdaMacros = async (query) => {
     url.searchParams.append('api_key', USDA_API_KEY);
     url.searchParams.append('query', query);
     url.searchParams.append('dataType', 'Foundation,SR Legacy');
-    url.searchParams.append('pageSize', '30'); // Fix: Increased search results to expand candidate recall pool
+    url.searchParams.append('pageSize', '30');
 
     const response = await fetch(url.toString());
 
     if (!response.ok) {
       console.warn(
-        `USDA API responded with status: ${response.status} for query "${query}". Returning zeroed fallback.`
+        `USDA API responded with status: ${response.status} for query "${query}". Returning null.`
       );
-      return { protein: 0, fat: 0, totalCarbs: 0, fiber: 0, netCarbs: 0 };
+      // Return null on failure
+      return null;
     }
 
     const data = await response.json();
 
     if (!data.foods || data.foods.length === 0) {
-      console.warn(`No USDA data found for: ${query}. Returning zeroed fallback.`);
-      return { protein: 0, fat: 0, netCarbs: 0 };
+      console.warn(`No USDA data found for: ${query}. Returning null.`);
+      // Return null on empty search
+      return null;
     }
 
     // Map each returned food item with its computed match score
@@ -123,23 +167,34 @@ const fetchUsdaMacros = async (query) => {
       return { food, score };
     });
 
-    // Sort descending by match score to bubble the most accurate description to the top
+    // Sort descending by match score
     scoredFoods.sort((a, b) => b.score - a.score);
 
-    // Pick the best match determined by our scoring algorithm
-    const topMatch = scoredFoods[0].food;
+    // Pick the best match
+    const bestMatch = scoredFoods[0];
+
+    // Reject match if score is below the strict similarity threshold
+    const MIN_MATCH_SCORE = 80;
+    if (bestMatch.score < MIN_MATCH_SCORE) {
+      console.log(
+        `[USDA Search] Best match "${bestMatch.food.description}" scored ${bestMatch.score.toFixed(1)} for query "${query}", which is below threshold ${MIN_MATCH_SCORE}. Rejecting match.`
+      );
+      return null;
+    }
+
+    const topMatch = bestMatch.food;
 
     console.log(
       `[USDA Search] Query "${query}" matched with item "${topMatch.description}" ` +
-        ` (Score: ${scoredFoods[0].score.toFixed(1)})`
+        ` (Score: ${bestMatch.score.toFixed(1)})`
     );
 
-    const protein = extractNutrient(topMatch, NUTRIENT_IDS.PROTEIN);
-    const fat = extractNutrient(topMatch, NUTRIENT_IDS.FAT);
-    const totalCarbs = extractNutrient(topMatch, NUTRIENT_IDS.CARBS);
-    const fiber = extractNutrient(topMatch, NUTRIENT_IDS.FIBER);
+    const protein = Math.max(0, extractNutrient(topMatch, NUTRIENT_IDS.PROTEIN));
+    const fat = Math.max(0, extractNutrient(topMatch, NUTRIENT_IDS.FAT));
+    const totalCarbs = Math.max(0, extractNutrient(topMatch, NUTRIENT_IDS.CARBS));
+    const fiber = Math.max(0, extractNutrient(topMatch, NUTRIENT_IDS.FIBER));
 
-    // Calculate Net Carbs
+    // Calculate Net Carbs safely
     const netCarbs = Math.max(0, totalCarbs - fiber);
 
     return {
