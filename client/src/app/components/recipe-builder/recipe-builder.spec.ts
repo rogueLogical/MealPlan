@@ -4,7 +4,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { RecipeBuilder } from './recipe-builder';
 import { IngredientService } from '../../services/ingredient';
 import { ToastService } from '../../services/toast';
-import { Ingredient } from '../../models/ingredient.model';
+import { Ingredient, NutritionMacros } from '../../models/ingredient.model';
 
 describe('RecipeBuilder Component Math & Form Logic', () => {
   let component: RecipeBuilder;
@@ -142,5 +142,68 @@ describe('RecipeBuilder Component Math & Form Logic', () => {
     // The payload array should reflect the absolute totals for that ingredient row
     expect(payload.ingredients[0].weightInGrams).toBe(200);
     expect(payload.ingredients[0].nutrition.calories).toBe(330);
+  });
+
+  it('should remain valid and saveable when an ingredient has a null ingredientId (AI Fallback)', () => {
+    const aiFallbackIngredient = {
+      _id: '', // No ID (AI fallback)
+      name: 'Synthetic Spice',
+      servingSize: 100,
+      servingUnit: 'g',
+      nutrition: {
+        calories: 50,
+        protein: 1,
+        totalCarbs: 10,
+        fiber: 2,
+        sugarAlcohols: 0,
+        netCarbs: 8,
+        fat: 0,
+      },
+    } as unknown as Ingredient;
+
+    // Adds a custom ingredient with null ID to the form
+    component.addIngredientToRecipe(aiFallbackIngredient);
+
+    expect(component.ingredients.length).toBe(1);
+    expect(component.ingredients.at(0).get('ingredientId')?.value).toBeNull();
+
+    // Verify that the Form Control is valid (no Validators.required blocking it)
+    expect(component.ingredients.at(0).valid).toBe(true);
+  });
+
+  it('should be invalid when an ingredient weight is set to less than 1g', () => {
+    component.addIngredientToRecipe(mockIngredient);
+
+    // Set ingredient weight to 0g
+    component.ingredients.at(0).get('weightInGrams')?.setValue(0);
+
+    // Verify that less than 1g correctly triggers validation failure
+    expect(component.ingredients.at(0).get('weightInGrams')?.invalid).toBe(true);
+    expect(component.recipeForm.get('ingredients')?.invalid).toBe(true);
+  });
+
+  it('should scale displayAmount proportionately using the weight multiplier in onBalancedRecipeSaved', () => {
+    // Initial State: Set 1 Portion recipe, weight = 100g, displayAmount = 3 cloves
+    component.recipeForm.get('portions')?.setValue(1);
+    component.addIngredientToRecipe(mockIngredient);
+    component.ingredients.at(0).get('weightInGrams')?.setValue(100);
+    component.ingredients.at(0).get('displayAmount')?.setValue(3);
+
+    // Simulate Balancer scaling up weight from 100g to 150g per portion
+    const balancedIngredient = {
+      ingredientId: 'ing123',
+      name: 'Chicken Breast',
+      weightInGrams: 150, // Per portion (multiplier = 150 / 100 = 1.5x)
+      displayAmount: 3,
+      displayUnit: 'cloves',
+      nutrition: {} as unknown as NutritionMacros,
+      baselineNutrition: mockIngredient.nutrition,
+    };
+
+    component.onBalancedRecipeSaved([balancedIngredient]);
+
+    // Verify proportional scaling: displayAmount should be 3 * 1.5 = 4.5
+    expect(component.ingredients.at(0).get('weightInGrams')?.value).toBe(150);
+    expect(component.ingredients.at(0).get('displayAmount')?.value).toBe(4.5);
   });
 });

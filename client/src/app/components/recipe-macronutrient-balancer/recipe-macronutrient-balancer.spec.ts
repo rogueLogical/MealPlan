@@ -11,6 +11,7 @@ import {
   BalanceRecipeResponse,
   InterventionOption,
 } from '../../models/recipe.model';
+import { NutritionMacros } from '../../models/ingredient.model';
 
 interface MockRecipeBalancer {
   balanceRecipe: Mock;
@@ -338,5 +339,46 @@ describe('RecipeMacronutrientBalancer Component State Machine', () => {
     expect(compiled.querySelector('.review-state')).toBeTruthy();
     expect(compiled.querySelector('.warning-banner')).toBeTruthy();
     expect(compiled.textContent).toContain('Approximate Match');
+  });
+
+  it('should calculate precise getWeightChange deltas and return correct class alignments', () => {
+    fixture.detectChanges();
+    component.mealTargets = { protein: 50, fat: 20, netCarbs: 10 };
+
+    // Positive change: New per-portion weight = 160g, Original = 150g. Delta = +10.
+    const positiveChangeIngredient = {
+      ingredientId: '1',
+      name: 'Chicken Breast',
+      weightInGrams: 160,
+      nutrition: {} as unknown as NutritionMacros,
+    };
+    const posDiff = component.getWeightChange(positiveChangeIngredient);
+    expect(posDiff).not.toBeNull();
+    expect(posDiff?.diff).toBe(10);
+    expect(posDiff?.formatted).toBe('(+10g)');
+    expect(posDiff?.class).toBe('weight-increase');
+
+    // Negative change: New per-portion weight = 120g, Original = 150g. Delta = -30.
+    const negativeChangeIngredient = {
+      ingredientId: '1',
+      name: 'Chicken Breast',
+      weightInGrams: 120,
+      nutrition: {} as unknown as NutritionMacros,
+    };
+    const negDiff = component.getWeightChange(negativeChangeIngredient);
+    expect(negDiff).not.toBeNull();
+    expect(negDiff?.diff).toBe(-30);
+    expect(negDiff?.formatted).toBe('(-30g)');
+    expect(negDiff?.class).toBe('weight-decrease');
+
+    // No change: New per-portion weight = 150g, Original = 150g. Delta = 0.
+    const noChangeIngredient = {
+      ingredientId: '1',
+      name: 'Chicken Breast',
+      weightInGrams: 150,
+      nutrition: {} as unknown as NutritionMacros,
+    };
+    const zeroDiff = component.getWeightChange(noChangeIngredient);
+    expect(zeroDiff).toBeNull();
   });
 });
