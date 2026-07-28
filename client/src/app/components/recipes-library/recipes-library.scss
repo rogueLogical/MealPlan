@@ -8,6 +8,104 @@
   font-weight: 600;
 }
 
+// Dedicated Top Action Bar Container Styles
+.top-action-bar {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+  width: 100%;
+
+  button {
+    @media (max-width: 550px) {
+      width: 100%;
+      text-align: center;
+    }
+  }
+}
+
+// Section Headers Styles
+.workspace-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+  flex-wrap: wrap; // Enables clean wrapping on mobile
+  gap: 1rem;
+
+  h2 {
+    margin: 0;
+    color: var(--text-main);
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+
+  // Relative wrapper to house the absolute clear button inside the input boundary
+  .search-container {
+    position: relative;
+    display: inline-block;
+    width: 260px;
+
+    @media (max-width: 550px) {
+      width: 100%; // Stretches to full width on small mobile devices
+    }
+
+    .header-search-input {
+      width: 100% !important; // Forces the input to fill the relative container
+      padding: 8px 36px 8px 14px; // Increased padding-right to leave space for the X button
+      background-color: var(--form-control-bg);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      font-size: 0.9rem;
+      outline: none;
+      transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+
+      &:focus {
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      }
+    }
+
+    // Absolutely positioned red clear button
+    .clear-search-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      color: #ef4444; // Red color
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 4px;
+      line-height: 1;
+      transition:
+        transform 0.1s ease,
+        color 0.2s ease;
+
+      &:hover {
+        color: #dc3545; // Darker red on hover
+        transform: translateY(-50%) scale(1.1); // Slight scale up transition
+      }
+    }
+  }
+}
+
+// Clean Section Dividers Styles
+.section-divider {
+  border: none;
+  height: 1px;
+  background-color: var(--border-color);
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
 .recipes-grid {
   display: grid;
   // Responsive columns: 1 on mobile, 2 on tablet, 3+ on large desktop

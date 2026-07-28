@@ -32,6 +32,7 @@
   flex-direction: column;
   gap: 0.5rem;
   align-items: flex-start;
+  flex-grow: 1;
 
   .recipe-title {
     margin: 0;
@@ -62,16 +63,23 @@
 }
 
 .action-menu {
-  display: flex;
-  gap: 0.5rem;
+  display: grid;
+  grid-template-columns: repeat(2, 32px);
+  gap: 0.25rem;
+  flex-shrink: 0; // Prevents the menu from compressing
 
   .icon-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: transparent;
     border: none;
     font-size: 1.1rem;
     cursor: pointer;
-    padding: 0.25rem;
-    border-radius: 4px;
+    padding: 0;
+    border-radius: 6px;
     transition: background-color 0.2s ease;
 
     &:hover {
@@ -107,11 +115,11 @@
 
 // Macros Display
 .macros-container {
-  background-color: var(--form-control-bg);
+  background-color: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 0.75rem;
-  box-shadow: inset 0 0 4px #020417;
+  box-shadow: inset 0 0 2px #020417;
   margin-top: 0.2rem;
 
   .macro-header {

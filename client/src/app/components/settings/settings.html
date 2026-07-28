@@ -56,26 +56,6 @@
           />
         </div>
       </section>
-      <!-- Display Preferences Card -->
-      <section class="settings-card">
-        <h2>Display Preferences</h2>
-        <p class="section-desc">
-          Select your preferred measurement system for tracking recipe volumes and dimensions.
-        </p>
-
-        <div class="form-group-row">
-          <label for="measurementSystem">Recipe Measurement System</label>
-          <select
-            id="measurementSystem"
-            name="measurementSystem"
-            [(ngModel)]="settingsData.measurementSystem"
-            class="form-select-control"
-          >
-            <option value="imperial">Imperial (oz, lbs)</option>
-            <option value="metric">Metric (g, kg)</option>
-          </select>
-        </div>
-      </section>
 
       <!-- Daily Nutritional Targets Card -->
       <section class="settings-card">
@@ -325,22 +305,6 @@
                 </label>
               }
             </div>
-          </div>
-
-          <div class="form-group expand-field">
-            <label for="likedFoods">Favorite Foods & Cuisines</label>
-            <span class="setting-hint" style="margin-bottom: 6px; margin-top: -4px"
-              >Separate items with commas.</span
-            >
-            <input
-              type="text"
-              id="likedFoods"
-              name="likedFoods"
-              [(ngModel)]="likedFoodsInput"
-              placeholder="e.g., Mexican, Birria, Pork, Mediterranean, Sushi"
-              class="form-control-input-text"
-              aria-label="Favorite Foods"
-            />
           </div>
 
           <div class="form-group expand-field">

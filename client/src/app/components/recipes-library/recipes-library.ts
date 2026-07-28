@@ -12,11 +12,20 @@ import { RecipeSearch } from '../recipe-search/recipe-search';
 import { ToastService } from '../../services/toast';
 import { Subscription } from 'rxjs';
 import { RecipeGenerator } from '../recipe-generator/recipe-generator';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-recipes',
   standalone: true,
-  imports: [CommonModule, RecipeBuilder, RecipeCard, RecipeDetail, RecipeSearch, RecipeGenerator],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RecipeBuilder,
+    RecipeCard,
+    RecipeDetail,
+    RecipeSearch,
+    RecipeGenerator,
+  ],
   templateUrl: './recipes-library.html',
   styleUrls: ['./recipes-library.scss'],
 })
@@ -50,6 +59,9 @@ export class RecipesLibrary implements OnInit, OnDestroy {
 
   isGeneratorOpen = false;
 
+  favoritesSearchQuery = '';
+  myRecipesSearchQuery = '';
+
   ngOnInit(): void {
     // Listen to the global auth stream safely
     this.authSub = this.authService.currentUser$.subscribe((user) => {
@@ -75,6 +87,42 @@ export class RecipesLibrary implements OnInit, OnDestroy {
     if (this.authSub) {
       this.authSub.unsubscribe();
     }
+  }
+
+  // Local getter for filtered favorite recipe cards
+  get filteredFavoriteRecipes(): Recipe[] {
+    const query = this.favoritesSearchQuery.trim().toLowerCase();
+    if (!query) {
+      return this.favoriteRecipes;
+    }
+    return this.favoriteRecipes.filter(
+      (recipe) =>
+        recipe.title.toLowerCase().includes(query) ||
+        (recipe.description && recipe.description.toLowerCase().includes(query)) ||
+        // Scan tags array
+        (recipe.tags && recipe.tags.some((tag) => tag.toLowerCase().includes(query))) ||
+        // Scan ingredient names array
+        (recipe.ingredients &&
+          recipe.ingredients.some((ing) => ing.name.toLowerCase().includes(query))),
+    );
+  }
+
+  // Local getter for filtered personal recipe cards
+  get filteredMyRecipes(): Recipe[] {
+    const query = this.myRecipesSearchQuery.trim().toLowerCase();
+    if (!query) {
+      return this.myRecipes;
+    }
+    return this.myRecipes.filter(
+      (recipe) =>
+        recipe.title.toLowerCase().includes(query) ||
+        (recipe.description && recipe.description.toLowerCase().includes(query)) ||
+        // Scan tags array
+        (recipe.tags && recipe.tags.some((tag) => tag.toLowerCase().includes(query))) ||
+        // Scan ingredient names array
+        (recipe.ingredients &&
+          recipe.ingredients.some((ing) => ing.name.toLowerCase().includes(query))),
+    );
   }
 
   fetchUserTargets(): void {
@@ -155,6 +203,7 @@ export class RecipesLibrary implements OnInit, OnDestroy {
             meal: mealTargets,
             snack: snackTargets,
           };
+          this.cdr.detectChanges();
         }
       },
       error: (err) => console.error('Failed to load user targets for builder:', err),

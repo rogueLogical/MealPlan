@@ -1,20 +1,22 @@
 /* --- Global Theme Variables --- */
 :root {
-  /* Light Mode Palette (Default) */
-  --bg-app: #eae8b8;
-  --bg-sidebar: #415776;
-  --bg-card: #ffc25f;
+  /* Light Mode Palette (Default - Dimmed Cozy Warm Stone & E-Reader Theme) */
+  --bg-app: #d5d2c4;
+  --bg-sidebar: #1e2736;
+  --bg-card: #e4e1d4;
 
-  --text-main: #111827;
-  --text-muted: #32373d;
-  --text-sidebar: #0c0c0d;
+  --text-main: #0f172a;
+  --text-muted: #334155;
+  --text-sidebar: #9ca3af;
   --text-sidebar-hover: #ffffff;
 
-  --form-control-bg: #faeac1;
+  --form-control-bg: #cfccbe;
 
-  --accent-primary: #3b82f6;
-  --border-color: #1a3746;
-  --shadow-sm: 2px 2px 3px rgba(0, 0, 0, 0.5);
+  --accent-primary: #1d4ed8;
+  --border-color: #b8b5a5;
+
+  // Highly diffused soft shadow to match the grounded, paper-like materials
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
 }
 
 html.dark-mode {
@@ -90,6 +92,6 @@ input:-webkit-autofill:active {
   text-shadow: 0 0 0 var(--text-main);
   border-color: var(--accent-primary) !important;
   box-shadow:
-    0 0 0 1000px var(--bg-card) inset !important,
+    0 0 0 1000px var(--bg-card) inset,
     0 0 0 3px rgba(37, 99, 235, 0.15) !important;
 }

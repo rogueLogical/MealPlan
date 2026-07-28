@@ -31,7 +31,6 @@ export class Settings implements OnInit {
   ];
 
   // Temporary string holders for the comma-separated text inputs
-  likedFoodsInput = '';
   dislikedFoodsInput = '';
 
   // Setup default form state
@@ -79,7 +78,6 @@ export class Settings implements OnInit {
                 ?.mealMacroSplitPercentage || { calories: 80, protein: 80, netCarbs: 80, fat: 80 },
             },
           };
-          this.likedFoodsInput = this.settingsData.nutritionSettings.likedFoods?.join(', ') || '';
           this.dislikedFoodsInput =
             this.settingsData.nutritionSettings.dislikedFoods?.join(', ') || '';
         }
@@ -244,11 +242,6 @@ export class Settings implements OnInit {
     this.onSnacksCountChange(this.settingsData.nutritionSettings.dailySnacksCount || 0);
 
     // change comma separated lists to arrays
-    this.settingsData.nutritionSettings.likedFoods = this.likedFoodsInput
-      .split(',')
-      .map((item) => item.trim())
-      .filter((item) => item.length > 0);
-
     this.settingsData.nutritionSettings.dislikedFoods = this.dislikedFoodsInput
       .split(',')
       .map((item) => item.trim())

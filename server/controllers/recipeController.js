@@ -200,6 +200,9 @@ const generateRecipe = async (req, res) => {
       return res.status(404).json({ message: 'User profile not found.' });
     }
 
+    // Extract the disliked ingredients and cuisines from the user's profile settings to pass to the AI model
+    const dislikedFoods = user.nutritionSettings?.dislikedFoods || [];
+
     let targets = null;
     if (useMacroTargets) {
       const settings = user.nutritionSettings || {};
@@ -256,7 +259,8 @@ const generateRecipe = async (req, res) => {
       promptText: description,
       recipeType,
       targets,
-      dietaryRestrictions
+      dietaryRestrictions,
+      dislikedFoods
     });
 
     // Run sequential resolution waterfall on each AI-suggested ingredient
@@ -386,8 +390,8 @@ const generateRecipe = async (req, res) => {
       isPublic: false,
       description: aiRecipe.description,
       instructions: formatInstructions(aiRecipe.instructions), // Applied formatting correction
-      prepTimeMinutes: aiRecipe.prepTimeMinutes,
-      cookTimeMinutes: aiRecipe.cookTimeMinutes,
+      prepTimeMinutes: aiRecipe.prepTimeMinutes, // Contains total combined minutes
+      cookTimeMinutes: 0,
       portions: aiRecipe.portions || 4,
       tags: aiRecipe.tags || [],
       ingredients: resolvedIngredients

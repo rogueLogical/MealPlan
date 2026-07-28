@@ -5,6 +5,7 @@ import { MealPrepService, MealPrepPlan, PlannedRecipe } from '../../services/mea
 import { RecipeService } from '../../services/recipe';
 import { Recipe } from '../../models/recipe.model';
 import { ToastService } from '../../services/toast';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-meals-planner',
@@ -30,6 +31,8 @@ export class MealsPlanner implements OnInit {
   planName = '';
   setAsActiveOnSave = false;
   selectedRecipes: { recipe: Recipe; plannedPortions: number; isSelected: boolean }[] = [];
+
+  planSearchQuery = '';
 
   // Recipe detail scaling view
   viewingPlannedRecipe: { recipe: Recipe; multiplier: number } | null = null;
@@ -58,8 +61,22 @@ export class MealsPlanner implements OnInit {
   }
 
   get unselectedPlanRecipes() {
-    return this.selectedRecipes
-      .filter((item) => !item.isSelected)
+    const query = this.planSearchQuery.trim().toLowerCase();
+    const base = this.selectedRecipes.filter((item) => !item.isSelected);
+
+    if (!query) {
+      return base.sort((a, b) => a.recipe.title.localeCompare(b.recipe.title));
+    }
+
+    return base
+      .filter(
+        (item) =>
+          item.recipe.title.toLowerCase().includes(query) ||
+          (item.recipe.description && item.recipe.description.toLowerCase().includes(query)) ||
+          (item.recipe.tags && item.recipe.tags.some((tag) => tag.toLowerCase().includes(query))) ||
+          (item.recipe.ingredients &&
+            item.recipe.ingredients.some((ing) => ing.name.toLowerCase().includes(query))),
+      )
       .sort((a, b) => a.recipe.title.localeCompare(b.recipe.title));
   }
 
@@ -96,14 +113,27 @@ export class MealsPlanner implements OnInit {
   }
 
   loadRecipes(): void {
-    this.recipeService.getMyRecipes().subscribe({
+    forkJoin({
+      myRecipes: this.recipeService.getMyRecipes(),
+      favRecipes: this.recipeService.getFavoriteRecipes(),
+    }).subscribe({
       next: (res) => {
-        this.userRecipes = res.data;
+        const mergedList = [...(res.myRecipes.data || []), ...(res.favRecipes.data || [])];
+
+        // De-duplicate the combined collection by unique recipe ID
+        const uniqueRecipesMap = new Map<string, Recipe>();
+        mergedList.forEach((recipe) => {
+          if (recipe && recipe._id) {
+            uniqueRecipesMap.set(recipe._id, recipe);
+          }
+        });
+
+        this.userRecipes = Array.from(uniqueRecipesMap.values());
         this.isLoading = false;
         this.cdr.markForCheck();
       },
       error: () => {
-        this.toastService.showError('Failed to load recipes.');
+        this.toastService.showError('Failed to load recipes selection pool.');
         this.isLoading = false;
         this.cdr.markForCheck();
       },
@@ -114,6 +144,7 @@ export class MealsPlanner implements OnInit {
     this.editingPlanId = null;
     this.planName = '';
     this.setAsActiveOnSave = false;
+    this.planSearchQuery = '';
     this.selectedRecipes = this.userRecipes.map((recipe) => ({
       recipe,
       plannedPortions: recipe.portions || 1,
@@ -128,7 +159,7 @@ export class MealsPlanner implements OnInit {
     this.editingPlanId = plan._id;
     this.planName = plan.name;
     this.setAsActiveOnSave = plan.isActive;
-
+    this.planSearchQuery = '';
     this.selectedRecipes = this.userRecipes.map((recipe) => {
       // Find matching mapped reference in the plan
       const planned = plan.recipes.find((pr) => {
@@ -150,6 +181,7 @@ export class MealsPlanner implements OnInit {
   cancelPlan(): void {
     this.isCreating = false;
     this.editingPlanId = null;
+    this.planSearchQuery = '';
   }
 
   savePlan(): void {
