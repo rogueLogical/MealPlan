@@ -40,11 +40,19 @@
 }
 
 .modal-header {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 24px;
+  padding: 24px 56px 24px 24px;
   border-bottom: 1px solid var(--border-color);
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.25rem;
+    padding: 20px 48px 20px 20px;
+  }
 
   .title-group {
     display: flex;
@@ -56,6 +64,10 @@
       font-size: 1.75rem;
       color: var(--text-main);
       line-height: 1.2;
+
+      @media (max-width: 768px) {
+        font-size: 1.4rem;
+      }
     }
   }
 
@@ -63,6 +75,23 @@
     display: flex;
     align-items: center;
     gap: 12px;
+    flex-wrap: wrap;
+
+    @media (max-width: 768px) {
+      width: 100%;
+      gap: 8px;
+
+      .icon-btn {
+        flex: 1 1 calc(50% - 8px); // Creates a tap-friendly 2x2 grid for action buttons on mobile
+        text-align: center;
+        font-size: 0.85rem;
+        padding: 10px 4px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+    }
 
     .icon-btn {
       background: transparent;
@@ -80,6 +109,9 @@
     }
 
     .close-btn {
+      position: absolute; // Absolutely positioned on ALL screens to prevent wrapping/hiding
+      top: 24px; // Locked 24px from top on desktop
+      right: 24px; // Locked 24px from right on desktop
       background: none;
       border: none;
       font-size: 1.5rem;
@@ -87,6 +119,16 @@
       cursor: pointer;
       padding: 0;
       line-height: 1;
+      z-index: 10; // Ensures it remains stacked above header content
+
+      @media (max-width: 768px) {
+        top: 20px; // Locked 20px from top on mobile
+        right: 20px; // Locked 20px from right on mobile
+      }
+
+      &:hover {
+        color: var(--text-main);
+      }
     }
   }
 }

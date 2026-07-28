@@ -150,31 +150,14 @@
                   }
                 </ul>
               </div>
-              <footer
-                style="
-                  display: flex;
-                  justify-content: space-between;
-                  align-items: center;
-                  margin-top: 8px;
-                  border-top: 1px solid var(--border-color);
-                  padding-top: 12px;
-                "
-              >
-                <div>
+              <footer class="history-plan-footer">
+                <div class="history-actions-group">
                   @if (!plan.isActive) {
-                    <button
-                      class="btn btn-primary"
-                      style="margin-right: 10px"
-                      (click)="activatePlan(plan)"
-                    >
+                    <button class="btn btn-primary" (click)="activatePlan(plan)">
                       ⚡ Activate Plan
                     </button>
                   }
-                  <button
-                    class="btn btn-secondary"
-                    style="margin-right: 10px"
-                    (click)="appendPlanIngredientsToList(plan)"
-                  >
+                  <button class="btn btn-secondary" (click)="appendPlanIngredientsToList(plan)">
                     🛒 Add to Shopping List
                   </button>
                   <button class="btn btn-secondary" (click)="initiatePlanEditing(plan)">
@@ -182,19 +165,8 @@
                   </button>
                 </div>
                 @if (!plan.isActive) {
-                  <button
-                    class="btn-remove"
-                    (click)="openDeleteDialog(plan)"
-                    title="Delete Plan"
-                    style="
-                      background: none;
-                      border: none;
-                      font-size: 1.2rem;
-                      color: #ef4444;
-                      cursor: pointer;
-                    "
-                  >
-                    🗑️ Delete
+                  <button class="btn-remove" (click)="openDeleteDialog(plan)" title="Delete Plan">
+                    🗑️ Delete Plan
                   </button>
                 }
               </footer>
@@ -283,9 +255,10 @@
             </div>
           }
 
-          <!-- Section B: Scrollable Unselected Recipes pool -->
-          <div class="selection-pool-section">
-            <h4
+          <!-- Local Search Input Group -->
+          <div class="form-group" style="margin-bottom: 1.5rem">
+            <label
+              for="planSearch"
               style="
                 margin-bottom: 0.75rem;
                 color: var(--text-main);
@@ -295,7 +268,31 @@
               "
             >
               Add Recipes:
-            </h4>
+            </label>
+            <div class="search-container">
+              <input
+                type="text"
+                id="planSearch"
+                [(ngModel)]="planSearchQuery"
+                placeholder="Filter by title, tag, or ingredient..."
+                class="form-control-input"
+                style="width: 100% !important; padding-right: 36px"
+              />
+              @if (planSearchQuery.trim()) {
+                <button
+                  type="button"
+                  class="clear-search-btn"
+                  (click)="planSearchQuery = ''"
+                  aria-label="Clear recipe search"
+                >
+                  ✕
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- Section B: Scrollable Unselected Recipes pool -->
+          <div class="selection-pool-section">
             <div class="recipes-selection-list">
               @for (item of unselectedPlanRecipes; track item.recipe._id) {
                 <div class="recipe-selection-row">
@@ -315,7 +312,11 @@
                     margin: 1.5rem 0;
                   "
                 >
-                  All recipes selected!
+                  {{
+                    planSearchQuery.trim()
+                      ? 'No recipes match your search query.'
+                      : 'All recipes selected!'
+                  }}
                 </p>
               }
             </div>

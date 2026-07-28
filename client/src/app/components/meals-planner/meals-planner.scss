@@ -351,6 +351,35 @@
   }
 }
 
+.search-container {
+  position: relative;
+  display: block;
+  width: 100%;
+
+  .clear-search-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: #ef4444;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 4px;
+    line-height: 1;
+    transition:
+      transform 0.1s ease,
+      color 0.2s ease;
+
+    &:hover {
+      color: #dc3545; // Darker red on hover
+      transform: translateY(-50%) scale(1.1); // Hover scaling effect
+    }
+  }
+}
+
 .modal-container {
   position: fixed;
   top: 0;
@@ -393,6 +422,67 @@
 
   &:hover {
     border-color: var(--accent-primary);
+  }
+}
+
+.history-plan-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 12px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch; // Stretches children full width
+    gap: 12px;
+  }
+
+  // Nested actions group container
+  .history-actions-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+
+    @media (max-width: 768px) {
+      width: 100%;
+      flex-direction: column; // Stacks Activate/Edit/List buttons vertically on mobile
+      gap: 8px;
+
+      .btn {
+        width: 100%;
+        text-align: center;
+        margin-right: 0 !important; // Overrides legacy inline margins
+      }
+    }
+  }
+
+  // Styled, tactile remove button
+  .btn-remove {
+    background: none;
+    border: none;
+    font-size: 0.95rem;
+    color: #ef4444;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-weight: 600;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: rgba(239, 68, 68, 0.08);
+    }
+
+    @media (max-width: 768px) {
+      width: 100%;
+      border: 1px solid rgba(239, 68, 68, 0.2); // Outlined borders on mobile
+      padding: 10px;
+    }
   }
 }
 

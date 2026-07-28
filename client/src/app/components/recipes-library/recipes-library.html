@@ -1,9 +1,33 @@
 <div class="library-workspace">
-  <div
-    class="workspace-header"
-    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem"
-  >
-    <h2 style="margin: 0">My Favorites</h2>
+  <div class="top-action-bar">
+    <button class="btn-secondary" (click)="openSearchModal()">🔍 Search Community</button>
+    <button class="btn-secondary" (click)="openGeneratorModal()">🧑‍🍳 Generate with AI</button>
+    <button class="btn-primary" (click)="toggleRecipeBuilder()">+ Create Custom Recipe</button>
+  </div>
+
+  <!-- Section 1: Favorites -->
+  <div class="workspace-header">
+    <h2>My Favorites</h2>
+    <!-- Search Input for Favorites Section -->
+    <div class="search-container">
+      <input
+        type="text"
+        [(ngModel)]="favoritesSearchQuery"
+        placeholder="Search favorites..."
+        class="header-search-input"
+      />
+      <!-- Render only if there is text in the search input -->
+      @if (favoritesSearchQuery.trim()) {
+        <button
+          type="button"
+          class="clear-search-btn"
+          (click)="favoritesSearchQuery = ''"
+          aria-label="Clear favorites search"
+        >
+          ✕
+        </button>
+      }
+    </div>
   </div>
 
   @if (isLoadingFavorites) {
@@ -24,9 +48,25 @@
     >
       <p style="color: var(--text-muted); margin: 0">You haven't favorited any recipes yet.</p>
     </div>
+  } @else if (filteredFavoriteRecipes.length === 0) {
+    <!-- Search Mismatch State -->
+    <div
+      class="empty-state"
+      style="
+        text-align: center;
+        padding: 2rem;
+        background: var(--bg-card);
+        border-radius: 12px;
+        border: 1px dashed var(--border-color);
+        margin-bottom: 2rem;
+      "
+    >
+      <p style="color: var(--text-muted); margin: 0">No favorites match your search query.</p>
+    </div>
   } @else {
     <div class="recipes-grid" style="margin-bottom: 2rem">
-      @for (recipe of favoriteRecipes; track recipe._id) {
+      <!-- Iterating through filtered list -->
+      @for (recipe of filteredFavoriteRecipes; track recipe._id) {
         <app-recipe-card
           [recipe]="recipe"
           [isFavorite]="true"
@@ -42,21 +82,28 @@
     </div>
   }
 
-  <hr style="border: 1px solid var(--border-color); margin-bottom: 2rem" />
-
-  <div
-    class="workspace-header"
-    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem"
-  >
-    <h2 style="margin: 0">My Recipes</h2>
-    <div class="header-actions">
-      <button class="btn-secondary" style="margin-right: 1rem" (click)="openGeneratorModal()">
-        🧑‍🍳 Generate with AI
-      </button>
-      <button class="btn-secondary" style="margin-right: 1rem" (click)="openSearchModal()">
-        🔍 Search Community
-      </button>
-      <button class="btn-primary" (click)="toggleRecipeBuilder()">+ Create New Recipe</button>
+  <!-- Section 2: Personal Recipes -->
+  <div class="workspace-header">
+    <h2>My Recipes</h2>
+    <!-- Search Input for My Recipes Section -->
+    <div class="search-container">
+      <input
+        type="text"
+        [(ngModel)]="myRecipesSearchQuery"
+        placeholder="Search my recipes..."
+        class="header-search-input"
+      />
+      <!-- Render only if there is text in the search input -->
+      @if (myRecipesSearchQuery.trim()) {
+        <button
+          type="button"
+          class="clear-search-btn"
+          (click)="myRecipesSearchQuery = ''"
+          aria-label="Clear recipes search"
+        >
+          ✕
+        </button>
+      }
     </div>
   </div>
 
@@ -81,9 +128,24 @@
       </p>
       <button class="btn-primary" (click)="toggleRecipeBuilder()">Create Your First Recipe</button>
     </div>
+  } @else if (filteredMyRecipes.length === 0) {
+    <!-- Search Mismatch State -->
+    <div
+      class="empty-state"
+      style="
+        text-align: center;
+        padding: 4rem;
+        background: var(--bg-card);
+        border-radius: 12px;
+        border: 1px dashed var(--border-color);
+      "
+    >
+      <p style="color: var(--text-muted); margin: 0">No recipes match your search query.</p>
+    </div>
   } @else {
     <div class="recipes-grid">
-      @for (recipe of myRecipes; track recipe._id) {
+      <!-- Iterating through filtered list -->
+      @for (recipe of filteredMyRecipes; track recipe._id) {
         <app-recipe-card
           [recipe]="recipe"
           [isFavorite]="favoriteRecipeIds.includes(recipe._id)"

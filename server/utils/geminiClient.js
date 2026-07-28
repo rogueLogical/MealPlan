@@ -73,8 +73,11 @@ const recipeGenerationSchema = {
       description:
         'Detailed step-by-step instructions. Use line breaks or paragraphs where necessary.'
     },
-    prepTimeMinutes: { type: Type.INTEGER },
-    cookTimeMinutes: { type: Type.INTEGER },
+    prepTimeMinutes: {
+      type: Type.INTEGER,
+      description:
+        'The total combined time required to both prepare and cook the recipe in its entirety, in minutes (Prep Time + Cook Time).'
+    },
     portions: { type: Type.INTEGER },
     tags: {
       type: Type.ARRAY,
@@ -134,7 +137,6 @@ const recipeGenerationSchema = {
     'description',
     'instructions',
     'prepTimeMinutes',
-    'cookTimeMinutes',
     'portions',
     'tags',
     'ingredients'
@@ -255,12 +257,16 @@ const generateRecipeFromPrompt = async ({
   promptText,
   recipeType,
   targets,
-  dietaryRestrictions = []
+  dietaryRestrictions = [],
+  dislikedFoods = []
 }) => {
   let prompt = `You are an expert chef and certified dietitian. Generate a delicious recipe matching this user prompt: "${promptText}".\n\n`;
   prompt += `Recipe Classification: ${recipeType}\n`;
   if (dietaryRestrictions.length > 0) {
     prompt += `Strict dietary restriction requirements to follow: [${dietaryRestrictions.join(', ')}]. Every single ingredient in the recipe must comply.\n`;
+  }
+  if (dislikedFoods.length > 0) {
+    prompt += `EXCLUDED INGREDIENTS & CUISINES: The user strongly dislikes and wants to avoid the following items: [${dislikedFoods.join(', ')}]. You MUST NOT include any of these, or any closely related ingredients, flavor profiles, or traditional recipe concepts associated with these cuisines, in the recipe's title, description, ingredients list, instructions, or tags.\n`;
   }
   if (targets) {
     prompt += `Macro Targets per single portion (Target total recipe macros = target * portions. Assume recipe yields ${targets.portions || 4} portions):\n`;

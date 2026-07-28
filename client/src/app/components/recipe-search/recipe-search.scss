@@ -6,9 +6,11 @@
   width: 100vw;
   height: 100vh;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   z-index: 1000;
+  padding-top: 40px;
+  box-sizing: border-box;
 }
 
 /* The Accessible Background Button */
@@ -32,7 +34,7 @@
   background: var(--bg-card); /* Matched to your theme */
   width: 90%;
   max-width: 1000px;
-  max-height: 85vh;
+  max-height: 90vh;
   border-radius: 12px;
   display: flex;
   flex-direction: column;

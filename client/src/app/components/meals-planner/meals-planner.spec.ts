@@ -73,6 +73,7 @@ describe('MealsPlanner Component Selection, Scaling, and State Management', () =
 
     mockRecipeService = {
       getMyRecipes: vi.fn().mockReturnValue(of({ data: mockRecipes })),
+      getFavoriteRecipes: vi.fn().mockReturnValue(of({ data: [] })),
     };
 
     mockToastService = {
