@@ -150,31 +150,14 @@
                   }
                 </ul>
               </div>
-              <footer
-                style="
-                  display: flex;
-                  justify-content: space-between;
-                  align-items: center;
-                  margin-top: 8px;
-                  border-top: 1px solid var(--border-color);
-                  padding-top: 12px;
-                "
-              >
-                <div>
+              <footer class="history-plan-footer">
+                <div class="history-actions-group">
                   @if (!plan.isActive) {
-                    <button
-                      class="btn btn-primary"
-                      style="margin-right: 10px"
-                      (click)="activatePlan(plan)"
-                    >
+                    <button class="btn btn-primary" (click)="activatePlan(plan)">
                       ⚡ Activate Plan
                     </button>
                   }
-                  <button
-                    class="btn btn-secondary"
-                    style="margin-right: 10px"
-                    (click)="appendPlanIngredientsToList(plan)"
-                  >
+                  <button class="btn btn-secondary" (click)="appendPlanIngredientsToList(plan)">
                     🛒 Add to Shopping List
                   </button>
                   <button class="btn btn-secondary" (click)="initiatePlanEditing(plan)">
@@ -182,19 +165,8 @@
                   </button>
                 </div>
                 @if (!plan.isActive) {
-                  <button
-                    class="btn-remove"
-                    (click)="openDeleteDialog(plan)"
-                    title="Delete Plan"
-                    style="
-                      background: none;
-                      border: none;
-                      font-size: 1.2rem;
-                      color: #ef4444;
-                      cursor: pointer;
-                    "
-                  >
-                    🗑️ Delete
+                  <button class="btn-remove" (click)="openDeleteDialog(plan)" title="Delete Plan">
+                    🗑️ Delete Plan
                   </button>
                 }
               </footer>
