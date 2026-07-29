@@ -193,7 +193,7 @@ describe('RecipeBuilder Component Math & Form Logic', () => {
     const balancedIngredient = {
       ingredientId: 'ing123',
       name: 'Chicken Breast',
-      weightInGrams: 150, // Per portion (multiplier = 150 / 100 = 1.5x)
+      weightInGrams: 150,
       displayAmount: 3,
       displayUnit: 'cloves',
       nutrition: {} as unknown as NutritionMacros,
@@ -202,8 +202,109 @@ describe('RecipeBuilder Component Math & Form Logic', () => {
 
     component.onBalancedRecipeSaved([balancedIngredient]);
 
-    // Verify proportional scaling: displayAmount should be 3 * 1.5 = 4.5
+    // 3. Verify proportional scaling: displayAmount should be 3 * 1.5 = 4.5
     expect(component.ingredients.at(0).get('weightInGrams')?.value).toBe(150);
     expect(component.ingredients.at(0).get('displayAmount')?.value).toBe(4.5);
+  });
+
+  it('should scale displayAmount proportionately when weightInGrams is manually changed', () => {
+    component.addIngredientToRecipe(mockIngredient);
+    component.ingredients.at(0).get('weightInGrams')?.setValue(100);
+    component.ingredients.at(0).get('displayAmount')?.setValue(2);
+
+    // Manually double the weight from 100g to 200g
+    component.ingredients.at(0).get('weightInGrams')?.setValue(200);
+
+    // Verify displayAmount scaled proportionately to 4
+    expect(component.ingredients.at(0).get('displayAmount')?.value).toBe(4);
+  });
+
+  it('should preserve displayAmount during backspace-erasures and scale cleanly on subsequent keystrokes', () => {
+    component.addIngredientToRecipe(mockIngredient);
+    component.ingredients.at(0).get('weightInGrams')?.setValue(800);
+    component.ingredients.at(0).get('displayAmount')?.setValue(4);
+
+    // Simulate user backspacing to clear the input field (newWeight = null)
+    component.ingredients.at(0).get('weightInGrams')?.setValue(null);
+
+    // Verify displayAmount is preserved at 4, rather than zeroing out
+    expect(component.ingredients.at(0).get('displayAmount')?.value).toBe(4);
+
+    // User types a new weight (e.g., 200g)
+    component.ingredients.at(0).get('weightInGrams')?.setValue(200);
+
+    // Verify that the scale calculates from the baseline: 200g / 800g = 0.25x. New display = 4 * 0.25 = 1
+    expect(component.ingredients.at(0).get('displayAmount')?.value).toBe(1);
+  });
+
+  it('should establish a new baseline when the user manually edits displayAmount to correct ratios', () => {
+    component.addIngredientToRecipe(mockIngredient);
+    component.ingredients.at(0).get('weightInGrams')?.setValue(100);
+    component.ingredients.at(0).get('displayAmount')?.setValue(2);
+
+    // The user manually edits displayAmount from 2 to 5 (at 100g)
+    // This should establish a new baseline: weight = 100, displayAmount = 5
+    component.ingredients.at(0).get('displayAmount')?.setValue(5);
+
+    // The user now manually edits weightInGrams from 100g to 200g
+    component.ingredients.at(0).get('weightInGrams')?.setValue(200);
+
+    // Verify that it scales from the new baseline (ratio = 200 / 100 = 2x, displayAmount = 5 * 2 = 10)
+    expect(component.ingredients.at(0).get('displayAmount')?.value).toBe(10);
+  });
+
+  it('should prevent standard Enter from submitting the form and instead shift focus to the next field', () => {
+    const submitSpy = vi.spyOn(component, 'onSubmit').mockImplementation(() => undefined);
+    const preventDefaultSpy = vi.fn();
+
+    const mockEvent = {
+      key: 'Enter',
+      ctrlKey: false,
+      metaKey: false,
+      preventDefault: preventDefaultSpy,
+      target: document.createElement('input'),
+    } as unknown as KeyboardEvent;
+
+    component.handleEnterKey(mockEvent);
+
+    expect(preventDefaultSpy).toHaveBeenCalled();
+    expect(submitSpy).not.toHaveBeenCalled();
+  });
+
+  it('should trigger onSubmit when Ctrl + Enter is pressed inside the form', () => {
+    const submitSpy = vi.spyOn(component, 'onSubmit').mockImplementation(() => undefined);
+    const preventDefaultSpy = vi.fn();
+
+    const mockEvent = {
+      key: 'Enter',
+      ctrlKey: true,
+      metaKey: false,
+      preventDefault: preventDefaultSpy,
+      target: document.createElement('input'),
+    } as unknown as KeyboardEvent;
+
+    component.handleEnterKey(mockEvent);
+
+    expect(preventDefaultSpy).toHaveBeenCalled();
+    expect(submitSpy).toHaveBeenCalled();
+  });
+
+  it('should prevent Shift + Enter from submitting the form and instead shift focus backward', () => {
+    const submitSpy = vi.spyOn(component, 'onSubmit').mockImplementation(() => undefined);
+    const preventDefaultSpy = vi.fn();
+
+    const mockEvent = {
+      key: 'Enter',
+      ctrlKey: false,
+      metaKey: false,
+      shiftKey: true, // Shift pressed
+      preventDefault: preventDefaultSpy,
+      target: document.createElement('input'),
+    } as unknown as KeyboardEvent;
+
+    component.handleEnterKey(mockEvent);
+
+    expect(preventDefaultSpy).toHaveBeenCalled();
+    expect(submitSpy).not.toHaveBeenCalled();
   });
 });

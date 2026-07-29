@@ -32,32 +32,25 @@ const formatInstructions = (instructions) => {
 const balanceRecipe = async (req, res) => {
   try {
     // Extract payload from the Angular client
-    const { ingredients, targets, dietaryRestrictions, interventionCount = 0 } = req.body;
+    const {
+      ingredients,
+      targets,
+      dietaryRestrictions,
+      interventionCount = 0,
+      title,
+      description,
+      recipeType,
+      instructions
+    } = req.body;
 
-    // Log request contents for debugging purposes
     console.log('\n=========================================');
     console.log('[DEBUG] INCOMING RECIPE BALANCER REQUEST');
     console.log('=========================================');
     console.log(`Intervention Count : ${interventionCount}`);
+    console.log(`Recipe Title       : "${title || 'Untitled'}"`);
     console.log(
       `Target Macros      : P: ${targets.protein}g | F: ${targets.fat}g | NC: ${targets.netCarbs}g`
     );
-    console.log(
-      `Dietary Filters    : [${dietaryRestrictions && dietaryRestrictions.length > 0 ? dietaryRestrictions.join(', ') : 'None'}]`
-    );
-    console.log('Ingredients:');
-    if (ingredients && ingredients.length > 0) {
-      ingredients.forEach((ing, i) => {
-        const nut = ing.nutrition || {};
-        console.log(
-          `  [${i + 1}] Name: "${ing.name}"` +
-            ` | Weight: ${ing.weightInGrams}g` +
-            ` | Macros (Scaled): P: ${nut.protein || 0}g, F: ${nut.fat || 0}g, NC: ${nut.netCarbs || 0}g`
-        );
-      });
-    } else {
-      console.log('  (No ingredients provided in request)');
-    }
     console.log('=========================================\n');
 
     // Attempt the core mathematical solve (+/- 10% tolerance band)
@@ -73,8 +66,6 @@ const balanceRecipe = async (req, res) => {
 
     // STATE 3: Circuit Breaker - Matrix failed, but we hit the retry limit
     if (!solverResult.isFeasible && interventionCount >= 4) {
-      // solverResult.scaledIngredients here contains the "best approximate" math
-      // where the solver dropped the strict constraints to force a resolution.
       return res.status(200).json({
         status: 'approximate_success',
         ingredients: solverResult.scaledIngredients
@@ -92,50 +83,63 @@ const balanceRecipe = async (req, res) => {
           type: 'REMOVE',
           targetIngredient: solverResult.offendingIngredient,
           reasoning: solverResult.failureReason,
-          options: [] // No alternative options possible for a strict 0
+          options: []
         }
       });
     }
 
-    // First, pass the failure context to Gemini for culinary concepts.
+    // Defensive check: extract userId safely and guard the database lookup
+    const userId = req.userData?.userId;
+    const User = require('../models/User');
+    const user = userId ? await User.findById(userId) : null;
+    const dislikedFoods = user ? user.nutritionSettings?.dislikedFoods || [] : [];
+
+    // Pass the rich recipe details and dislikes to Gemini for context-aware suggestions
     const aiConcepts = await getAiSuggestions({
       failureType: solverResult.failureType,
       failureReason: solverResult.failureReason,
       offendingIngredient: solverResult.offendingIngredient,
       targetMacro: solverResult.targetMacro,
       dietaryRestrictions: dietaryRestrictions,
-      currentIngredients: ingredients.map((ing) => ing.name),
-      zeroTargets: solverResult.zeroTargets
+      zeroTargets: solverResult.zeroTargets,
+      dislikedFoods: dislikedFoods,
+      recipeContext: {
+        title: title || '',
+        description: description || '',
+        recipeType: recipeType || 'Meal',
+        instructions: instructions || '',
+        ingredients: ingredients.map((ing) => ({
+          name: ing.name,
+          weightInGrams: ing.weightInGrams
+        }))
+      }
     });
 
     // Look in Database for ingredient macros First, USDA Second
     const rawOptions = await Promise.all(
       aiConcepts.map(async (concept) => {
-        // Sanitize the incoming string
         const safeIngredientName = escapeRegExp(concept.ingredientName);
 
-        // Safely execute the case-insensitive lookup
         const localIngredient = await Ingredient.findOne({
           name: { $regex: new RegExp(`^${safeIngredientName}$`, 'i') }
         });
 
         if (localIngredient) {
-          // Found in DB! Return the full Mongoose document + AI Reasoning
           return {
             ...localIngredient.toObject(),
             reasonForRecommendation: concept.reasonForRecommendation
           };
         }
 
-        // Not found in DB. Fallback to USDA API.
         const verifiedMacros = await fetchUsdaMacros(concept.ingredientName);
 
-        // AUTO-POPULATE: Save the newly verified ingredient to the database
-        // so the NEXT time the AI suggests it, we hit Step 1 instead
-        if (verifiedMacros.protein > 0 || verifiedMacros.fat > 0 || verifiedMacros.netCarbs > 0) {
+        if (
+          verifiedMacros &&
+          (verifiedMacros.protein > 0 || verifiedMacros.fat > 0 || verifiedMacros.netCarbs > 0)
+        ) {
           const finalIngredient = await Ingredient.create({
             name: concept.ingredientName,
-            servingSize: 100, // USDA returns data per 100g
+            servingSize: 100,
             servingUnit: 'g',
             nutritionPerServing: {
               protein: verifiedMacros.protein,
@@ -153,26 +157,21 @@ const balanceRecipe = async (req, res) => {
           };
         }
 
-        // EDGE CASE: USDA found nothing (zero macros).
-        // The ingredient is useless for macro balancing, so we return null.
-        // This takes the option out of the selectable results for the user.
         return null;
       })
     );
 
-    // Clean the array: Strip out any nulls where USDA came up empty
     const verifiedOptions = rawOptions.filter((option) => option !== null);
 
-    // Finally, return the strict schema the Angular frontend expects
     return res.status(200).json({
       status: 'action_required',
       ingredients: solverResult.scaledIngredients,
       intervention: {
-        type: solverResult.failureType, // 'SWAP' or 'ADD'
+        type: solverResult.failureType,
         targetIngredient:
           solverResult.failureType === 'SWAP' ? solverResult.offendingIngredient : null,
         reasoning: solverResult.failureReason,
-        options: verifiedOptions // Only contains fully verified, macro-filled ingredients
+        options: verifiedOptions
       }
     });
   } catch (error) {

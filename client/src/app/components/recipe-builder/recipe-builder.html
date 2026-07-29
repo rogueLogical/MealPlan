@@ -6,13 +6,18 @@
     aria-label="Close builder"
   ></button>
 
-  <div class="modal-content recipe-builder-modal">
+  <div class="modal-content recipe-builder-modal" appFocusTrap>
     <header class="modal-header">
       <h2>{{ initialRecipe ? 'Edit Recipe' : 'Create New Recipe' }}</h2>
       <button type="button" class="close-btn" (click)="onClose()">✕</button>
     </header>
 
-    <form [formGroup]="recipeForm" (ngSubmit)="onSubmit()" class="recipe-builder">
+    <form
+      [formGroup]="recipeForm"
+      (ngSubmit)="onSubmit()"
+      (keydown)="handleEnterKey($event)"
+      class="recipe-builder"
+    >
       <div class="modal-body">
         <div class="header-section">
           <input
@@ -24,17 +29,31 @@
           <div class="header-toggles">
             <div class="type-toggle">
               <label class="radio-btn">
-                <input type="radio" formControlName="recipeType" value="Meal" />
+                <input
+                  type="radio"
+                  formControlName="recipeType"
+                  value="Meal"
+                  (keydown.enter)="$event.preventDefault(); $event.target.click()"
+                />
                 <span>Meal</span>
               </label>
               <label class="radio-btn">
-                <input type="radio" formControlName="recipeType" value="Snack" />
+                <input
+                  type="radio"
+                  formControlName="recipeType"
+                  value="Snack"
+                  (keydown.enter)="$event.preventDefault(); $event.target.click()"
+                />
                 <span>Snack</span>
               </label>
             </div>
             <div class="type-toggle">
               <label class="radio-btn">
-                <input type="checkbox" formControlName="isPublic" />
+                <input
+                  type="checkbox"
+                  formControlName="isPublic"
+                  (keydown.enter)="$event.preventDefault(); $event.target.click()"
+                />
                 <span>{{ recipeForm.get('isPublic')?.value ? '🌍 Public' : '🔒 Private' }}</span>
               </label>
             </div>
@@ -187,6 +206,7 @@
                   [id]="'recipe-tag-' + i"
                   [checked]="hasTag(tag)"
                   (change)="toggleTag(tag, $event)"
+                  (keydown.enter)="$event.preventDefault(); $event.target.click()"
                 />
                 {{ tag }}
               </label>

@@ -1,5 +1,5 @@
 <div class="balancer-overlay">
-  <div class="balancer-modal">
+  <div class="balancer-modal" appFocusTrap>
     <div class="modal-header">
       <h2>Balance Recipe Macros</h2>
       <button class="close-btn" (click)="onCancel()">×</button>
@@ -67,6 +67,7 @@
                       type="checkbox"
                       [checked]="selectedDietaryRestrictions.includes(tag)"
                       (change)="toggleRestriction(tag)"
+                      (keydown.enter)="$event.preventDefault(); $event.target.click()"
                     />
                     {{ tag }}
                   </label>

@@ -13,6 +13,7 @@ import { ToastService } from '../../services/toast';
 import { Subscription } from 'rxjs';
 import { RecipeGenerator } from '../recipe-generator/recipe-generator';
 import { FormsModule } from '@angular/forms';
+import { FocusTrapDirective } from '../../directives/focus-trap';
 
 @Component({
   selector: 'app-recipes',
@@ -25,6 +26,7 @@ import { FormsModule } from '@angular/forms';
     RecipeDetail,
     RecipeSearch,
     RecipeGenerator,
+    FocusTrapDirective,
   ],
   templateUrl: './recipes-library.html',
   styleUrls: ['./recipes-library.scss'],

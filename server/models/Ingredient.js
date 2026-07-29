@@ -86,6 +86,32 @@ IngredientSchema.index({ tags: 1 });
 
 // Auto-calculate Net Carbs, Calories, 100g Baselines, and Apply Semantic + Math Tags
 IngredientSchema.pre('save', async function () {
+  const normalizedName = this.name.toLowerCase().trim();
+  const zeroNutritionItems = [
+    'water',
+    'tap water',
+    'distilled water',
+    'drinking water',
+    'sparkling water',
+    'ice',
+    'ice cubes',
+    'club soda',
+    'seltzer'
+  ];
+
+  // Programmatic override guaranteeing pure hydration ingredients remain at 0g macros
+  if (zeroNutritionItems.includes(normalizedName)) {
+    this.nutritionPerServing = {
+      calories: 0,
+      protein: 0,
+      totalCarbs: 0,
+      fiber: 0,
+      sugarAlcohols: 0,
+      netCarbs: 0,
+      fat: 0
+    };
+  }
+
   const serving = this.nutritionPerServing;
 
   // Calculate Net Carbs for the serving

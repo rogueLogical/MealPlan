@@ -6,11 +6,12 @@ import { IngredientService } from '../../services/ingredient';
 import { ToastService } from '../../services/toast';
 import { IngredientForm } from '../ingredient-form/ingredient-form';
 import { UserService } from '../../services/user';
+import { FocusTrapDirective } from '../../directives/focus-trap';
 
 @Component({
   selector: 'app-ingredient-search',
   standalone: true,
-  imports: [CommonModule, FormsModule, IngredientForm],
+  imports: [CommonModule, FormsModule, IngredientForm, FocusTrapDirective],
   templateUrl: './ingredient-search.html',
   styleUrls: ['./ingredient-search.scss'],
 })

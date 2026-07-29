@@ -5,11 +5,12 @@ import { Recipe, UserMacroTargets } from '../../models/recipe.model';
 import { AuthService } from '../../services/auth';
 import { MealPrepService } from '../../services/meal-prep';
 import { ToastService } from '../../services/toast';
+import { FocusTrapDirective } from '../../directives/focus-trap';
 
 @Component({
   selector: 'app-recipe-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FocusTrapDirective],
   templateUrl: './recipe-detail.html',
   styleUrls: ['./recipe-detail.scss'],
 })

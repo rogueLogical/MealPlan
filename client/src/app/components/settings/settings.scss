@@ -179,13 +179,20 @@
     box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);
   }
 
-  /* Hide the checkbox square visually */
+  /* Hide the checkbox square visually but keep it focusable */
   input[type='checkbox'] {
     position: absolute;
     opacity: 0;
     width: 0;
     height: 0;
     margin: 0;
+    pointer-events: none;
+  }
+
+  // Dynamic focus-within outline highlight
+  &:focus-within {
+    outline: 2px solid var(--accent-primary) !important;
+    outline-offset: 2px;
   }
 }
 

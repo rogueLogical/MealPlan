@@ -8,9 +8,23 @@ const Ingredient = require('../models/Ingredient');
 jest.mock('../utils/macroBalancer');
 jest.mock('../utils/geminiClient');
 jest.mock('../utils/usdaClient');
+
+// Mock User model queries to prevent database timeout buffering in unit tests
+jest.mock('../models/User', () => {
+  return {
+    findById: jest.fn().mockResolvedValue({
+      _id: 'test_mock_user_id',
+      nutritionSettings: {
+        dislikedFoods: []
+      }
+    })
+  };
+});
+
 jest.mock('../middleware/auth', () => {
   return (req, res, next) => {
     req.user = { id: 'test_mock_user_id' }; // Simulates a logged-in user
+    req.userData = { userId: 'test_mock_user_id' };
     next();
   };
 });

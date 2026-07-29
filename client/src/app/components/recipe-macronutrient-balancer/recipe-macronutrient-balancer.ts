@@ -18,13 +18,14 @@ import {
   InterventionPayload,
   InterventionOption,
 } from '../../models/recipe.model';
+import { FocusTrapDirective } from '../../directives/focus-trap';
 
 type BalancerState = 'CONFIG' | 'LOADING' | 'INTERVENTION' | 'REVIEW';
 
 @Component({
   selector: 'app-recipe-macronutrient-balancer',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FocusTrapDirective],
   templateUrl: './recipe-macronutrient-balancer.html',
   styleUrls: ['./recipe-macronutrient-balancer.scss'],
 })
@@ -102,6 +103,10 @@ export class RecipeMacronutrientBalancer implements OnInit {
       targets: this.mealTargets,
       dietaryRestrictions: this.selectedDietaryRestrictions,
       interventionCount: this.interventionCount,
+      title: this.originalRecipe.title,
+      description: this.originalRecipe.description,
+      recipeType: this.originalRecipe.recipeType,
+      instructions: this.originalRecipe.instructions,
     };
 
     this.balancerService

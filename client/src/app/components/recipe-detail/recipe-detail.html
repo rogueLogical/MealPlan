@@ -1,7 +1,7 @@
 <div class="modal-container">
   <button class="modal-backdrop" (click)="onClose()" aria-label="Close recipe details"></button>
 
-  <div class="modal-content detail-modal">
+  <div class="modal-content detail-modal" appFocusTrap>
     <header class="modal-header">
       <div class="title-group">
         <h2>{{ recipe.title }}</h2>
@@ -119,7 +119,7 @@
         (click)="closePortionDialog()"
         aria-label="Cancel portions selection"
       ></button>
-      <div class="dialog-box">
+      <div class="dialog-box" appFocusTrap>
         <header class="dialog-header">
           <h3>Log Cooked Portions</h3>
           <button class="dialog-close-btn" (click)="closePortionDialog()">✕</button>

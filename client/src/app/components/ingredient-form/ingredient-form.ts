@@ -14,11 +14,12 @@ import { IngredientService } from '../../services/ingredient';
 import { AuthService } from '../../services/auth';
 import { ToastService } from '../../services/toast';
 import { NumbersOnlyDirective } from '../../directives/numbers-only';
+import { FocusTrapDirective } from '../../directives/focus-trap';
 
 @Component({
   selector: 'app-ingredient-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, NumbersOnlyDirective],
+  imports: [CommonModule, FormsModule, NumbersOnlyDirective, FocusTrapDirective],
   templateUrl: './ingredient-form.html',
   styleUrls: ['./ingredient-form.scss'],
 })
