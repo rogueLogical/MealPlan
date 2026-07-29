@@ -366,7 +366,7 @@ Generates a complete, structured recipe based on a natural language text descrip
 
 `POST /recipes/balance`
 
-Executes the mathematical Non-Negative Least Squares (NNLS) optimizer to scale active recipe ingredients so they align with a user's exact per-portion macronutrient targets.
+Executes the mathematical Non-Negative Least Squares (NNLS) optimizer to scale active recipe ingredients so they align with a user's exact per-portion macronutrient targets. If the solver hits a constraint conflict, it passes the full recipe details (title, description, category type, instructions, and ingredients with weights) alongside the user's settings-based disliked foods list to Gemini AI to generate context-aware ingredient additions or substitutions.
 
 - Auth Required: Yes
 - Body:
@@ -394,7 +394,12 @@ Executes the mathematical Non-Negative Least Squares (NNLS) optimizer to scale a
       "netCarbs": 10
     },
     "dietaryRestrictions": ["Dairy-Free"],
-    "interventionCount": 0
+    "interventionCount": 0,
+    // Context-rich parameters added to support AI-driven, settings-aware suggestions
+    "title": "Keto Chicken Bowl",
+    "description": "A high-protein, low-carb meal prep option.",
+    "recipeType": "Meal", // "Meal" | "Snack"
+    "instructions": "1. Grill the chicken breast until cooked.\n\n2. Slice and serve on a bed of greens."
   }
   ```
 - Success Response (200): Depending on mathematical feasibility, returns one of three states:
@@ -417,7 +422,7 @@ Executes the mathematical Non-Negative Least Squares (NNLS) optimizer to scale a
         "options": [
           {
             "_id": "60d5ecb8b392d8...",
-            "name": "Brown Rice",
+            "name": "brown rice",
             "servingSize": 100,
             "nutritionPerServing": { "calories": 111, "protein": 3, "totalCarbs": 23, "fiber": 2, "sugarAlcohols": 0, "netCarbs": 21, "fat": 1 },
             "reasonForRecommendation": "Excellent source of complex carbs."
