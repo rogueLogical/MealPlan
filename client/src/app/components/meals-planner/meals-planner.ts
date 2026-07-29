@@ -6,11 +6,12 @@ import { RecipeService } from '../../services/recipe';
 import { Recipe } from '../../models/recipe.model';
 import { ToastService } from '../../services/toast';
 import { forkJoin } from 'rxjs';
+import { FocusTrapDirective } from '../../directives/focus-trap';
 
 @Component({
   selector: 'app-meals-planner',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FocusTrapDirective],
   templateUrl: './meals-planner.html',
   styleUrls: ['./meals-planner.scss'],
 })

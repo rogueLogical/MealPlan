@@ -6,7 +6,7 @@
     [disabled]="isGenerating"
   ></button>
 
-  <div class="modal-content generator-modal">
+  <div class="modal-content generator-modal" appFocusTrap>
     <header class="modal-header">
       <h2>Generate AI Recipe</h2>
       <button class="close-btn" (click)="onCancel()" [disabled]="isGenerating">✕</button>
@@ -21,7 +21,7 @@
           </p>
 
           <div class="form-group" style="margin-bottom: 1.5rem">
-            <label for="recipeDescription">Recipe Idea / Description (Max 256 characters) *</label>
+            <label for="recipeDescription">Recipe Idea / Description</label>
             <textarea
               id="recipeDescription"
               [(ngModel)]="description"
@@ -29,6 +29,7 @@
               rows="4"
               placeholder="e.g., Creamy garlic chicken with asparagus and brown rice..."
               class="form-control-input"
+              (keydown)="onKeyDown($event)"
             ></textarea>
             <div
               class="char-counter"
@@ -51,11 +52,23 @@
               <span class="section-title">Recipe Type</span>
               <div class="type-toggle" style="display: flex; gap: 1rem; margin-top: 6px">
                 <label class="radio-btn" [class.active]="recipeType === 'Meal'">
-                  <input type="radio" name="recipeType" value="Meal" [(ngModel)]="recipeType" />
+                  <input
+                    type="radio"
+                    name="recipeType"
+                    value="Meal"
+                    [(ngModel)]="recipeType"
+                    (keydown.enter)="$event.preventDefault(); $event.target.click()"
+                  />
                   <span>Meal</span>
                 </label>
                 <label class="radio-btn" [class.active]="recipeType === 'Snack'">
-                  <input type="radio" name="recipeType" value="Snack" [(ngModel)]="recipeType" />
+                  <input
+                    type="radio"
+                    name="recipeType"
+                    value="Snack"
+                    [(ngModel)]="recipeType"
+                    (keydown.enter)="$event.preventDefault(); $event.target.click()"
+                  />
                   <span>Snack</span>
                 </label>
               </div>
@@ -68,7 +81,11 @@
                   class="checkbox-label"
                   style="display: inline-flex; width: auto; font-weight: 600"
                 >
-                  <input type="checkbox" [(ngModel)]="useMacroTargets" />
+                  <input
+                    type="checkbox"
+                    [(ngModel)]="useMacroTargets"
+                    (keydown.enter)="$event.preventDefault(); $event.target.click()"
+                  />
                   <span>{{
                     useMacroTargets
                       ? '🎯 Target My User Settings Macros'
@@ -88,6 +105,7 @@
                     type="checkbox"
                     [checked]="dietaryRestrictions.includes(tag)"
                     (change)="toggleRestriction(tag)"
+                    (keydown.enter)="$event.preventDefault(); $event.target.click()"
                   />
                   {{ tag }}
                 </label>

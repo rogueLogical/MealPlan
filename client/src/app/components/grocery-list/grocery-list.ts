@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MealPrepService, ShoppingListItem } from '../../services/meal-prep';
 import { ToastService } from '../../services/toast';
+import { FocusTrapDirective } from '../../directives/focus-trap';
 
 @Component({
   selector: 'app-grocery-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FocusTrapDirective],
   templateUrl: './grocery-list.html',
   styleUrls: ['./grocery-list.scss'],
 })

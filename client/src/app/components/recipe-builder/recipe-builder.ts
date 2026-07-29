@@ -23,11 +23,18 @@ import { IngredientSearch } from '../ingredient-search/ingredient-search';
 import { RecipeMacronutrientBalancer } from '../recipe-macronutrient-balancer/recipe-macronutrient-balancer';
 import { IngredientService } from '../../services/ingredient';
 import { ToastService } from '../../services/toast';
+import { FocusTrapDirective } from '../../directives/focus-trap';
 
 @Component({
   selector: 'app-recipe-builder',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, IngredientSearch, RecipeMacronutrientBalancer],
+  imports: [
+    ReactiveFormsModule,
+    CommonModule,
+    IngredientSearch,
+    RecipeMacronutrientBalancer,
+    FocusTrapDirective,
+  ],
   templateUrl: './recipe-builder.html',
   styleUrls: ['./recipe-builder.scss'],
 })
@@ -43,6 +50,10 @@ export class RecipeBuilder implements OnInit, OnDestroy, OnChanges {
   recipeForm!: FormGroup;
   private formSub?: Subscription;
   private previousPortions = 1;
+
+  // Stable baseline cache to prevent incremental rounding drift and backspace-erasures
+  baselines: { weight: number; displayAmount: number | null }[] = [];
+  lastProgrammaticDisplays: (number | null)[] = [];
 
   // UI Math State (Everything rendered here is PER PORTION)
   recipeTotalsPerPortion: NutritionMacros = {
@@ -88,18 +99,29 @@ export class RecipeBuilder implements OnInit, OnDestroy, OnChanges {
 
       const ratio = newPortions / this.previousPortions;
 
-      // Loop through all ingredients and scale them
-      this.ingredients.controls.forEach((control) => {
+      this.ingredients.controls.forEach((control, idx) => {
         const currentWeight = control.get('weightInGrams')?.value || 0;
         const currentDisplay = control.get('displayAmount')?.value;
 
+        const scaledWeight = Math.round(currentWeight * ratio * 10) / 10;
+        const scaledDisplay = currentDisplay
+          ? parseFloat((currentDisplay * ratio).toFixed(2))
+          : null;
+
         control.patchValue(
           {
-            weightInGrams: Math.round(currentWeight * ratio * 10) / 10,
-            displayAmount: currentDisplay ? parseFloat((currentDisplay * ratio).toFixed(2)) : null,
+            weightInGrams: scaledWeight,
+            displayAmount: scaledDisplay,
           },
-          { emitEvent: false }, // Prevent infinite recalculation loops
+          { emitEvent: false }, // Prevent infinite loops
         );
+
+        // Keep programmatics and baselines in sync with the portions auto-scaler
+        this.lastProgrammaticDisplays[idx] = scaledDisplay;
+        this.baselines[idx] = {
+          weight: scaledWeight,
+          displayAmount: scaledDisplay,
+        };
       });
 
       this.previousPortions = newPortions;
@@ -111,7 +133,6 @@ export class RecipeBuilder implements OnInit, OnDestroy, OnChanges {
       this.patchInitialData();
     }
 
-    // Force an initial calculation so the UI populates immediately
     this.recipeForm.updateValueAndValidity();
   }
 
@@ -170,6 +191,8 @@ export class RecipeBuilder implements OnInit, OnDestroy, OnChanges {
   }
 
   removeIngredient(index: number): void {
+    this.baselines.splice(index, 1);
+    this.lastProgrammaticDisplays.splice(index, 1);
     this.ingredients.removeAt(index);
   }
 
@@ -255,6 +278,8 @@ export class RecipeBuilder implements OnInit, OnDestroy, OnChanges {
       originalIngredientsMap.set(key, { weight, displayAmount: display });
     });
 
+    this.baselines = [];
+    this.lastProgrammaticDisplays = [];
     this.ingredients.clear();
 
     balancedIngredients.forEach((ing) => {
@@ -295,12 +320,143 @@ export class RecipeBuilder implements OnInit, OnDestroy, OnChanges {
     this.showBalancerModal = false;
   }
 
+  /**
+   * Intercepts Enter keystrokes to prevent accidental form submissions,
+   * shifting focus to the next input field, or executing an affirmative save on Ctrl + Enter.
+   * Allows buttons, textareas, checkboxes, and radio buttons to behave natively.
+   */
+  handleEnterKey(event: Event): void {
+    const kbEvent = event as KeyboardEvent;
+
+    // Safety Guard: Exit immediately for any non-Enter keypresses
+    if (kbEvent.key !== 'Enter') {
+      return;
+    }
+
+    const activeElement = document.activeElement as HTMLElement;
+    if (!activeElement) return;
+
+    // If Ctrl + Enter or Cmd + Enter is pressed -> Affirmative Save!
+    if (kbEvent.ctrlKey || kbEvent.metaKey) {
+      kbEvent.preventDefault();
+      this.onSubmit();
+      return;
+    }
+
+    // If the active element is a button, let the browser handle it natively (triggering click)
+    if (activeElement.tagName.toLowerCase() === 'button') {
+      return;
+    }
+
+    // If standard Enter is pressed inside a textarea, let it insert newlines naturally
+    if (activeElement.tagName.toLowerCase() === 'textarea') {
+      return;
+    }
+
+    // If the active element is a checkbox or radio button, do not shift focus
+    if (activeElement.tagName.toLowerCase() === 'input') {
+      const inputEl = activeElement as HTMLInputElement;
+      const type = inputEl.type.toLowerCase();
+      if (type === 'checkbox' || type === 'radio') {
+        return;
+      }
+    }
+
+    // Prevent default form submission under all other conditions (including Shift + Enter)
+    kbEvent.preventDefault();
+
+    // Query the modal wrapper for all focusable inputs, textareas, selects, and buttons
+    const modalElement = activeElement.closest('.recipe-builder-modal');
+    if (!modalElement) return;
+
+    const focusables = Array.from(
+      modalElement.querySelectorAll(
+        'input:not([disabled]), textarea:not([disabled]), select:not([disabled]), button.btn-secondary:not([disabled]), button.btn-primary:not([disabled])',
+      ),
+    ) as HTMLElement[];
+
+    // Exclude the absolute close button '✕' to keep keyboard navigation within input bounds
+    const filteredFocusables = focusables.filter((el) => !el.classList.contains('close-btn'));
+
+    const index = filteredFocusables.indexOf(activeElement);
+    if (index > -1) {
+      if (kbEvent.shiftKey) {
+        // Symmetrical navigation: Shift + Enter shifts focus BACKWARD (similar to Shift + Tab)
+        if (index > 0) {
+          filteredFocusables[index - 1].focus();
+        }
+      } else {
+        // Standard Enter shifts focus FORWARD (similar to Tab)
+        if (index < filteredFocusables.length - 1) {
+          filteredFocusables[index + 1].focus();
+        }
+      }
+    }
+  }
+
   private setupReactiveMath(): void {
-    // Listen to the entire form so changes to "portions" trigger recalculations
     this.formSub = this.recipeForm.valueChanges.subscribe((formValue) => {
-      const portions = Math.max(1, formValue.portions || 1); // Prevent divide by 0
+      const portions = Math.max(1, formValue.portions || 1);
       const type = formValue.recipeType;
       const items = formValue.ingredients || [];
+
+      // Unified baseline-oriented proportional scaling logic with programmatics protection
+      items.forEach(
+        (item: { weightInGrams?: number | null; displayAmount?: number | null }, idx: number) => {
+          const newWeight = item.weightInGrams;
+          const newDisplay = item.displayAmount !== undefined ? item.displayAmount : null;
+
+          // Initialize baseline parameters if they do not exist yet
+          if (!this.baselines[idx]) {
+            this.baselines[idx] = {
+              weight: newWeight || 100,
+              displayAmount: newDisplay,
+            };
+            this.lastProgrammaticDisplays[idx] = newDisplay;
+          }
+
+          const baseline = this.baselines[idx];
+          const lastProgrammatic =
+            this.lastProgrammaticDisplays[idx] !== undefined
+              ? this.lastProgrammaticDisplays[idx]
+              : null;
+
+          // Detect manual custom user edit to the displayAmount input field.
+          // If the current displayAmount differs from our last programmatically written value,
+          // the user has explicitly typed a new baseline ratio reference point.
+          if (newDisplay !== lastProgrammatic) {
+            baseline.displayAmount = newDisplay;
+
+            // Preserve the existing baseline weight if the current weight input is empty/invalid (backspaced)
+            if (newWeight !== null && newWeight !== undefined && newWeight > 0) {
+              baseline.weight = newWeight;
+            }
+
+            this.lastProgrammaticDisplays[idx] = newDisplay; // Cache this new user-assigned manual baseline
+          }
+
+          // Detect manual user edit to the weightInGrams input field.
+          // If the weight is erased (null/0/empty), we skip scaling to prevent zero-erasure.
+          if (newWeight !== null && newWeight !== undefined && newWeight > 0) {
+            // Removed the redundant "newWeight !== baseline.weight" check to allow returning to the baseline weight
+            const ratio = newWeight / baseline.weight;
+            const baseDisplay = baseline.displayAmount;
+
+            if (baseDisplay !== null && baseDisplay !== undefined) {
+              const calculatedDisplay = parseFloat((baseDisplay * ratio).toFixed(2));
+
+              // Only patch if value changed to prevent redundant recursive digest cycles
+              if (calculatedDisplay !== newDisplay) {
+                this.ingredients
+                  .at(idx)
+                  .get('displayAmount')
+                  ?.setValue(calculatedDisplay, { emitEvent: false });
+                this.lastProgrammaticDisplays[idx] = calculatedDisplay; // Cache this write so the next tick does not treat it as a manual edit
+              }
+            }
+          }
+        },
+      );
 
       const absoluteTotals = {
         calories: 0,

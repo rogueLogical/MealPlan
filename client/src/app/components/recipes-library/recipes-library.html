@@ -200,7 +200,11 @@
 @if (recipeToDelete) {
   <div class="modal-container">
     <button class="modal-backdrop" (click)="cancelDelete()" aria-label="Cancel deletion"></button>
-    <div class="modal-content" style="max-width: 400px; padding: 24px; text-align: center">
+    <div
+      class="modal-content"
+      style="max-width: 400px; padding: 24px; text-align: center"
+      appFocusTrap
+    >
       <h3 style="margin-top: 0; color: var(--text-main)">Delete Recipe?</h3>
       <p style="color: var(--text-muted); margin-bottom: 24px; line-height: 1.5">
         Are you sure you want to permanently delete "<strong>{{ recipeToDelete.title }}</strong

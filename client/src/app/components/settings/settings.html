@@ -300,6 +300,7 @@
                     type="checkbox"
                     [checked]="hasRestriction(restriction)"
                     (change)="toggleRestriction(restriction, $event)"
+                    (keydown.enter)="$event.preventDefault(); $event.target.click()"
                   />
                   {{ restriction }}
                 </label>

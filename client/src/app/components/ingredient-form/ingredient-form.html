@@ -5,7 +5,7 @@
     aria-label="Close ingredient form"
   ></button>
 
-  <div class="modal-content">
+  <div class="modal-content" appFocusTrap>
     <header class="modal-header">
       <h2>{{ isEditMode ? 'Edit Ingredient' : 'Create New Ingredient' }}</h2>
       <button class="close-btn" (click)="closeFormDialog()">✕</button>
@@ -152,6 +152,7 @@
                   [checked]="hasTag(tag)"
                   (change)="toggleTag(tag, $event)"
                   [disabled]="isEditMode && !isOwner"
+                  (keydown.enter)="$event.preventDefault(); $event.target.click()"
                 />
                 {{ tag }}
               </label>

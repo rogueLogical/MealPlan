@@ -13,11 +13,12 @@ import { RecipeService } from '../../services/recipe';
 import { UserService } from '../../services/user';
 import { ToastService } from '../../services/toast';
 import { RecipePayload } from '../../models/recipe.model';
+import { FocusTrapDirective } from '../../directives/focus-trap';
 
 @Component({
   selector: 'app-recipe-generator',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FocusTrapDirective],
   templateUrl: './recipe-generator.html',
   styleUrls: ['./recipe-generator.scss'],
 })
@@ -134,6 +135,14 @@ export class RecipeGenerator implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       },
     });
+  }
+
+  // Intercepts Ctrl/Cmd + Enter to trigger submission and prevent newline wrapping
+  onKeyDown(event: KeyboardEvent): void {
+    if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+      event.preventDefault(); // Prevents a newline from registering in the description textarea
+      this.generateRecipe();
+    }
   }
 
   onCancel(): void {

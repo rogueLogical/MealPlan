@@ -102,4 +102,22 @@ describe('RecipeGenerator Component Unit Tests', () => {
     expect(component.isGenerating).toBe(false); // Resets loading state so user can re-try
     expect(mockToastService.showError).toHaveBeenCalled();
   });
+
+  it('should intercept Ctrl + Enter on the textarea, prevent default newline insertion, and submit', () => {
+    fixture.detectChanges();
+    component.description = 'Shortcut test description';
+
+    const generateSpy = vi.spyOn(component, 'generateRecipe').mockImplementation(() => undefined);
+
+    const mockEvent = {
+      ctrlKey: true,
+      key: 'Enter',
+      preventDefault: vi.fn(),
+    } as unknown as KeyboardEvent;
+
+    component.onKeyDown(mockEvent);
+
+    expect(mockEvent.preventDefault).toHaveBeenCalled();
+    expect(generateSpy).toHaveBeenCalled();
+  });
 });

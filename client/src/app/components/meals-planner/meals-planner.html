@@ -183,7 +183,7 @@
   @if (isCreating) {
     <div class="modal-container" style="z-index: 1050">
       <button class="modal-backdrop" (click)="cancelPlan()" aria-label="Cancel planning"></button>
-      <div class="modal-content plan-form-card">
+      <div class="modal-content plan-form-card" appFocusTrap>
         <header class="modal-header">
           <h3>{{ editingPlanId ? 'Edit Meal Prep Plan' : 'Create Meal Prep Plan' }}</h3>
           <button class="close-btn" (click)="cancelPlan()">✕</button>
@@ -235,7 +235,11 @@
                     style="border-color: var(--accent-primary); background: rgba(37, 99, 235, 0.02)"
                   >
                     <label class="checkbox-label">
-                      <input type="checkbox" [(ngModel)]="item.isSelected" />
+                      <input
+                        type="checkbox"
+                        [(ngModel)]="item.isSelected"
+                        (keydown.enter)="$event.preventDefault(); $event.target.click()"
+                      />
                       <strong>{{ item.recipe.title }}</strong>
                     </label>
                     <div class="portions-input-group">
@@ -297,7 +301,11 @@
               @for (item of unselectedPlanRecipes; track item.recipe._id) {
                 <div class="recipe-selection-row">
                   <label class="checkbox-label">
-                    <input type="checkbox" [(ngModel)]="item.isSelected" />
+                    <input
+                      type="checkbox"
+                      [(ngModel)]="item.isSelected"
+                      (keydown.enter)="$event.preventDefault(); $event.target.click()"
+                    />
                     {{ item.recipe.title }}
                   </label>
                 </div>
@@ -330,7 +338,11 @@
             class="checkbox-label"
             style="justify-content: flex-start; margin: 0; font-size: 0.95rem; font-weight: 600"
           >
-            <input type="checkbox" [(ngModel)]="setAsActiveOnSave" />
+            <input
+              type="checkbox"
+              [(ngModel)]="setAsActiveOnSave"
+              (keydown.enter)="$event.preventDefault(); $event.target.click()"
+            />
             Set as my Active Plan
           </label>
           <div class="footer-buttons" style="display: flex; gap: 12px">
@@ -350,7 +362,7 @@
         (click)="closePlannedRecipe()"
         aria-label="Close scaled recipe"
       ></button>
-      <div class="scaled-recipe-modal">
+      <div class="scaled-recipe-modal" appFocusTrap>
         <header class="scaled-recipe-header">
           <div class="scaled-title-group">
             <h2>Scaled: {{ viewingPlannedRecipe.recipe.title }}</h2>
@@ -445,7 +457,7 @@
         (click)="closeCompletionDialog()"
         aria-label="Cancel portions selection"
       ></button>
-      <div class="dialog-box">
+      <div class="dialog-box" appFocusTrap>
         <header class="dialog-header">
           <h3>Log Cooked Recipe</h3>
           <button class="dialog-close-btn" (click)="closeCompletionDialog()">✕</button>
@@ -494,7 +506,7 @@
         (click)="closeResetDialog()"
         aria-label="Cancel progress reset"
       ></button>
-      <div class="dialog-box">
+      <div class="dialog-box" appFocusTrap>
         <header class="dialog-header">
           <h3>Restart Cooking Plan?</h3>
           <button class="dialog-close-btn" (click)="closeResetDialog()">✕</button>
@@ -527,7 +539,7 @@
         (click)="closeDeactivateDialog()"
         aria-label="Cancel deactivation"
       ></button>
-      <div class="dialog-box">
+      <div class="dialog-box" appFocusTrap>
         <header class="dialog-header">
           <h3>Deactivate Active Plan?</h3>
           <button class="dialog-close-btn" (click)="closeDeactivateDialog()">✕</button>
@@ -554,7 +566,7 @@
         (click)="closeDeleteDialog()"
         aria-label="Cancel deletion"
       ></button>
-      <div class="dialog-box">
+      <div class="dialog-box" appFocusTrap>
         <header class="dialog-header">
           <h3>Delete Prep Plan?</h3>
           <button class="dialog-close-btn" (click)="closeDeleteDialog()">✕</button>

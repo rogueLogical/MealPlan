@@ -14,12 +14,13 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Recipe, UserMacroTargets } from '../../models/recipe.model';
 import { RecipeService } from '../../services/recipe';
 import { RecipeCard } from '../recipe-card/recipe-card';
+import { FocusTrapDirective } from '../../directives/focus-trap';
 
 @Component({
   selector: 'app-recipe-search',
   standalone: true,
   templateUrl: './recipe-search.html',
-  imports: [CommonModule, RecipeCard],
+  imports: [CommonModule, RecipeCard, FocusTrapDirective],
   styleUrls: ['./recipe-search.scss'],
 })
 export class RecipeSearch implements OnInit, OnDestroy {

@@ -155,8 +155,9 @@ const getAiSuggestions = async (context) => {
     offendingIngredient,
     targetMacro,
     dietaryRestrictions = [],
-    currentIngredients = [],
-    zeroTargets = []
+    zeroTargets = [],
+    dislikedFoods = [],
+    recipeContext = null
   } = context;
 
   const restrictionText =
@@ -166,8 +167,31 @@ const getAiSuggestions = async (context) => {
 
   let prompt = `You are an expert culinary and nutritional AI assistant.\n\n`;
   prompt += `We are balancing a recipe mathematically, but the algorithm hit a wall. \n`;
-  prompt += `Current ingredients in the recipe: [${currentIngredients.join(', ')}]\n`;
+  if (recipeContext) {
+    prompt += `FULL RECIPE CONTEXT:\n`;
+    prompt += `- Recipe Title: "${recipeContext.title}"\n`;
+    if (recipeContext.recipeType) prompt += `- Recipe Type: ${recipeContext.recipeType}\n`;
+    if (recipeContext.description)
+      prompt += `- Recipe Description: "${recipeContext.description}"\n`;
+    if (recipeContext.instructions)
+      prompt += `- Recipe Instructions: "${recipeContext.instructions}"\n`;
+
+    prompt += `- Current Ingredients in Recipe (with physical weights):\n`;
+    recipeContext.ingredients.forEach((ing) => {
+      prompt += `  * ${ing.name} (${ing.weightInGrams}g)\n`;
+    });
+    prompt += `\n`;
+  } else {
+    // Fallback block to maintain backwards compatibility
+    const currentIngredients = context.currentIngredients || [];
+    prompt += `Current ingredients in the recipe: [${currentIngredients.join(', ')}]\n\n`;
+  }
   prompt += `${restrictionText}\n\n`;
+
+  if (dislikedFoods.length > 0) {
+    prompt += `EXCLUDED INGREDIENTS & CUISINES: The user strongly dislikes and wants to avoid these items: [${dislikedFoods.join(', ')}]. You MUST NOT suggest any of these, or any closely related ingredients or flavor profiles, in your suggestions.\n`;
+  }
+  prompt += `\n`;
 
   // --- Strict Ingredient Naming Constraints ---
   prompt += `CRITICAL INGREDIENT NAMING RULES:\n`;

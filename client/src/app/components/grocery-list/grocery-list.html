@@ -85,6 +85,7 @@
                 type="checkbox"
                 [(ngModel)]="item.isChecked"
                 (ngModelChange)="toggleItemCheck(item, $event)"
+                (keydown.enter)="$event.preventDefault(); $event.target.click()"
               />
               <span class="item-name">{{ item.name | titlecase }}</span>
             </label>
@@ -118,6 +119,7 @@
                   type="checkbox"
                   [(ngModel)]="item.isChecked"
                   (ngModelChange)="toggleItemCheck(item, $event)"
+                  (keydown.enter)="$event.preventDefault(); $event.target.click()"
                 />
                 <span class="item-name strikethrough">{{ item.name | titlecase }}</span>
               </label>
@@ -148,7 +150,7 @@
         (click)="closeClearConfirmDialog()"
         aria-label="Cancel clear list"
       ></button>
-      <div class="dialog-box">
+      <div class="dialog-box" appFocusTrap>
         <header class="dialog-header">
           <h3>Clear Shopping List?</h3>
           <button class="dialog-close-btn" (click)="closeClearConfirmDialog()">✕</button>

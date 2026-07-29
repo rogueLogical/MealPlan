@@ -1,4 +1,11 @@
-<article class="recipe-card" role="button" (click)="onViewClicked()" tabindex="0">
+<article
+  class="recipe-card"
+  role="button"
+  (click)="onViewClicked()"
+  (keydown.enter)="onViewClicked(); $event.preventDefault()"
+  (keydown.space)="onViewClicked(); $event.preventDefault()"
+  tabindex="0"
+>
   <header class="card-header">
     <div class="title-group">
       <h3 class="recipe-title">{{ recipe.title }}</h3>

@@ -136,6 +136,35 @@ const fetchUsdaMacros = async (query) => {
     throw new Error('Missing USDA_API_KEY in environment variables.');
   }
 
+  const normalizedQuery = query.toLowerCase().trim();
+
+  // Zero-Nutrition Safeguard List
+  const zeroNutritionItems = [
+    'water',
+    'tap water',
+    'distilled water',
+    'drinking water',
+    'sparkling water',
+    'ice',
+    'ice cubes',
+    'club soda',
+    'seltzer'
+  ];
+
+  // Intercept pure-hydration elements to bypass API matching inaccuracies
+  if (zeroNutritionItems.includes(normalizedQuery)) {
+    console.log(
+      `[USDA Search] Zero-Nutrition Safeguard intercepted "${normalizedQuery}". Returning zeroed macros.`
+    );
+    return {
+      protein: 0,
+      fat: 0,
+      totalCarbs: 0,
+      fiber: 0,
+      netCarbs: 0
+    };
+  }
+
   try {
     const url = new URL(USDA_SEARCH_URL);
     url.searchParams.append('api_key', USDA_API_KEY);
