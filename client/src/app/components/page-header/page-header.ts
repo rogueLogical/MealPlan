@@ -23,7 +23,7 @@ export class PageHeader implements OnInit {
   // Mapping matrix translating URL routes to friendly text and icons
   private routeMap: Record<string, { title: string; icon: string }> = {
     home: { title: 'Home', icon: '🏠' },
-    meals: { title: 'Meal Prep Planner', icon: '📅' },
+    meals: { title: 'Meal Prep Planner', icon: '🗓️' },
     recipes: { title: 'Recipes', icon: '🍳' },
     settings: { title: 'Settings', icon: '⚙️' },
     groceries: { title: 'Shopping List', icon: '🛒' },

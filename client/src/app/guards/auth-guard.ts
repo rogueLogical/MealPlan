@@ -9,8 +9,8 @@ export const authGuard: CanActivateFn = () => {
   if (authService.isLoggedIn()) {
     return true; // Grant passage to the dashboard route
   } else {
-    // Block passage and redirect to the public login screen
-    router.navigate(['/login']);
+    // Block passage and redirect unauthenticated users to the welcome page
+    router.navigate(['/welcome']);
     return false;
   }
 };

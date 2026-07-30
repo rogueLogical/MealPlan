@@ -1,0 +1,76 @@
+<div class="welcome-wrapper">
+  <!-- Top Bar Controls -->
+  <header class="top-nav">
+    <div class="brand-link">
+      <span class="logo">🥗</span>
+      <span class="brand-text">MealPlan</span>
+    </div>
+    <div class="top-nav-actions">
+      <button
+        (click)="toggleTheme()"
+        class="theme-toggle-btn"
+        type="button"
+        aria-label="Toggle visual theme"
+      >
+        <span>{{ isDarkMode ? '☀️ Light' : '🌙 Dark' }}</span>
+      </button>
+      <!-- Hidden on narrow mobile viewports to prevent crowding -->
+      <a routerLink="/login" class="btn btn-secondary nav-auth-btn">Log In</a>
+      <a routerLink="/register" class="btn btn-primary nav-auth-btn">Get Started</a>
+    </div>
+  </header>
+
+  <!-- Hero Banner -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <span class="badge">Smart Meal Prepping & Macro Tracking</span>
+      <h1 class="hero-title">
+        Master Your Macros, <br />
+        <span class="title-gradient">Simplify Your Meal Prep</span>
+      </h1>
+      <p class="hero-subtitle">
+        Eliminate the guesswork from healthy eating. Balance recipe ingredients mathematically,
+        generate custom recipes with AI, schedule prep cycles, and keep stored portions organized.
+      </p>
+
+      <div class="hero-cta-group">
+        <a routerLink="/register" class="btn btn-primary btn-large"> Create Free Account </a>
+        <a routerLink="/login" class="btn btn-secondary btn-large"> Sign In to Your Account </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Feature Grid Section -->
+  <section class="features-section">
+    <div class="section-header">
+      <h2>Everything You Need for Effortless Meal Prep</h2>
+      <p>Built specifically for fitness enthusiasts, meal preppers, and macro-conscious cooks.</p>
+    </div>
+
+    <div class="features-grid">
+      @for (feature of features; track feature.title) {
+        <article class="feature-card">
+          <div class="feature-icon">{{ feature.icon }}</div>
+          <h3>{{ feature.title }}</h3>
+          <p>{{ feature.description }}</p>
+        </article>
+      }
+    </div>
+  </section>
+
+  <!-- Bottom Call to Action Footer -->
+  <section class="bottom-cta-section">
+    <div class="cta-card">
+      <h2>Ready to optimize your meal prep workflow?</h2>
+      <p>Join MealPlan today and take control of your nutritional targets.</p>
+      <div class="cta-button-row">
+        <a routerLink="/register" class="btn btn-primary btn-large">Get Started Now</a>
+        <a routerLink="/login" class="btn btn-outline btn-large">Existing User? Log In</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer-bar">
+    <p>© 2026 MealPlan Platform. All rights reserved.</p>
+  </footer>
+</div>
