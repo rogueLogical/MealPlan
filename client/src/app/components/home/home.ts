@@ -20,7 +20,7 @@ export class Home implements OnInit {
   menuItems = [
     { name: 'Home', icon: '🏠', path: 'home' },
     { name: 'Recipes', icon: '🍳', path: 'recipes' },
-    { name: 'Meal Prep Planner', icon: '📅', path: 'meals' },
+    { name: 'Meal Prep Planner', icon: '🗓️', path: 'meals' },
     { name: 'Shopping List', icon: '🛒', path: 'groceries' },
     { name: 'Portion Storage', icon: '📦', path: 'storage' },
     { name: 'Settings', icon: '⚙️', path: 'settings' },

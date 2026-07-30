@@ -11,8 +11,10 @@ import { Settings } from './components/settings/settings';
 import { Register } from './components/register/register';
 import { ForgotPassword } from './components/forgot-password/forgot-password';
 import { PortionStorage } from './components/portion-storage/portion-storage';
+import { Welcome } from './components/welcome/welcome';
 
 export const routes: Routes = [
+  { path: 'welcome', component: Welcome, canActivate: [guestGuard] },
   { path: 'login', component: Login, canActivate: [guestGuard] },
   { path: 'register', component: Register, canActivate: [guestGuard] },
   { path: 'forgot-password', component: ForgotPassword, canActivate: [guestGuard] },
@@ -28,8 +30,8 @@ export const routes: Routes = [
       { path: 'groceries', component: GroceryList },
       { path: 'storage', component: PortionStorage },
       { path: 'settings', component: Settings },
-      { path: '', redirectTo: 'home', pathMatch: 'full' }, // Default dashboard view
+      { path: '', redirectTo: 'home', pathMatch: 'full' },
     ],
   },
-  { path: '**', redirectTo: 'login' }, // Global fallback catch-all
+  { path: '**', redirectTo: 'welcome' }, // Global fallback routes to welcome for unauthenticated traffic
 ];

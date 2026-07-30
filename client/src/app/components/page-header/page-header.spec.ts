@@ -107,7 +107,7 @@ describe('User Account Logout', () => {
     expect(mockStorage['token']).toBeUndefined();
   });
 
-  it('should redirect user to login screen when attempting to navigate to /home after logout (UT-7)', async () => {
+  it('should redirect user to welcome screen when attempting to navigate to /home after logout (UT-7)', async () => {
     // simulate a logged-out environment state
     delete mockStorage['token'];
     currentUserSubject.next(null);
@@ -121,6 +121,6 @@ describe('User Account Logout', () => {
 
     // Results Validation
     expect(guardResult).toBeFalsy();
-    expect(navigateSpy).toHaveBeenCalledWith(['/login']);
+    expect(navigateSpy).toHaveBeenCalledWith(['/welcome']);
   });
 });
