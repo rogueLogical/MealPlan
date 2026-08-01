@@ -61,6 +61,8 @@
 
 .menu-tray {
   width: 260px;
+  min-width: 260px;
+  flex-shrink: 0;
   background-color: var(--bg-sidebar);
   color: var(--text-sidebar-hover);
   padding: 20px;
@@ -207,6 +209,7 @@
 
 .main-content {
   flex-grow: 1;
+  min-width: 0;
   padding: 20px 40px;
 
   @media (max-width: 768px) {

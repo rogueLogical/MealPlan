@@ -79,7 +79,11 @@
         <div class="ingredients-section">
           <h3>Ingredients</h3>
           <ul class="ingredient-list">
-            @for (ing of recipe.ingredients; track ing.ingredientId) {
+            @for (
+              ing of recipe.ingredients;
+              track ing.ingredientId || ing.name + '-' + $index;
+              let i = $index
+            ) {
               <li>
                 <div class="ing-amount">
                   @if (ing.displayAmount) {

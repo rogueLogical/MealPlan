@@ -5,6 +5,33 @@ const THRESHOLD = 50; // The minimum number of ingredients required in the DB
 
 const seedIngredients = async () => {
   try {
+    // Purge any corrupted zero-macro ingredient records created by previous lookup glitches
+    const zeroPurgeResult = await Ingredient.deleteMany({
+      'nutritionPerServing.protein': 0,
+      'nutritionPerServing.fat': 0,
+      'nutritionPerServing.totalCarbs': 0,
+      'nutritionPerServing.netCarbs': 0,
+      name: {
+        $nin: [
+          'water',
+          'tap water',
+          'distilled water',
+          'drinking water',
+          'sparkling water',
+          'ice',
+          'ice cubes',
+          'club soda',
+          'seltzer'
+        ]
+      }
+    });
+
+    if (zeroPurgeResult && zeroPurgeResult.deletedCount > 0) {
+      console.log(
+        `[Seeder] Cleaned up ${zeroPurgeResult.deletedCount} corrupted zero-macro ingredients from database.`
+      );
+    }
+
     // Check current database ingredients
     const count = await Ingredient.countDocuments();
 

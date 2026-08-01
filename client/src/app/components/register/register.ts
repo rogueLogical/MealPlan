@@ -20,6 +20,7 @@ export class Register implements OnInit {
     password: '',
     confirmPassword: '',
   };
+  isLoading = false;
 
   private titleService = inject(Title);
   private router = inject(Router);
@@ -33,7 +34,6 @@ export class Register implements OnInit {
   onRegisterSubmit(): void {
     const { username, email, password, confirmPassword } = this.userData;
 
-    // Basic validation rules checks
     if (!username || !email || !password || !confirmPassword) {
       return;
     }
@@ -46,14 +46,16 @@ export class Register implements OnInit {
       return;
     }
 
-    // Fire the network registration request payload
+    this.isLoading = true;
     this.authService.register({ username, email, password }).subscribe({
       next: () => {
         this.toastService.showSuccess('Account created successfully! Please log in.');
+        this.isLoading = false;
         this.router.navigate(['/login']);
       },
       error: (err) => {
         console.error('Registration Failure:', err);
+        this.isLoading = false;
         this.toastService.showError(err.error?.message || 'Failed to create user account.');
       },
     });

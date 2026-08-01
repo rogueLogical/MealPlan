@@ -133,10 +133,15 @@ const balanceRecipe = async (req, res) => {
 
         const verifiedMacros = await fetchUsdaMacros(concept.ingredientName);
 
-        if (
-          verifiedMacros &&
-          (verifiedMacros.protein > 0 || verifiedMacros.fat > 0 || verifiedMacros.netCarbs > 0)
-        ) {
+        // Require at least one non-zero macronutrient to save to database
+        const hasNutritionalValue =
+          verifiedMacros !== null &&
+          (verifiedMacros.protein > 0 ||
+            verifiedMacros.fat > 0 ||
+            (verifiedMacros.totalCarbs || 0) > 0 ||
+            (verifiedMacros.netCarbs || 0) > 0);
+
+        if (hasNutritionalValue) {
           const finalIngredient = await Ingredient.create({
             name: concept.ingredientName,
             servingSize: 100,
@@ -302,7 +307,15 @@ const generateRecipe = async (req, res) => {
         console.warn(`[RecipeGen] USDA lookup failed for "${normalizedName}":`, err.message);
       }
 
-      if (usdaMacros !== null) {
+      // Require at least one non-zero macronutrient to cache in MongoDB
+      const hasNutritionalValue =
+        usdaMacros !== null &&
+        (usdaMacros.protein > 0 ||
+          usdaMacros.fat > 0 ||
+          (usdaMacros.totalCarbs || 0) > 0 ||
+          (usdaMacros.netCarbs || 0) > 0);
+
+      if (hasNutritionalValue) {
         // Create and cache globally in the Ingredient collection
         const newDbIngredient = await Ingredient.create({
           name: normalizedName,
@@ -388,8 +401,8 @@ const generateRecipe = async (req, res) => {
       recipeType,
       isPublic: false,
       description: aiRecipe.description,
-      instructions: formatInstructions(aiRecipe.instructions), // Applied formatting correction
-      prepTimeMinutes: aiRecipe.prepTimeMinutes, // Contains total combined minutes
+      instructions: formatInstructions(aiRecipe.instructions),
+      prepTimeMinutes: aiRecipe.prepTimeMinutes,
       cookTimeMinutes: 0,
       portions: aiRecipe.portions || 4,
       tags: aiRecipe.tags || [],

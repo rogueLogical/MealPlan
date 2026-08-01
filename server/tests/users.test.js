@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const app = require('../server');
 const User = require('../models/User');
+const Recipe = require('../models/Recipe');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 
 let mongoServer;
@@ -10,6 +11,7 @@ let mongoServer;
 describe('User Settings API Operations Contract Test Suite', () => {
   let mockToken;
   let mockUserId;
+  let mockRecipeId;
 
   beforeAll(async () => {
     process.env.JWT_SECRET = 'local_docker_development_only_secret_key_12345';
@@ -26,6 +28,30 @@ describe('User Settings API Operations Contract Test Suite', () => {
     await testUser.save();
     mockUserId = testUser._id;
 
+    // Seed a recipe for recently viewed tests
+    const recipe = await Recipe.create({
+      title: 'Recently Viewed Test Recipe',
+      recipeType: 'Meal',
+      createdBy: mockUserId,
+      portions: 2,
+      ingredients: [
+        {
+          name: 'Chicken',
+          weightInGrams: 150,
+          nutrition: {
+            calories: 200,
+            protein: 30,
+            totalCarbs: 0,
+            fiber: 0,
+            sugarAlcohols: 0,
+            netCarbs: 0,
+            fat: 5
+          }
+        }
+      ]
+    });
+    mockRecipeId = recipe._id;
+
     // Generate a valid signed JWT bearer token matching our auth middleware constraints
     mockToken = jwt.sign(
       { userId: mockUserId },
@@ -35,14 +61,15 @@ describe('User Settings API Operations Contract Test Suite', () => {
 
   afterAll(async () => {
     await User.deleteMany({});
+    await Recipe.deleteMany({});
     await mongoose.connection.close();
     await mongoServer.stop();
   });
 
-  it('should successfully update measurement and macronutrient configuration targets when providing a valid token', async () => {
+  it('should successfully update measurement and macronutrient configuration targets and set hasConfiguredSettings: true', async () => {
     const res = await request(app)
       .put('/api/users/settings')
-      .set('Authorization', `Bearer ${mockToken}`) // Attach authorization interceptor token
+      .set('Authorization', `Bearer ${mockToken}`)
       .send({
         measurementSystem: 'metric',
         nutritionSettings: {
@@ -54,6 +81,7 @@ describe('User Settings API Operations Contract Test Suite', () => {
     expect(res.body.settings.measurementSystem).toEqual('metric');
     expect(res.body.nutritionSettings.dailyMacroTargets.calories).toEqual(2500);
     expect(res.body.nutritionSettings.dailyMacroTargets.protein).toEqual(180);
+    expect(res.body.hasConfiguredSettings).toBe(true);
   });
 
   it('should successfully update daily meal structure and macro split percentages', async () => {
@@ -84,6 +112,34 @@ describe('User Settings API Operations Contract Test Suite', () => {
     // Verify the nested split object persisted properly
     expect(res.body.nutritionSettings.mealMacroSplitPercentage.protein).toEqual(90);
     expect(res.body.nutritionSettings.mealMacroSplitPercentage.netCarbs).toEqual(80);
+  });
+
+  it('should dismiss welcome banner via POST /api/users/dismiss-welcome', async () => {
+    const res = await request(app)
+      .post('/api/users/dismiss-welcome')
+      .set('Authorization', `Bearer ${mockToken}`);
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body.user.dismissedWelcomeBanner).toBe(true);
+  });
+
+  it('should record and fetch recently viewed recipes', async () => {
+    // 1. Record view
+    const recordRes = await request(app)
+      .post(`/api/users/recently-viewed/${mockRecipeId}`)
+      .set('Authorization', `Bearer ${mockToken}`);
+
+    expect(recordRes.statusCode).toEqual(200);
+    expect(recordRes.body.success).toBe(true);
+
+    // 2. Fetch recently viewed
+    const fetchRes = await request(app)
+      .get('/api/users/recently-viewed')
+      .set('Authorization', `Bearer ${mockToken}`);
+
+    expect(fetchRes.statusCode).toEqual(200);
+    expect(fetchRes.body.data.length).toBeGreaterThan(0);
+    expect(fetchRes.body.data[0]._id.toString()).toBe(mockRecipeId.toString());
   });
 
   it('should explicitly reject adjustments with a 401 when the Authorization header is missing', async () => {

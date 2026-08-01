@@ -1,1 +1,221 @@
-<p>overview works!</p>
+<div class="overview-workspace">
+  @if (isLoading) {
+    <div class="loading-state">Loading your home dashboard...</div>
+  } @else {
+    <!-- DISMISSABLE WELCOME BANNER FOR NEW USERS -->
+    @if (showWelcomeBanner) {
+      <section class="welcome-banner">
+        <div class="banner-content">
+          <div class="banner-text">
+            <h3>👋 Welcome to MealPlan!</h3>
+            <p>
+              Get started by configuring your nutritional targets, daily meal structure, and dietary
+              preferences in Settings.
+            </p>
+          </div>
+          <div class="banner-actions">
+            <a routerLink="/settings" class="btn btn-primary">Go to Settings ⚙️</a>
+            <button (click)="dismissBanner()" class="btn-dismiss" title="Dismiss banner">
+              ✕ Dismiss
+            </button>
+          </div>
+        </div>
+      </section>
+    }
+
+    <!-- ACTIVE MEAL PREP PLAN SUMMARY -->
+    <section class="dashboard-section active-plan-section">
+      <div class="section-title-row">
+        <h2>🗓️ Active Meal Prep Plan</h2>
+        <a routerLink="/meals" class="btn btn-secondary">Open Planner →</a>
+      </div>
+
+      @if (activePlan) {
+        <div class="summary-card plan-card">
+          <div class="plan-header">
+            <h3>{{ activePlan.name }}</h3>
+            <span class="plan-progress-badge">
+              {{ activePlanProgress.completed }} of {{ activePlanProgress.total }} cooked
+            </span>
+          </div>
+          <div class="plan-recipes-preview">
+            @for (pr of activePlan.recipes; track getRecipeId(pr.recipeId)) {
+              <span class="recipe-pill" [class.cooked]="pr.isCompleted">
+                {{ pr.isCompleted ? '✓ ' : '' }}{{ getRecipeTitle(pr.recipeId) }} ({{
+                  pr.plannedPortions
+                }}p)
+              </span>
+            }
+          </div>
+        </div>
+      } @else {
+        <div class="empty-summary-card">
+          <p>You don't have an active meal prep plan right now.</p>
+          <a routerLink="/meals" class="btn btn-primary">+ Create Meal Prep Plan</a>
+        </div>
+      }
+    </section>
+
+    <!-- SHOPPING LIST SUMMARY STRIP -->
+    <section class="dashboard-section shopping-section">
+      <div class="summary-strip">
+        <div class="strip-text">
+          <span class="strip-icon">🛒</span>
+          @if (shoppingListUncheckedCount > 0) {
+            <p class="strip-message">
+              You have <strong>{{ shoppingListUncheckedCount }}</strong> item{{
+                shoppingListUncheckedCount !== 1 ? 's' : ''
+              }}
+              in your shopping list
+            </p>
+          } @else {
+            <p class="strip-message">Your shopping list is all clear! 🎉</p>
+          }
+        </div>
+        <a routerLink="/groceries" class="btn btn-secondary">View Shopping List →</a>
+      </div>
+    </section>
+
+    <!-- PORTION STORAGE & LOW-STOCK ALERTS -->
+    <section class="dashboard-section storage-section">
+      <div class="section-title-row">
+        <h2>📦 Portion Storage</h2>
+        <a routerLink="/storage" class="btn btn-secondary">Manage Storage →</a>
+      </div>
+
+      <div class="summary-card storage-card">
+        <div class="storage-summary-count">
+          <span class="count-number">{{ totalPortionsInStorage }}</span>
+          <span class="count-label"
+            >Total Portion{{ totalPortionsInStorage !== 1 ? 's' : '' }} Stored</span
+          >
+        </div>
+
+        @if (lowStockPortions.length > 0) {
+          <div class="low-stock-alerts">
+            <h4 class="alert-header">⚠️ Low Stock Warnings</h4>
+            <div class="alerts-list">
+              @for (item of lowStockPortions; track item.recipeId) {
+                <div class="alert-pill">
+                  Your stock of <strong>{{ item.recipeTitle }}</strong> is running low (only
+                  <strong>{{ item.portionsInStorage }}</strong> portion{{
+                    item.portionsInStorage !== 1 ? 's' : ''
+                  }}
+                  left).
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- FAVORITE RECIPES ROW -->
+    <section class="dashboard-section recipes-row-section">
+      <div class="section-title-row">
+        <h2>⭐ Recently Updated Favorites</h2>
+        <a routerLink="/recipes" class="btn btn-secondary">View All Recipes →</a>
+      </div>
+
+      @if (favoriteRecipes.length === 0) {
+        <div class="empty-summary-card">
+          <p>You haven't favorited any recipes yet.</p>
+          <a routerLink="/recipes" class="btn btn-secondary">Explore Recipes</a>
+        </div>
+      } @else {
+        <div class="recipes-grid">
+          @for (recipe of displayedFavoriteRecipes; track recipe._id) {
+            <app-recipe-card
+              [recipe]="recipe"
+              [isFavorite]="true"
+              [targetMacros]="userTargets"
+              (view)="onViewRecipe($event)"
+              (edit)="onEditRecipe($event)"
+              (delete)="onDeleteRecipe($event)"
+              (toggleFavorite)="onToggleFavorite($event)"
+              (copyRecipe)="onCopyRecipe($event)"
+            >
+            </app-recipe-card>
+          }
+        </div>
+      }
+    </section>
+
+    <!-- RECENTLY VIEWED RECIPES ROW -->
+    @if (recentlyViewedRecipes.length > 0) {
+      <section class="dashboard-section recipes-row-section">
+        <div class="section-title-row">
+          <h2>👁️ Recently Viewed Recipes</h2>
+          <a routerLink="/recipes" class="btn btn-secondary">View All Recipes →</a>
+        </div>
+
+        <div class="recipes-grid">
+          @for (recipe of displayedRecentlyViewedRecipes; track recipe._id) {
+            <app-recipe-card
+              [recipe]="recipe"
+              [isFavorite]="favoriteRecipeIds.includes(recipe._id)"
+              [targetMacros]="userTargets"
+              (view)="onViewRecipe($event)"
+              (edit)="onEditRecipe($event)"
+              (delete)="onDeleteRecipe($event)"
+              (toggleFavorite)="onToggleFavorite($event)"
+              (copyRecipe)="onCopyRecipe($event)"
+            >
+            </app-recipe-card>
+          }
+        </div>
+      </section>
+    }
+  }
+
+  @if (viewingRecipe) {
+    <app-recipe-detail
+      [recipe]="viewingRecipe"
+      [isFavorite]="favoriteRecipeIds.includes(viewingRecipe._id)"
+      [targetMacros]="userTargets"
+      [trackRecentlyViewed]="false"
+      (closeDetail)="closeView()"
+      (editRecipe)="onEditRecipe($event)"
+      (toggleFavorite)="onToggleFavorite($event)"
+      (copyRecipe)="onCopyRecipe($event)"
+    >
+    </app-recipe-detail>
+  }
+
+  @if (showRecipeBuilder) {
+    <app-recipe-builder
+      [targetMacros]="userTargets"
+      [initialRecipe]="selectedRecipeToEdit"
+      (saveRecipe)="onSaveRecipe($event)"
+      (closeBuilder)="closeBuilder()"
+    >
+    </app-recipe-builder>
+  }
+
+  @if (recipeToDelete) {
+    <div class="modal-container" style="z-index: 1100">
+      <button class="modal-backdrop" (click)="cancelDelete()" aria-label="Cancel deletion"></button>
+      <div
+        class="modal-content"
+        style="max-width: 400px; padding: 24px; text-align: center"
+        appFocusTrap
+      >
+        <h3 style="margin-top: 0; color: var(--text-main)">Delete Recipe?</h3>
+        <p style="color: var(--text-muted); margin-bottom: 24px; line-height: 1.5">
+          Are you sure you want to permanently delete "<strong>{{ recipeToDelete.title }}</strong
+          >"? This action cannot be undone.
+        </p>
+        <div style="display: flex; gap: 12px; justify-content: center">
+          <button class="btn btn-secondary" (click)="cancelDelete()">Cancel</button>
+          <button
+            class="btn btn-primary"
+            style="background-color: #ef4444"
+            (click)="confirmDelete()"
+          >
+            Yes, Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

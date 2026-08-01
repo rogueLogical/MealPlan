@@ -22,6 +22,10 @@ describe('Ingredient Seeder Utility', () => {
     jest.clearAllMocks();
     saveMock = jest.fn();
 
+    // Mock static methods
+    Ingredient.deleteMany = jest.fn().mockResolvedValue({ deletedCount: 0 });
+    Ingredient.countDocuments = jest.fn();
+
     // Mock Constructor instantiation
     Ingredient.mockImplementation(() => {
       return {

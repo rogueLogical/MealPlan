@@ -80,7 +80,7 @@ Retrieves the full profile and settings for the currently authenticated user.
 
 `PUT /users/settings`
 
-Updates the authenticated user's account preferences and nutritional targets.
+Updates the authenticated user's account preferences and nutritional targets. Automatically sets `hasConfiguredSettings: true` upon saving.
 
 - Body:
   ```JSON
@@ -99,7 +99,30 @@ Updates the authenticated user's account preferences and nutritional targets.
     }
   }
   ```
-- Success Response (200): Returns the updated settings blocks.
+- Success Response (200): Returns the updated settings blocks, `hasConfiguredSettings`, and `dismissedWelcomeBanner`.
+
+`POST /users/dismiss-welcome`
+
+Dismisses the new user welcome banner on the home dashboard for the authenticated user.
+
+- Auth Required: Yes
+- Body: None
+- Success Response (200): Returns the updated user document with `dismissedWelcomeBanner: true`.
+
+`POST /users/recently-viewed/:recipeId`
+
+Records a recipe as recently viewed by the authenticated user. Deduplicates the list, unshifts the recipe ID to index 0, and caps the array at 10 items.
+
+- Auth Required: Yes
+- Body: None
+- Success Response (200): Returns the updated `recentlyViewed` array of recipe ObjectIds.
+
+`GET /users/recently-viewed`
+
+Retrieves a list of populated, non-deleted recipes recently viewed by the authenticated user, ordered from most to least recent.
+
+- Auth Required: Yes
+- Success Response (200): Returns an array of recipe objects under the `data` key.
 
 `POST /users/favorites/:recipeId`
 
@@ -319,7 +342,7 @@ Performs a "soft-delete" on a recipe. Sets the `isDeleted` flag to `true` rather
 
 `POST /recipes/generate`
 
-Generates a complete, structured recipe based on a natural language text description, classified by category (meal/snack), and optionally targeted to match the user's personal dietary restrictions and macro settings splits. Resolves ingredients through a sequential waterfall of local database checks, USDA lookups, and AI estimation fallbacks.
+Generates a complete, structured recipe based on a natural language text description, classified by category (meal/snack), and optionally targeted to match the user's personal dietary restrictions and macro settings splits. Resolves ingredients through a sequential waterfall of local database checks, USDA lookups (requiring $> 0$ macros to save to MongoDB), and AI estimation fallbacks.
 
 - Auth Required: Yes
 - Body:

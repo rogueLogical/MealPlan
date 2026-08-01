@@ -18,6 +18,7 @@ export class ForgotPassword {
   confirmPassword = '';
   token: string | null = null;
   isResetMode = false;
+  isLoading = false;
 
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
@@ -25,27 +26,39 @@ export class ForgotPassword {
   private router = inject(Router);
 
   constructor() {
-    // Determine context: check if the user clicked an email link with a token query string parameter
     this.token = this.route.snapshot.queryParamMap.get('token');
     this.isResetMode = !!this.token;
   }
 
   requestLink(): void {
+    this.isLoading = true;
     this.authService.forgotPassword(this.email).subscribe({
-      next: (res) => this.toastService.showSuccess(res.message),
-      error: (err) => this.toastService.showError(err.error?.message || 'Request failed.'),
+      next: (res) => {
+        this.isLoading = false;
+        this.toastService.showSuccess(res.message);
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.toastService.showError(err.error?.message || 'Request failed.');
+      },
     });
   }
 
   executeReset(): void {
     if (!this.token) return;
     if (this.newPassword !== this.confirmPassword) return;
+
+    this.isLoading = true;
     this.authService.resetPassword(this.token, this.newPassword).subscribe({
       next: (res) => {
+        this.isLoading = false;
         this.toastService.showSuccess(res.message);
         void this.router.navigate(['/login']);
       },
-      error: (err) => this.toastService.showError(err.error?.message || 'Reset failed.'),
+      error: (err) => {
+        this.isLoading = false;
+        this.toastService.showError(err.error?.message || 'Reset failed.');
+      },
     });
   }
 }

@@ -63,7 +63,7 @@ describe('POST /api/recipes/generate integration suite', () => {
     const aiRecipeResponse = {
       title: 'Trio Bowl',
       description: 'A test trio ingredient bowl.',
-      instructions: '1. Chop chicken. 2. Boil rice. 3. Steam broccoli.', // Single-line step output
+      instructions: '1. Chop chicken. 2. Boil rice. 3. Steam broccoli.',
       prepTimeMinutes: 10,
       cookTimeMinutes: 15,
       portions: 4,
@@ -137,5 +137,64 @@ describe('POST /api/recipes/generate integration suite', () => {
     expect(res.body.instructions).toContain(
       '1. Chop chicken.\n\n2. Boil rice.\n\n3. Steam broccoli.'
     );
+  });
+
+  it('should not save zero-macro USDA results to MongoDB and should fall back to Stage C', async () => {
+    const aiRecipeResponse = {
+      title: 'Zero Macro Test Dish',
+      description: 'Testing zero macro handling.',
+      instructions: '1. Mix ingredients.',
+      prepTimeMinutes: 5,
+      cookTimeMinutes: 0,
+      portions: 1,
+      tags: [],
+      ingredients: [
+        {
+          name: 'zero powder',
+          displayAmount: 1,
+          displayUnit: 'cup',
+          weightInGrams: 100,
+          fallbackNutrition: {
+            calories: 100,
+            protein: 10,
+            totalCarbs: 10,
+            fiber: 0,
+            sugarAlcohols: 0,
+            fat: 2
+          }
+        }
+      ]
+    };
+
+    generateRecipeFromPrompt.mockResolvedValue(aiRecipeResponse);
+
+    // Mock USDA returning an entry with ALL 0s
+    fetchUsdaMacros.mockResolvedValueOnce({
+      protein: 0,
+      fat: 0,
+      totalCarbs: 0,
+      fiber: 0,
+      netCarbs: 0
+    });
+
+    const res = await request(app)
+      .post('/api/recipes/generate')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        description: 'Zero Macro Dish Idea',
+        recipeType: 'Snack',
+        useMacroTargets: false,
+        dietaryRestrictions: []
+      });
+
+    expect(res.statusCode).toEqual(200);
+
+    // Verify that zero powder was NOT saved to MongoDB
+    const zeroDbCheck = await Ingredient.findOne({ name: 'zero powder' });
+    expect(zeroDbCheck).toBeNull();
+
+    // Verify it fell back to Stage C and used the fallback nutrition calculations
+    expect(res.body.ingredients[0].ingredientId).toBeNull();
+    expect(res.body.ingredients[0].nutrition.calories).toBeGreaterThan(0);
   });
 });

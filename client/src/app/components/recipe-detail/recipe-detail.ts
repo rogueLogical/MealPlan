@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Recipe, UserMacroTargets } from '../../models/recipe.model';
 import { AuthService } from '../../services/auth';
+import { UserService } from '../../services/user';
 import { MealPrepService } from '../../services/meal-prep';
 import { ToastService } from '../../services/toast';
 import { FocusTrapDirective } from '../../directives/focus-trap';
@@ -18,6 +19,7 @@ export class RecipeDetail implements OnInit {
   @Input({ required: true }) recipe!: Recipe;
   @Input() isFavorite = false;
   @Input() targetMacros?: UserMacroTargets;
+  @Input() trackRecentlyViewed = true;
 
   @Output() toggleFavorite = new EventEmitter<Recipe>();
   @Output() copyRecipe = new EventEmitter<Recipe>();
@@ -25,6 +27,7 @@ export class RecipeDetail implements OnInit {
   @Output() editRecipe = new EventEmitter<Recipe>();
 
   private authService = inject(AuthService);
+  private userService = inject(UserService);
   private prepService = inject(MealPrepService);
   private toastService = inject(ToastService);
 
@@ -38,6 +41,12 @@ export class RecipeDetail implements OnInit {
     this.authService.currentUser$.subscribe((user) => {
       this.currentUserId = user?.id;
     });
+
+    if (this.trackRecentlyViewed && this.recipe && this.recipe._id) {
+      this.userService.recordRecentlyViewed(this.recipe._id).subscribe({
+        error: (err) => console.error('Failed to record recently viewed recipe:', err),
+      });
+    }
   }
 
   openPortionDialog(): void {
