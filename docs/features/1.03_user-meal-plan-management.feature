@@ -4,6 +4,7 @@ Feature: 1.3.1. User Meal Plan Management
   how many snacks they want to eat each day. 
   - The system shall allow users to update their meal 
   plan after initially setting it. 
+  
   Scenario: Successful Meal Plan Entry (UAT-11)
     Given a logged in user navigates to the settings page
     When the user enters their number of meals and snacks

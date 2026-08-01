@@ -27,6 +27,7 @@ Feature: 1.5.4. User Recipe Browsing
   The system shall provide logged in users with the 
   ability to view, search, and filter a list of their saved 
   recipes. 
+  
   Scenario: Filtering Personal Recipe Library
     Given a logged-in user has navigated to their personal saved recipes library
     When the user loads the page
@@ -35,6 +36,7 @@ Feature: 1.5.4. User Recipe Browsing
 Feature: 1.5.5. Recipe Copying
   The system shall provide logged in users with the ability
   to copy existing recipes. 
+
   Scenario: Recipe Duplication
     Given a logged-in user is viewing a recipe created by another user
     When the user clicks the "Copy Recipe" button
@@ -43,6 +45,7 @@ Feature: 1.5.5. Recipe Copying
 Feature: 1.5.6. Recipe Modification
   The system shall provide logged in users with the ability 
   to modify existing recipes. 
+
   Scenario: Editing a Saved Recipe
     Given a logged-in user is viewing one of their saved recipes
     When the user updates the recipe data fields

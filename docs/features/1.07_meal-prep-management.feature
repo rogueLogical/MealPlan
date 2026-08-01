@@ -7,6 +7,7 @@ Feature: 1.7.1. Meal Prep Plan Creation
     recipe was written for.
     Once a meal prep plan is created, the user should be able to 
     view and edit the plan.
+
     Scenario: Meal Prep Planning (UAT-28)
         Given the user wants to plan a meal prep activity, and has the recipes they want to prepare in the system. 
         When the user selects recipes and number of portions that they want to prepare for each one. 
@@ -21,6 +22,7 @@ Feature: 1.7.2. Shopping List Generation
     the shopping list.
     If a user edits an existing meal plan, they should have the option to 
     update the shopping list with the changes.
+
     Scenario: Shopping List (UAT-29)
         Given the user has created a meal prep plan. 
         When the user views the meal prep plan. 
@@ -29,6 +31,7 @@ Feature: 1.7.2. Shopping List Generation
 Feature: 1.7.3. Shopping List Editing
     The system shall allow users to modify the generated shopping 
     list by editing list items and adding and removing items. 
+
     Scenario: Rapidly adding a manual custom item to the shopping list using the Enter key (UAT-32)
         Given the user is on the "Shopping List" page
         And the cursor is focused inside the custom item name input field
@@ -41,6 +44,7 @@ Feature: 1.7.3. Shopping List Editing
 Feature: 1.7.4. Shopping List Item Checking
     The system shall allow users to check off and un-check items from the 
     shopping list as they do their shopping.
+
     Scenario: Checking, unchecking, and custom drag-and-drop reordering of shopping list items (UAT-33)
         Given the user is on the "Shopping List" page
         And the unchecked section contains the items: "Zip Bags", "Broccoli (250g)", "Lemon (2 pieces)", and "Olive Oil"
@@ -56,6 +60,7 @@ Feature: 1.7.5. Planned Recipe Viewing
     each recipe selected, the planned recipe version has its 
     ingredients already scaled up to match the number of portions
     in the Meal Prep Plan. 
+
     Scenario: Viewing scaled-up ingredient quantities inside a planned recipe (UAT-34)
         Given the user has an active meal prep plan
         And the plan contains "Seared Chicken" planned for 12 portions (where the base recipe yields 4 portions, requiring 150g broccoli)
@@ -67,6 +72,7 @@ Feature: 1.7.5. Planned Recipe Viewing
 Feature: 1.7.6. Planned Recipe Completion
     The system shall provide a function to add planned meal 
     portions to the storage tracker when meal prep is completed. 
+    
     Scenario: Cook Recipe (UAT-30)
         Given the user has created a meal prep plan. 
         When the user views the meal prep plan. 

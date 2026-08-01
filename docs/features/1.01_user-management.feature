@@ -1,6 +1,7 @@
 Feature: 1.1.1. User Account Creation
   The system shall provide a way for users to create an 
   account.
+
   Scenario: Successful Account Creation (UAT-1)
     Given the user navigates to the register page
     When the user enters their correct new account data
@@ -11,12 +12,14 @@ Feature: 1.1.1. User Account Creation
 Feature: 1.1.2. User Authentication
   The system shall provide authentication services to 
   support user account log in. 
+
   Scenario: Successful Login (UAT-2)
     Given the user navigates to the login page
     When the user enters their valid username and password
     And the user clicks the log in button
     Then a toast message appears welcoming the user back to the site
     And the user is redirected to their home page
+
   Scenario: Successful Log out (UAT-3)
     Given a logged in user 
     When the user clicks the profile picture in the top right of the page header
@@ -28,6 +31,7 @@ Feature: 1.1.2. User Authentication
 Feature: 1.1.3. User Profile Management
   The system shall allow users to update their profile 
   information. 
+
   Scenario: Successful profile settings update (UAT-4)
     Given a logged in user navigates to the settings page
     When the user updates their avatar URL
@@ -36,26 +40,19 @@ Feature: 1.1.3. User Profile Management
     Then a toast message appears confirming settings were updated successfully
     And the user data is updated in the database
 
-Feature: 1.1.4. User Interface Preferences
-  The system shall allow users to set their preferences, 
-  like selecting imperial or metric measurements. 
-  Scenario: Successful interface settings update (UAT-5)
-    Given a logged in user navigates to the settings page
-    When the user updates their preferred measurement system
-    And the user clicks the Save Settings button
-    Then a toast message appears confirming settings were updated successfully
-    And the user data is updated in the database
-
+Feature: 1.1.4. DELETED
 
 Feature: 1.1.5. User Account Recovery
   The system shall provide a solution for users to recover 
   their account access via email. 
+  
   Scenario: Successful Account Recovery (UAT-6)
     Given the user navigates to the forgot-password page
     When the user enters their valid email address matching a registered account
     And the user clicks the Request Account Details button
     Then a toast message appears stating that if the account exists then an email has been sent
     And the system sends the user a recovery email including their username and a reset password link
+
   Scenario: Successful Password Reset Link (UAT-7)
     Given the user navigates to the reset-password page with a valid unexpired password reset link
     When the user enters matching passwords into the two password fields
@@ -67,6 +64,26 @@ Feature: 1.1.6. Email Verification
   The system shall verify new user email addresses upon 
   account creation. 
 
+  Scenario: Email verification is enabled (UAT-38)
+    Given a user goes to create an account 
+    When the user submits the registration form. 
+    Then the system performs email verification on the provided email address. 
+
+  Scenario: New users cannot log in before verifying their email (UAT-39)
+    Given a user has submitted the account creation form, but has not verified their email address. 
+    When they try to log into the website. 
+    Then the system rejects the login attempt. 
+
+  Scenario: New user email verification success (UAT-40)
+    Given a user has submitted the account creation form, but has not verified their email address. 
+    When they click on the verify email link in their email. 
+    Then the system marks the user's email as verified and allows them to log in afterwards. 
+
 Feature: 1.1.7. User Account Deletion
   The system shall provide a way for users to delete 
   their account. 
+
+  Scenario: Account Deletion (UAT-41)
+    Given a user is logged in to their account. 
+    When  they navigate to the settings page and select "Delete Account". 
+    Then the system asks the user to verify that they want to delete their account, and if they select yes, then the user's account is deleted. 
