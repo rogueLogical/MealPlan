@@ -18,6 +18,7 @@
             placeholder="Enter your username"
             class="form-control"
             aria-label="Username"
+            [disabled]="isLoading"
             #userRef="ngModel"
           />
         </div>
@@ -39,6 +40,7 @@
             placeholder="Enter your password"
             class="form-control"
             aria-label="Password"
+            [disabled]="isLoading"
             #passwordRef="ngModel"
           />
         </div>
@@ -50,7 +52,13 @@
           </div>
         }
 
-        <button type="submit" class="login-submit-btn">Log In</button>
+        <button type="submit" class="login-submit-btn" [disabled]="isLoading">
+          @if (isLoading) {
+            <span class="btn-spinner"></span> Logging In...
+          } @else {
+            Log In
+          }
+        </button>
       </form>
     </main>
     <footer class="login-footer-links">

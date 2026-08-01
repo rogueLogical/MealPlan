@@ -402,7 +402,11 @@
             <div class="scaled-ingredients-section">
               <h3>Ingredients (Scaled {{ viewingPlannedRecipe.multiplier | number: '1.0-1' }}x)</h3>
               <ul class="scaled-ingredient-list">
-                @for (ing of viewingPlannedRecipe.recipe.ingredients; track ing.ingredientId) {
+                @for (
+                  ing of viewingPlannedRecipe.recipe.ingredients;
+                  track ing.ingredientId || ing.name + '-' + $index;
+                  let i = $index
+                ) {
                   <li>
                     <div class="scaled-ing-amount">
                       @if (ing.displayAmount) {

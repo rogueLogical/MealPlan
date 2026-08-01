@@ -14,7 +14,9 @@ router.put('/settings', checkAuth, async (req, res) => {
     const { measurementSystem, nutritionSettings, profilePicture, email } = req.body;
 
     // Build dataset object
-    const updatePayload = {};
+    const updatePayload = {
+      hasConfiguredSettings: true
+    };
 
     if (measurementSystem) {
       updatePayload['settings.measurementSystem'] = measurementSystem;
@@ -95,7 +97,9 @@ router.put('/settings', checkAuth, async (req, res) => {
     res.status(200).json({
       message: 'Account dashboard configurations updated successfully!',
       settings: updatedUser.settings,
-      nutritionSettings: updatedUser.nutritionSettings
+      nutritionSettings: updatedUser.nutritionSettings,
+      hasConfiguredSettings: updatedUser.hasConfiguredSettings,
+      dismissedWelcomeBanner: updatedUser.dismissedWelcomeBanner
     });
   } catch (err) {
     console.error('Settings API Error:', err);
@@ -117,6 +121,76 @@ router.get('/me', checkAuth, async (req, res) => {
   } catch (err) {
     console.error('Fetch User Profile API Error:', err);
     res.status(500).json({ message: 'Internal server error.' });
+  }
+});
+
+// POST /api/users/dismiss-welcome - Dismiss new user welcome banner
+router.post('/dismiss-welcome', checkAuth, async (req, res) => {
+  try {
+    const userId = req.userData.userId;
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { $set: { dismissedWelcomeBanner: true } },
+      { returnDocument: 'after' }
+    ).select('-password');
+
+    if (!user) return res.status(404).json({ message: 'User not found.' });
+
+    res.status(200).json({ message: 'Welcome banner dismissed.', user });
+  } catch (err) {
+    console.error('Dismiss Welcome Banner Error:', err);
+    res.status(500).json({ message: 'Failed to dismiss welcome banner.' });
+  }
+});
+
+// POST /api/users/recently-viewed/:recipeId - Track recently viewed recipe
+router.post('/recently-viewed/:recipeId', checkAuth, async (req, res) => {
+  try {
+    const userId = req.userData.userId;
+    const { recipeId } = req.params;
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found.' });
+
+    // Deduplicate array
+    user.recentlyViewedRecipes = user.recentlyViewedRecipes.filter(
+      (id) => id.toString() !== recipeId
+    );
+
+    // Unshift to top (index 0)
+    user.recentlyViewedRecipes.unshift(recipeId);
+
+    // Limit array to max 20 items
+    if (user.recentlyViewedRecipes.length > 20) {
+      user.recentlyViewedRecipes = user.recentlyViewedRecipes.slice(0, 10);
+    }
+
+    await user.save();
+    res.status(200).json({ success: true, recentlyViewed: user.recentlyViewedRecipes });
+  } catch (err) {
+    console.error('Record Recently Viewed Error:', err);
+    res.status(500).json({ message: 'Failed to record recently viewed recipe.' });
+  }
+});
+
+// GET /api/users/recently-viewed - Fetch populated recently viewed recipes
+router.get('/recently-viewed', checkAuth, async (req, res) => {
+  try {
+    const userId = req.userData.userId;
+    const user = await User.findById(userId).populate({
+      path: 'recentlyViewedRecipes',
+      match: { isDeleted: false }
+    });
+
+    if (!user) return res.status(404).json({ message: 'User not found.' });
+
+    // Filter out null values (if any deleted recipes were filtered by match)
+    const recipes = (user.recentlyViewedRecipes || []).filter((r) => r !== null);
+
+    res.status(200).json({ data: recipes });
+  } catch (err) {
+    console.error('Fetch Recently Viewed Error:', err);
+    res.status(500).json({ message: 'Failed to fetch recently viewed recipes.' });
   }
 });
 

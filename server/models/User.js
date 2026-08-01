@@ -54,6 +54,14 @@ const UserSchema = new mongoose.Schema(
         fat: { type: Number, default: 80 }
       }
     },
+    hasConfiguredSettings: {
+      type: Boolean,
+      default: false
+    },
+    dismissedWelcomeBanner: {
+      type: Boolean,
+      default: false
+    },
     resetPasswordToken: {
       type: String,
       default: undefined
@@ -63,6 +71,12 @@ const UserSchema = new mongoose.Schema(
       default: undefined
     },
     favoriteRecipes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Recipe'
+      }
+    ],
+    recentlyViewedRecipes: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Recipe'

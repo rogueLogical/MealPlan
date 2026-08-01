@@ -14,6 +14,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class Login implements OnInit {
   isDarkMode = false;
+  isLoading = false;
   credentials = {
     username: '',
     password: '',
@@ -25,14 +26,12 @@ export class Login implements OnInit {
   private authService = inject(AuthService);
 
   ngOnInit(): void {
-    // Sync Angular state flag with the root HTML element class state
     if (document.documentElement.classList.contains('dark-mode')) {
       this.isDarkMode = true;
     }
     this.titleService.setTitle('Login | MealPlan');
   }
 
-  // handle dark mode changes
   @HostListener('window:storage', ['$event'])
   onStorageChange(event: StorageEvent): void {
     if (event.key === 'theme') {
@@ -46,20 +45,22 @@ export class Login implements OnInit {
     }
   }
 
-  // handle login submit
   onLoginSubmit(): void {
     if (!this.credentials.username || !this.credentials.password) {
       this.toastService.showError('Please fill out all credential fields.');
       return;
     }
 
+    this.isLoading = true;
     this.authService.login(this.credentials).subscribe({
       next: () => {
         this.toastService.showSuccess(`Welcome back, ${this.credentials.username}!`);
+        this.isLoading = false;
         this.router.navigate(['/home']);
       },
       error: (err) => {
         console.error('Login Failure:', err);
+        this.isLoading = false;
         this.toastService.showError(err.error?.message || 'Invalid username or password.');
       },
     });

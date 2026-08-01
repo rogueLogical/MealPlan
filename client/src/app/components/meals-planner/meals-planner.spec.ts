@@ -5,6 +5,7 @@ import { of, throwError } from 'rxjs';
 import { MealsPlanner } from './meals-planner';
 import { MealPrepService, MealPrepPlan } from '../../services/meal-prep';
 import { RecipeService } from '../../services/recipe';
+import { UserService } from '../../services/user';
 import { ToastService } from '../../services/toast';
 import { Recipe } from '../../models/recipe.model';
 import { NutritionMacros } from '../../models/ingredient.model';
@@ -15,6 +16,7 @@ describe('MealsPlanner Component Selection, Scaling, and State Management', () =
 
   let mockPrepService: Partial<MealPrepService>;
   let mockRecipeService: Partial<RecipeService>;
+  let mockUserService: Partial<UserService>;
   let mockToastService: Partial<ToastService>;
 
   const mockRecipes: Recipe[] = [
@@ -76,6 +78,10 @@ describe('MealsPlanner Component Selection, Scaling, and State Management', () =
       getFavoriteRecipes: vi.fn().mockReturnValue(of({ data: [] })),
     };
 
+    mockUserService = {
+      recordRecentlyViewed: vi.fn().mockReturnValue(of({ success: true })),
+    };
+
     mockToastService = {
       showSuccess: vi.fn(),
       showError: vi.fn(),
@@ -87,6 +93,7 @@ describe('MealsPlanner Component Selection, Scaling, and State Management', () =
       providers: [
         { provide: MealPrepService, useValue: mockPrepService },
         { provide: RecipeService, useValue: mockRecipeService },
+        { provide: UserService, useValue: mockUserService },
         { provide: ToastService, useValue: mockToastService },
       ],
     }).compileComponents();
@@ -95,7 +102,6 @@ describe('MealsPlanner Component Selection, Scaling, and State Management', () =
     component = fixture.componentInstance;
   });
 
-  // HTML Template Render coverage
   it('should render loading spinner when isLoading is true', () => {
     vi.spyOn(component, 'loadData').mockImplementation(() => {
       /* noop */
@@ -120,7 +126,6 @@ describe('MealsPlanner Component Selection, Scaling, and State Management', () =
     expect(compiled.querySelector('.empty-state')).toBeTruthy();
   });
 
-  // Selection Arrays Groupings and Getters
   it('should separate selected and unselected recipes into distinct arrays', () => {
     fixture.detectChanges();
     component.selectedRecipes = [
@@ -135,6 +140,20 @@ describe('MealsPlanner Component Selection, Scaling, and State Management', () =
     const unselected = component.unselectedPlanRecipes;
     expect(unselected).toHaveLength(1);
     expect(unselected[0].recipe.title).toBe('Lemon Chicken');
+  });
+
+  it('should record recently viewed recipe when viewing a scaled recipe', () => {
+    fixture.detectChanges();
+
+    component.userRecipes = mockRecipes;
+    component.viewPlannedRecipe({
+      recipeId: mockRecipes[0],
+      plannedPortions: 4,
+      isCompleted: false,
+    });
+
+    expect(mockUserService.recordRecentlyViewed).toHaveBeenCalledWith('rec123');
+    expect(component.viewingPlannedRecipe).not.toBeNull();
   });
 
   // Safe Mongoose ID resolvers

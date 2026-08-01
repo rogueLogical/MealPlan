@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MealPrepService, MealPrepPlan, PlannedRecipe } from '../../services/meal-prep';
 import { RecipeService } from '../../services/recipe';
+import { UserService } from '../../services/user';
 import { Recipe } from '../../models/recipe.model';
 import { ToastService } from '../../services/toast';
 import { forkJoin } from 'rxjs';
@@ -18,6 +19,7 @@ import { FocusTrapDirective } from '../../directives/focus-trap';
 export class MealsPlanner implements OnInit {
   private prepService = inject(MealPrepService);
   private recipeService = inject(RecipeService);
+  private userService = inject(UserService);
   private toastService = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
 
@@ -233,7 +235,6 @@ export class MealsPlanner implements OnInit {
     }
   }
 
-  // Feature 1.7.2: Append scaled ingredient requirements directly to shopping list
   appendPlanIngredientsToList(plan: MealPrepPlan): void {
     if (!plan._id) return;
 
@@ -250,7 +251,6 @@ export class MealsPlanner implements OnInit {
     });
   }
 
-  // Dynamic Activations
   activatePlan(plan: MealPrepPlan): void {
     if (!plan._id) return;
 
@@ -268,7 +268,6 @@ export class MealsPlanner implements OnInit {
     });
   }
 
-  // De-activation Confirms
   openDeactivateDialog(): void {
     this.showDeactivateConfirmDialog = true;
   }
@@ -294,7 +293,6 @@ export class MealsPlanner implements OnInit {
     });
   }
 
-  // Active Progress Resets
   openResetDialog(): void {
     this.showResetConfirmDialog = true;
   }
@@ -320,7 +318,6 @@ export class MealsPlanner implements OnInit {
     });
   }
 
-  // Plan Deletions
   openDeleteDialog(plan: MealPrepPlan): void {
     if (!plan._id) return;
     this.planIdToDelete = plan._id;
@@ -364,13 +361,18 @@ export class MealsPlanner implements OnInit {
       recipe: fullRecipe,
       multiplier: pr.plannedPortions / (fullRecipe.portions || 1),
     };
+
+    if (fullRecipe._id) {
+      this.userService.recordRecentlyViewed(fullRecipe._id).subscribe({
+        error: (err) => console.error('Failed to record recently viewed recipe from planner:', err),
+      });
+    }
   }
 
   closePlannedRecipe(): void {
     this.viewingPlannedRecipe = null;
   }
 
-  // Portions completions dialog
   initiateRecipeCompletion(recipeId: string, recipeTitle: string, defaultPortions: number): void {
     this.recipeIdToComplete = recipeId;
     this.recipeTitleToComplete = recipeTitle;
