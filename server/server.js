@@ -27,7 +27,7 @@ if (process.env.NODE_ENV !== 'test') {
     .connect(mongoURI)
     .then(async () => {
       console.log('Database connected successfully');
-      await seedIngredients();
+      seedIngredients().catch((err) => console.error('Seeding error:', err));
     })
     .catch((err) => {
       console.error('Database connection error:', err);
