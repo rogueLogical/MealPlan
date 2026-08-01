@@ -63,14 +63,14 @@
             <span class="label">Pro</span>
           </div>
           <div class="macro-stat">
+            <span class="value" [ngClass]="getMacroClass('fat')">{{ displayMacros.fat }}g</span>
+            <span class="label">Fat</span>
+          </div>
+          <div class="macro-stat">
             <span class="value" [ngClass]="getMacroClass('netCarbs')"
               >{{ displayMacros.netCarbs }}g</span
             >
             <span class="label">Net</span>
-          </div>
-          <div class="macro-stat">
-            <span class="value" [ngClass]="getMacroClass('fat')">{{ displayMacros.fat }}g</span>
-            <span class="label">Fat</span>
           </div>
         </div>
       </div>
