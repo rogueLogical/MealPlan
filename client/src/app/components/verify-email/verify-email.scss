@@ -23,7 +23,7 @@
   align-items: center;
   justify-content: center;
   gap: 16px;
-  margin: 0 0 30px 0;
+  margin: 0 0 20px 0;
   line-height: 1;
 }
 
@@ -48,13 +48,13 @@
   text-align: center;
 }
 
-.verification-reminder-card {
+.status-box {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
 
-  .card-icon {
+  .status-icon {
     font-size: 3.5rem;
   }
 
@@ -71,39 +71,37 @@
     line-height: 1.5;
   }
 
-  .reminder-actions {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 16px;
-    width: 100%;
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border-color);
+    border-top: 3px solid var(--accent-primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 12px;
   }
+}
 
-  .link-btn {
-    text-decoration: none;
-  }
+.card-divider {
+  border: none;
+  height: 1px;
+  background-color: var(--border-color);
+  width: 100%;
+  margin: 20px 0;
 }
 
 .auth-form {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 16px;
+  width: 100%;
 }
 
 .form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  text-align: left;
   width: 100%;
-  align-items: center;
-
-  label {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--text-main);
-  }
+  display: flex;
+  justify-content: center;
 }
 
 .form-control {
@@ -115,28 +113,26 @@
   border: 1px solid var(--border-color);
   border-radius: 20px;
   font-size: 0.95rem;
+  outline: none;
 
   &:focus {
-    outline: none;
     border-color: var(--accent-primary);
-  }
-
-  &:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
   }
 }
 
 .login-submit-btn {
-  padding: 14px 28px;
+  padding: 12px 24px;
   background-color: var(--accent-primary);
   color: #ffffff;
   border: none;
   border-radius: 20px;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  margin-top: 10px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
   &:hover:not(:disabled) {
     background-color: #1d4ed8;
@@ -166,25 +162,18 @@
 
 .login-footer-links {
   display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 12px;
   margin-top: 24px;
 }
 
 .utility-link {
-  background: transparent;
-  border: none;
-  font-size: 0.85rem;
   color: var(--text-muted);
-  cursor: pointer;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
 
   &:hover {
     color: var(--accent-primary);
     text-decoration: underline;
   }
-}
-
-.link-divider {
-  color: var(--border-color);
 }

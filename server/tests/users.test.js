@@ -6,9 +6,14 @@ const User = require('../models/User');
 const Recipe = require('../models/Recipe');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 
+jest.mock('../services/emailService', () => ({
+  sendEmail: jest.fn().mockResolvedValue(true)
+}));
+const { sendEmail } = require('../services/emailService');
+
 let mongoServer;
 
-describe('User Settings API Operations Contract Test Suite', () => {
+describe('User Settings & Email Change API Operations', () => {
   let mockToken;
   let mockUserId;
   let mockRecipeId;
@@ -19,16 +24,16 @@ describe('User Settings API Operations Contract Test Suite', () => {
     const testMongoURI = mongoServer.getUri();
     await mongoose.connect(testMongoURI);
 
-    // Seed a standard dummy testing account profile configuration
     const testUser = new User({
       username: 'settingstester',
       email: 'settings@test.com',
-      password: 'password123'
+      password: 'password123',
+      isEmailVerified: true
     });
     await testUser.save();
     mockUserId = testUser._id;
 
-    // Seed a recipe for recently viewed tests
+    // Seed a recipe for recently viewed and favorites tests
     const recipe = await Recipe.create({
       title: 'Recently Viewed Test Recipe',
       recipeType: 'Meal',
@@ -59,6 +64,10 @@ describe('User Settings API Operations Contract Test Suite', () => {
     );
   });
 
+  afterEach(async () => {
+    jest.restoreAllMocks();
+  });
+
   afterAll(async () => {
     await User.deleteMany({});
     await Recipe.deleteMany({});
@@ -85,7 +94,6 @@ describe('User Settings API Operations Contract Test Suite', () => {
   });
 
   it('should successfully update daily meal structure and macro split percentages', async () => {
-    // Dispatch an update request populated with the new structure layout
     const res = await request(app)
       .put('/api/users/settings')
       .set('Authorization', `Bearer ${mockToken}`)
@@ -102,14 +110,9 @@ describe('User Settings API Operations Contract Test Suite', () => {
         }
       });
 
-    // Verify the server accepted the request
     expect(res.statusCode).toEqual(200);
-
-    // Verify the returned user profile correctly saved the exact integers
     expect(res.body.nutritionSettings.dailyMealsCount).toEqual(4);
     expect(res.body.nutritionSettings.dailySnacksCount).toEqual(1);
-
-    // Verify the nested split object persisted properly
     expect(res.body.nutritionSettings.mealMacroSplitPercentage.protein).toEqual(90);
     expect(res.body.nutritionSettings.mealMacroSplitPercentage.netCarbs).toEqual(80);
   });
@@ -124,7 +127,6 @@ describe('User Settings API Operations Contract Test Suite', () => {
   });
 
   it('should record and fetch recently viewed recipes', async () => {
-    // 1. Record view
     const recordRes = await request(app)
       .post(`/api/users/recently-viewed/${mockRecipeId}`)
       .set('Authorization', `Bearer ${mockToken}`);
@@ -132,7 +134,6 @@ describe('User Settings API Operations Contract Test Suite', () => {
     expect(recordRes.statusCode).toEqual(200);
     expect(recordRes.body.success).toBe(true);
 
-    // 2. Fetch recently viewed
     const fetchRes = await request(app)
       .get('/api/users/recently-viewed')
       .set('Authorization', `Bearer ${mockToken}`);
@@ -149,7 +150,6 @@ describe('User Settings API Operations Contract Test Suite', () => {
   });
 
   it('should successfully update dietary restrictions and culinary preference arrays', async () => {
-    // Dispatch an update request populated with the new array structures
     const res = await request(app)
       .put('/api/users/settings')
       .set('Authorization', `Bearer ${mockToken}`)
@@ -161,56 +161,70 @@ describe('User Settings API Operations Contract Test Suite', () => {
         }
       });
 
-    // Verify the server accepted the request
     expect(res.statusCode).toEqual(200);
-
-    // Verify the returned user profile contains the exact arrays we sent
     expect(res.body.nutritionSettings.dietaryRestrictions).toContain('Vegetarian');
     expect(res.body.nutritionSettings.dietaryRestrictions).toHaveLength(2);
-
     expect(res.body.nutritionSettings.likedFoods).toContain('Spinach');
     expect(res.body.nutritionSettings.likedFoods).toHaveLength(3);
-
     expect(res.body.nutritionSettings.dislikedFoods).toContain('Pork');
   });
 
   it('should add a recipe to favorites if it is not already favorited', async () => {
-    const mockUser = {
-      _id: 'mockUserId123',
-      favoriteRecipes: [], // Empty initially
-      save: jest.fn().mockResolvedValue(true)
-    };
-
-    User.findById = jest.fn().mockResolvedValue(mockUser);
-
     const response = await request(app)
-      .post('/api/users/favorites/recipe123')
+      .post(`/api/users/favorites/${mockRecipeId}`)
       .set('Authorization', `Bearer ${mockToken}`);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBe(true);
     expect(response.body.isFavorite).toBe(true);
-    expect(mockUser.favoriteRecipes).toContain('recipe123');
-    expect(mockUser.save).toHaveBeenCalled();
+
+    const userInDb = await User.findById(mockUserId);
+    expect(userInDb.favoriteRecipes.map((id) => id.toString())).toContain(mockRecipeId.toString());
   });
 
   it('should remove a recipe from favorites if it is already favorited', async () => {
-    const mockUser = {
-      _id: 'mockUserId123',
-      favoriteRecipes: ['recipe123'], // Already favorited
-      save: jest.fn().mockResolvedValue(true)
-    };
-
-    User.findById = jest.fn().mockResolvedValue(mockUser);
-
     const response = await request(app)
-      .post('/api/users/favorites/recipe123')
+      .post(`/api/users/favorites/${mockRecipeId}`)
       .set('Authorization', `Bearer ${mockToken}`);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBe(true);
     expect(response.body.isFavorite).toBe(false);
-    expect(mockUser.favoriteRecipes).not.toContain('recipe123');
-    expect(mockUser.save).toHaveBeenCalled();
+
+    const userInDb = await User.findById(mockUserId);
+    expect(userInDb.favoriteRecipes.map((id) => id.toString())).not.toContain(
+      mockRecipeId.toString()
+    );
+  });
+
+  it('should update settings without mutating email address via PUT /api/users/settings', async () => {
+    const res = await request(app)
+      .put('/api/users/settings')
+      .set('Authorization', `Bearer ${mockToken}`)
+      .send({
+        email: 'attempted_override@test.com', // Should be ignored by PUT /settings
+        measurementSystem: 'metric'
+      });
+
+    expect(res.statusCode).toEqual(200);
+
+    const userInDb = await User.findById(mockUserId);
+    expect(userInDb.email).toEqual('settings@test.com'); // Email unchanged!
+  });
+
+  it('should dispatch verification link for email change via POST /api/users/request-email-change', async () => {
+    sendEmail.mockClear();
+
+    const res = await request(app)
+      .post('/api/users/request-email-change')
+      .set('Authorization', `Bearer ${mockToken}`)
+      .send({ newEmail: 'brandnewemail@test.com' });
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body.message).toContain('Verification link dispatched');
+    expect(sendEmail).toHaveBeenCalledTimes(1);
+
+    const userInDb = await User.findById(mockUserId);
+    expect(userInDb.pendingEmail).toEqual('brandnewemail@test.com');
   });
 });

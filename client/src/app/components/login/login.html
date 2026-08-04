@@ -52,6 +52,24 @@
           </div>
         }
 
+        @if (showResendVerification) {
+          <div class="unverified-alert">
+            <p>Your email address is not verified yet.</p>
+            <button
+              type="button"
+              class="btn-resend-link"
+              (click)="onResendVerification()"
+              [disabled]="isResendingVerification"
+            >
+              @if (isResendingVerification) {
+                <span class="btn-spinner"></span> Sending...
+              } @else {
+                📧 Resend Verification Email
+              }
+            </button>
+          </div>
+        }
+
         <button type="submit" class="login-submit-btn" [disabled]="isLoading">
           @if (isLoading) {
             <span class="btn-spinner"></span> Logging In...

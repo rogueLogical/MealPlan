@@ -12,11 +12,13 @@ import { Register } from './components/register/register';
 import { ForgotPassword } from './components/forgot-password/forgot-password';
 import { PortionStorage } from './components/portion-storage/portion-storage';
 import { Welcome } from './components/welcome/welcome';
+import { VerifyEmail } from './components/verify-email/verify-email';
 
 export const routes: Routes = [
   { path: 'welcome', component: Welcome, canActivate: [guestGuard] },
   { path: 'login', component: Login, canActivate: [guestGuard] },
   { path: 'register', component: Register, canActivate: [guestGuard] },
+  { path: 'verify-email', component: VerifyEmail },
   { path: 'forgot-password', component: ForgotPassword, canActivate: [guestGuard] },
   { path: 'reset-password', component: ForgotPassword, canActivate: [guestGuard] },
   {
@@ -33,5 +35,5 @@ export const routes: Routes = [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
     ],
   },
-  { path: '**', redirectTo: 'welcome' }, // Global fallback routes to welcome for unauthenticated traffic
+  { path: '**', redirectTo: 'welcome' },
 ];

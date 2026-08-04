@@ -1,133 +1,154 @@
 <div class="login-wrapper">
   <div class="login-container">
-    <!-- Account Creation Card -->
     <main class="login-card">
       <h1 class="brand-title">
         <span class="brand-logo">🥗</span>
         <span class="title-text">MealPlan</span>
       </h1>
 
-      <p class="auth-message">Sign up below to create your personalized MealPlan account.</p>
+      @if (!isRegisteredSuccess) {
+        <p class="auth-message">Sign up below to create your personalized MealPlan account.</p>
 
-      <form
-        (ngSubmit)="registerForm.form.valid && onRegisterSubmit()"
-        novalidate
-        class="auth-form"
-        #registerForm="ngForm"
-      >
-        <div class="form-group">
-          <input
-            type="text"
-            id="username"
-            name="username"
-            [(ngModel)]="userData.username"
-            required
-            placeholder="Choose a username"
-            class="form-control"
-            aria-label="Username"
-            minlength="6"
-            [disabled]="isLoading"
-            #userRef="ngModel"
-          />
-          @if (registerForm.submitted && userRef.invalid) {
-            <div style="color: red">
-              @if (userRef.errors?.['required']) {
-                <small>Username is required.</small>
-              }
-              @if (userRef.errors?.['minlength']) {
-                <small>Username must be at least 6 characters long.</small>
-              }
-            </div>
-          }
+        <form
+          (ngSubmit)="registerForm.form.valid && onRegisterSubmit()"
+          novalidate
+          class="auth-form"
+          #registerForm="ngForm"
+        >
+          <div class="form-group">
+            <input
+              type="text"
+              id="username"
+              name="username"
+              [(ngModel)]="userData.username"
+              required
+              placeholder="Choose a username"
+              class="form-control"
+              aria-label="Username"
+              minlength="6"
+              [disabled]="isLoading"
+              #userRef="ngModel"
+            />
+            @if (registerForm.submitted && userRef.invalid) {
+              <div style="color: red">
+                @if (userRef.errors?.['required']) {
+                  <small>Username is required.</small>
+                }
+                @if (userRef.errors?.['minlength']) {
+                  <small>Username must be at least 6 characters long.</small>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="form-group">
+            <input
+              type="email"
+              id="email"
+              name="email"
+              [(ngModel)]="userData.email"
+              required
+              pattern="^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
+              placeholder="Enter your email address"
+              class="form-control"
+              aria-label="Email Address"
+              [disabled]="isLoading"
+              #emailRef="ngModel"
+            />
+            @if (registerForm.submitted && emailRef.invalid) {
+              <div style="color: red">
+                @if (emailRef.errors?.['required']) {
+                  <small>Email address is required.</small>
+                }
+                @if (emailRef.errors?.['pattern']) {
+                  <small>Please enter a valid email address.</small>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="form-group">
+            <input
+              type="password"
+              id="password"
+              name="password"
+              [(ngModel)]="userData.password"
+              required
+              placeholder="Create a secure password"
+              class="form-control"
+              aria-label="Password"
+              [disabled]="isLoading"
+              #passwordRef="ngModel"
+            />
+            @if (registerForm.submitted && passwordRef.invalid) {
+              <div style="color: red">
+                @if (passwordRef.errors?.['required']) {
+                  <small>Password is required.</small>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="form-group">
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              [(ngModel)]="userData.confirmPassword"
+              required
+              placeholder="Confirm your password"
+              class="form-control"
+              aria-label="Confirm Password"
+              [disabled]="isLoading"
+              #confirmPasswordRef="ngModel"
+            />
+            @if (registerForm.submitted || confirmPasswordRef.touched) {
+              <div style="color: red">
+                @if (confirmPasswordRef.errors?.['required']) {
+                  <small>Please re-enter your password to confirm.</small>
+                }
+                @if (
+                  userData.password !== userData.confirmPassword &&
+                  !confirmPasswordRef.errors?.['required']
+                ) {
+                  <small>Passwords do not match.</small>
+                }
+              </div>
+            }
+          </div>
+
+          <button type="submit" class="login-submit-btn" [disabled]="isLoading">
+            @if (isLoading) {
+              <span class="btn-spinner"></span> Creating Account...
+            } @else {
+              Create Account
+            }
+          </button>
+        </form>
+      } @else {
+        <!-- Post-Registration Email Verification Reminder Card -->
+        <div class="verification-reminder-card">
+          <span class="card-icon">✉️</span>
+          <h2>Check Your Inbox!</h2>
+          <p>
+            We've sent a verification link to <strong>{{ userData.email }}</strong
+            >. Please click the link in that email to activate your account before logging in.
+          </p>
+          <div class="reminder-actions">
+            <a routerLink="/login" class="login-submit-btn link-btn">Proceed to Log In</a>
+            <button
+              (click)="onResendVerification()"
+              class="utility-link"
+              type="button"
+              style="margin-top: 12px"
+            >
+              Didn't receive an email? Resend verification link
+            </button>
+          </div>
         </div>
-
-        <div class="form-group">
-          <input
-            type="email"
-            id="email"
-            name="email"
-            [(ngModel)]="userData.email"
-            required
-            pattern="^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
-            placeholder="Enter your email address"
-            class="form-control"
-            aria-label="Email Address"
-            [disabled]="isLoading"
-            #emailRef="ngModel"
-          />
-          @if (registerForm.submitted && emailRef.invalid) {
-            <div style="color: red">
-              @if (emailRef.errors?.['required']) {
-                <small>Email address is required.</small>
-              }
-              @if (emailRef.errors?.['pattern']) {
-                <small>Please enter a valid email address.</small>
-              }
-            </div>
-          }
-        </div>
-
-        <div class="form-group">
-          <input
-            type="password"
-            id="password"
-            name="password"
-            [(ngModel)]="userData.password"
-            required
-            placeholder="Create a secure password"
-            class="form-control"
-            aria-label="Password"
-            [disabled]="isLoading"
-            #passwordRef="ngModel"
-          />
-          @if (registerForm.submitted && passwordRef.invalid) {
-            <div style="color: red">
-              @if (passwordRef.errors?.['required']) {
-                <small>Password is required.</small>
-              }
-            </div>
-          }
-        </div>
-
-        <div class="form-group">
-          <input
-            type="password"
-            id="confirmPassword"
-            name="confirmPassword"
-            [(ngModel)]="userData.confirmPassword"
-            required
-            placeholder="Confirm your password"
-            class="form-control"
-            aria-label="Confirm Password"
-            [disabled]="isLoading"
-            #confirmPasswordRef="ngModel"
-          />
-          @if (registerForm.submitted || confirmPasswordRef.touched) {
-            <div style="color: red">
-              @if (confirmPasswordRef.errors?.['required']) {
-                <small>Please re-enter your password to confirm.</small>
-              }
-              @if (
-                userData.password !== userData.confirmPassword &&
-                !confirmPasswordRef.errors?.['required']
-              ) {
-                <small>Passwords do not match.</small>
-              }
-            </div>
-          }
-        </div>
-
-        <button type="submit" class="login-submit-btn" [disabled]="isLoading">
-          @if (isLoading) {
-            <span class="btn-spinner"></span> Creating Account...
-          } @else {
-            Create Account
-          }
-        </button>
-      </form>
+      }
     </main>
 
-    <!-- Navigation Utility Back Link to Login View -->
     <footer class="login-footer-links">
       <button class="utility-link" routerLink="/login" type="button">
         Already have an account? Log In

@@ -62,7 +62,7 @@ Feature: 1.1.5. User Account Recovery
 
 Feature: 1.1.6. Email Verification
   The system shall verify new user email addresses upon 
-  account creation. 
+  account creation and upon change.
 
   Scenario: Email verification is enabled (UAT-38)
     Given a user goes to create an account 
@@ -78,6 +78,11 @@ Feature: 1.1.6. Email Verification
     Given a user has submitted the account creation form, but has not verified their email address. 
     When they click on the verify email link in their email. 
     Then the system marks the user's email as verified and allows them to log in afterwards. 
+
+  Scenario: Existing user email change requested (UAT-43)
+    Given a logged in user has the settings page open.
+    When the user submits a new email address change.
+    Then the system performs email verification on the provided email address. 
 
 Feature: 1.1.7. User Account Deletion
   The system shall provide a way for users to delete 

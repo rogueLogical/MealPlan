@@ -41,6 +41,32 @@ Authenticates a user and provisions a JWT session token.
   ```
 - Success Response (200): Returns a JWT token and user profile object.
 
+`POST /auth/verify-email`
+
+Consumes an email verification token to mark a user's email address as verified, or to confirm a requested email change.
+
+- Auth Required: No
+- Body:
+  ```JSON
+  {
+    "token": "crypto_hex_string_12345"
+  }
+  ```
+- Success Response (200): Returns a success message and basic user object.
+
+`POST /auth/resend-verification`
+
+Resends a verification link to a user with an unverified primary or pending email address.
+
+- Auth Required: No
+- Body:
+  ```JSON
+  {
+    "email": "test@example.com"
+  }
+  ```
+- Success Response (200): Returns a dispatch confirmation message.
+
 `POST /auth/forgot-password`
 
 Generates a secure recovery token and dispatches an email with a reset link.
@@ -80,12 +106,12 @@ Retrieves the full profile and settings for the currently authenticated user.
 
 `PUT /users/settings`
 
-Updates the authenticated user's account preferences and nutritional targets. Automatically sets `hasConfiguredSettings: true` upon saving.
+Updates the authenticated user's account preferences and nutritional targets. Automatically sets `hasConfiguredSettings: true` upon completion.
+_Note: Direct updates to `email` via this endpoint are disabled. Email updates must be requested via `POST /users/request-email-change`._
 
 - Body:
   ```JSON
   {
-    "email": "updated@example.com",
     "measurementSystem": "metric",
     "profilePicture": "https://example.com/avatar.png",
     "nutritionSettings": {
@@ -99,11 +125,24 @@ Updates the authenticated user's account preferences and nutritional targets. Au
     }
   }
   ```
-- Success Response (200): Returns the updated settings blocks, `hasConfiguredSettings`, and `dismissedWelcomeBanner`.
+- Success Response (200): Returns the updated settings blocks.
+
+`POST /users/request-email-change`
+
+Dispatches a verification link to a user's requested new email address. Stores the requested address in `pendingEmail` on the user profile until verified.
+
+- Auth Required: Yes
+- Body:
+  ```JSON
+  {
+    "newEmail": "new.email@example.com"
+  }
+  ```
+- Success Response (200): Returns a dispatch confirmation message and `pendingEmail`.
 
 `POST /users/dismiss-welcome`
 
-Dismisses the new user welcome banner on the home dashboard for the authenticated user.
+Permanently dismisses the new user welcome banner on the home dashboard for the authenticated user.
 
 - Auth Required: Yes
 - Body: None
@@ -111,7 +150,7 @@ Dismisses the new user welcome banner on the home dashboard for the authenticate
 
 `POST /users/recently-viewed/:recipeId`
 
-Records a recipe as recently viewed by the authenticated user. Deduplicates the list, unshifts the recipe ID to index 0, and caps the array at 10 items.
+Records a recipe as recently viewed by the authenticated user. Deduplicates the array, unshifts the recipe ID to index 0, and caps the list at 10 items.
 
 - Auth Required: Yes
 - Body: None
@@ -342,7 +381,7 @@ Performs a "soft-delete" on a recipe. Sets the `isDeleted` flag to `true` rather
 
 `POST /recipes/generate`
 
-Generates a complete, structured recipe based on a natural language text description, classified by category (meal/snack), and optionally targeted to match the user's personal dietary restrictions and macro settings splits. Resolves ingredients through a sequential waterfall of local database checks, USDA lookups (requiring $> 0$ macros to save to MongoDB), and AI estimation fallbacks.
+Generates a complete, structured recipe based on a natural language text description, classified by category (meal/snack), and optionally targeted to match the user's personal dietary restrictions and macro settings splits. Resolves ingredients through a sequential waterfall of local database checks, USDA lookups (requiring $> 0$ macros to be cached in MongoDB), and AI estimation fallbacks.
 
 - Auth Required: Yes
 - Body:

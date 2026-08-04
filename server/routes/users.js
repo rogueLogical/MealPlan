@@ -1,19 +1,18 @@
 const express = require('express');
+const crypto = require('crypto');
 const router = express.Router();
 const User = require('../models/User');
+const Recipe = require('../models/Recipe');
 const checkAuth = require('../middleware/auth');
 const PortionStorage = require('../models/PortionStorage');
+const { sendEmail } = require('../services/emailService');
 
-// PUT /api/users/settings
+// PUT /api/users/settings - Updates settings
 router.put('/settings', checkAuth, async (req, res) => {
   try {
-    // Extract the authenticated user ID
     const userId = req.userData.userId;
+    const { measurementSystem, nutritionSettings, profilePicture } = req.body;
 
-    // Destructure valid configuration tokens out of the incoming HTTP request body
-    const { measurementSystem, nutritionSettings, profilePicture, email } = req.body;
-
-    // Build dataset object
     const updatePayload = {
       hasConfiguredSettings: true
     };
@@ -23,24 +22,7 @@ router.put('/settings', checkAuth, async (req, res) => {
     }
     if (profilePicture) updatePayload['profilePicture'] = profilePicture;
 
-    if (email) {
-      // check if email exists on an account that is not the current user
-      const sanitizedEmail = email.trim().toLowerCase();
-      const emailConflict = await User.findOne({
-        email: sanitizedEmail,
-        _id: { $ne: userId }
-      });
-      if (emailConflict) {
-        return res.status(400).json({
-          message: 'The email address you entered is already registered to another account.'
-        });
-      }
-
-      updatePayload['email'] = sanitizedEmail;
-    }
-
     if (nutritionSettings) {
-      // update macro targets if provided by the client
       if (nutritionSettings.dailyMacroTargets) {
         const { calories, protein, netCarbs, fat } = nutritionSettings.dailyMacroTargets;
         if (calories !== undefined)
@@ -52,7 +34,6 @@ router.put('/settings', checkAuth, async (req, res) => {
         if (fat !== undefined) updatePayload['nutritionSettings.dailyMacroTargets.fat'] = fat;
       }
 
-      // Update meal macro breakdown structure
       if (nutritionSettings.dailyMealsCount !== undefined) {
         updatePayload['nutritionSettings.dailyMealsCount'] = nutritionSettings.dailyMealsCount;
       }
@@ -73,7 +54,6 @@ router.put('/settings', checkAuth, async (req, res) => {
           updatePayload['nutritionSettings.mealMacroSplitPercentage.fat'] = split.fat;
       }
 
-      // Update preferred meal structural arrays if provided by the client
       if (nutritionSettings.likedFoods)
         updatePayload['nutritionSettings.likedFoods'] = nutritionSettings.likedFoods;
       if (nutritionSettings.dislikedFoods)
@@ -83,12 +63,11 @@ router.put('/settings', checkAuth, async (req, res) => {
           nutritionSettings.dietaryRestrictions;
     }
 
-    // Update the user entry in the database
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { $set: updatePayload },
-      { returnDocument: 'after', runValidators: true } // Returns updated profile, runs schema validators
-    ).select('-password'); // Exclude the encrypted password hash
+      { returnDocument: 'after', runValidators: true }
+    ).select('-password');
 
     if (!updatedUser) {
       return res.status(404).json({ message: 'User account profile not found.' });
@@ -107,7 +86,67 @@ router.put('/settings', checkAuth, async (req, res) => {
   }
 });
 
-// GET /api/users/me // get user profile information
+// POST /api/users/request-email-change - Dedicated email change request endpoint
+router.post('/request-email-change', checkAuth, async (req, res) => {
+  try {
+    const userId = req.userData.userId;
+    const { newEmail } = req.body;
+
+    if (!newEmail) {
+      return res.status(400).json({ message: 'New email address is required.' });
+    }
+
+    const sanitizedNewEmail = newEmail.trim().toLowerCase();
+
+    // Verify email is not already taken by another user
+    const existingUser = await User.findOne({
+      email: sanitizedNewEmail,
+      _id: { $ne: userId }
+    });
+
+    if (existingUser) {
+      return res.status(400).json({
+        message: 'That email address is already registered to another account.'
+      });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found.' });
+
+    if (user.email === sanitizedNewEmail) {
+      return res
+        .status(400)
+        .json({ message: 'New email address must be different from your current email.' });
+    }
+
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    user.pendingEmail = sanitizedNewEmail;
+    user.emailVerificationToken = verificationToken;
+    user.emailVerificationExpires = new Date(Date.now() + 86400000); // 24 hours
+
+    await user.save();
+
+    const clientBaseUrl = process.env.CLIENT_URL || 'http://localhost:4200';
+    const verificationUrl = `${clientBaseUrl}/verify-email?token=${verificationToken}`;
+
+    await sendEmail({
+      to: sanitizedNewEmail,
+      subject: 'Confirm Your New MealPlan Email Address',
+      text: `Hello ${user.username},\n\nYou requested to change your MealPlan account email address to ${sanitizedNewEmail}. Please click the link below to confirm this change:\n\n${verificationUrl}\n\nThis verification link will expire in 24 hours.`
+    });
+
+    res.status(200).json({
+      message:
+        'Verification link dispatched! Please check your new email address to confirm the change.',
+      pendingEmail: sanitizedNewEmail
+    });
+  } catch (error) {
+    console.error('Request Email Change Error:', error);
+    res.status(500).json({ message: 'Failed to dispatch email change verification.' });
+  }
+});
+
+// GET /api/users/me
 router.get('/me', checkAuth, async (req, res) => {
   try {
     const userId = req.userData.userId;
@@ -124,7 +163,7 @@ router.get('/me', checkAuth, async (req, res) => {
   }
 });
 
-// POST /api/users/dismiss-welcome - Dismiss new user welcome banner
+// POST /api/users/dismiss-welcome
 router.post('/dismiss-welcome', checkAuth, async (req, res) => {
   try {
     const userId = req.userData.userId;
@@ -143,7 +182,7 @@ router.post('/dismiss-welcome', checkAuth, async (req, res) => {
   }
 });
 
-// POST /api/users/recently-viewed/:recipeId - Track recently viewed recipe
+// POST /api/users/recently-viewed/:recipeId
 router.post('/recently-viewed/:recipeId', checkAuth, async (req, res) => {
   try {
     const userId = req.userData.userId;
@@ -152,16 +191,12 @@ router.post('/recently-viewed/:recipeId', checkAuth, async (req, res) => {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: 'User not found.' });
 
-    // Deduplicate array
     user.recentlyViewedRecipes = user.recentlyViewedRecipes.filter(
       (id) => id.toString() !== recipeId
     );
-
-    // Unshift to top (index 0)
     user.recentlyViewedRecipes.unshift(recipeId);
 
-    // Limit array to max 20 items
-    if (user.recentlyViewedRecipes.length > 20) {
+    if (user.recentlyViewedRecipes.length > 10) {
       user.recentlyViewedRecipes = user.recentlyViewedRecipes.slice(0, 10);
     }
 
@@ -173,7 +208,7 @@ router.post('/recently-viewed/:recipeId', checkAuth, async (req, res) => {
   }
 });
 
-// GET /api/users/recently-viewed - Fetch populated recently viewed recipes
+// GET /api/users/recently-viewed
 router.get('/recently-viewed', checkAuth, async (req, res) => {
   try {
     const userId = req.userData.userId;
@@ -184,7 +219,6 @@ router.get('/recently-viewed', checkAuth, async (req, res) => {
 
     if (!user) return res.status(404).json({ message: 'User not found.' });
 
-    // Filter out null values (if any deleted recipes were filtered by match)
     const recipes = (user.recentlyViewedRecipes || []).filter((r) => r !== null);
 
     res.status(200).json({ data: recipes });
@@ -202,16 +236,13 @@ router.post('/favorites/:recipeId', checkAuth, async (req, res) => {
 
     const user = await User.findById(userId);
 
-    // Check if the recipe is already in the array
     const index = user.favoriteRecipes.indexOf(recipeId);
     let isFavorite = false;
 
     if (index === -1) {
-      // Not favorited yet, so add it
       user.favoriteRecipes.push(recipeId);
       isFavorite = true;
     } else {
-      // Already favorited, so remove it
       user.favoriteRecipes.splice(index, 1);
     }
 
@@ -228,7 +259,7 @@ router.post('/favorites/:recipeId', checkAuth, async (req, res) => {
   }
 });
 
-// GET /api/users/storage - Fetch user's portion storage
+// GET /api/users/storage
 router.get('/storage', checkAuth, async (req, res) => {
   try {
     const storage = await PortionStorage.find({ userId: req.userData.userId });
@@ -239,7 +270,7 @@ router.get('/storage', checkAuth, async (req, res) => {
   }
 });
 
-// POST /api/users/storage/adjust - Increment or decrement portions
+// POST /api/users/storage/adjust
 router.post('/storage/adjust', checkAuth, async (req, res) => {
   try {
     const { recipeId, recipeTitle, delta } = req.body;

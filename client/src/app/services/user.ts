@@ -32,12 +32,13 @@ export interface BackendUserDocument {
   nutritionSettings?: NutritionSettings;
   hasConfiguredSettings?: boolean;
   dismissedWelcomeBanner?: boolean;
+  isEmailVerified?: boolean;
+  pendingEmail?: string;
   favoriteRecipes?: string[];
   recentlyViewedRecipes?: string[];
 }
 
 export interface UserSettingsPayload {
-  email?: string;
   measurementSystem: 'metric' | 'imperial';
   profilePicture?: string;
   nutritionSettings: NutritionSettings;
@@ -50,14 +51,19 @@ export class UserService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/users`;
 
-  // Fetch current user details and configurations
   getUserProfile(): Observable<{ user: BackendUserDocument }> {
     return this.http.get<{ user: BackendUserDocument }>(`${this.apiUrl}/me`);
   }
 
-  // Persist updated settings map to MongoDB
   updateUserSettings(payload: UserSettingsPayload): Observable<unknown> {
     return this.http.put<unknown>(`${this.apiUrl}/settings`, payload);
+  }
+
+  requestEmailChange(newEmail: string): Observable<{ message: string; pendingEmail: string }> {
+    return this.http.post<{ message: string; pendingEmail: string }>(
+      `${this.apiUrl}/request-email-change`,
+      { newEmail },
+    );
   }
 
   dismissWelcomeBanner(): Observable<{ message: string; user: BackendUserDocument }> {
