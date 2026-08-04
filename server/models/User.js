@@ -26,6 +26,22 @@ const UserSchema = new mongoose.Schema(
       type: String,
       default: ''
     },
+    isEmailVerified: {
+      type: Boolean,
+      default: false
+    },
+    emailVerificationToken: {
+      type: String,
+      default: undefined
+    },
+    emailVerificationExpires: {
+      type: Date,
+      default: undefined
+    },
+    pendingEmail: {
+      type: String,
+      default: undefined
+    },
     recipes: [
       {
         type: mongoose.Schema.Types.ObjectId,

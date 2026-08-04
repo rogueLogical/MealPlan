@@ -21,6 +21,7 @@ export class Register implements OnInit {
     confirmPassword: '',
   };
   isLoading = false;
+  isRegisteredSuccess = false;
 
   private titleService = inject(Title);
   private router = inject(Router);
@@ -49,15 +50,24 @@ export class Register implements OnInit {
     this.isLoading = true;
     this.authService.register({ username, email, password }).subscribe({
       next: () => {
-        this.toastService.showSuccess('Account created successfully! Please log in.');
         this.isLoading = false;
-        this.router.navigate(['/login']);
+        this.isRegisteredSuccess = true;
+        this.toastService.showSuccess('Account created! Please check your email to verify.');
       },
       error: (err) => {
         console.error('Registration Failure:', err);
         this.isLoading = false;
         this.toastService.showError(err.error?.message || 'Failed to create user account.');
       },
+    });
+  }
+
+  onResendVerification(): void {
+    if (!this.userData.email) return;
+
+    this.authService.resendVerification(this.userData.email).subscribe({
+      next: (res) => this.toastService.showSuccess(res.message),
+      error: (err) => this.toastService.showError(err.error?.message || 'Failed to resend email.'),
     });
   }
 }

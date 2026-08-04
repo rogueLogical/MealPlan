@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-login',
+  standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './login.html',
   styleUrl: './login.scss',
@@ -15,6 +16,11 @@ import { FormsModule } from '@angular/forms';
 export class Login implements OnInit {
   isDarkMode = false;
   isLoading = false;
+
+  showResendVerification = false;
+  unverifiedEmail = '';
+  isResendingVerification = false;
+
   credentials = {
     username: '',
     password: '',
@@ -52,6 +58,8 @@ export class Login implements OnInit {
     }
 
     this.isLoading = true;
+    this.showResendVerification = false;
+
     this.authService.login(this.credentials).subscribe({
       next: () => {
         this.toastService.showSuccess(`Welcome back, ${this.credentials.username}!`);
@@ -61,7 +69,34 @@ export class Login implements OnInit {
       error: (err) => {
         console.error('Login Failure:', err);
         this.isLoading = false;
-        this.toastService.showError(err.error?.message || 'Invalid username or password.');
+
+        if (err.status === 403 && err.error?.isEmailVerified === false) {
+          this.showResendVerification = true;
+          this.unverifiedEmail = err.error?.email || '';
+          this.toastService.showError(err.error?.message || 'Email not verified.');
+        } else {
+          this.toastService.showError(err.error?.message || 'Invalid username or password.');
+        }
+      },
+    });
+  }
+
+  onResendVerification(): void {
+    if (!this.unverifiedEmail) {
+      this.toastService.showError('Unable to identify email address. Please contact support.');
+      return;
+    }
+
+    this.isResendingVerification = true;
+    this.authService.resendVerification(this.unverifiedEmail).subscribe({
+      next: (res) => {
+        this.isResendingVerification = false;
+        this.toastService.showSuccess(res.message);
+      },
+      error: (err) => {
+        console.error('Resend Verification Failure:', err);
+        this.isResendingVerification = false;
+        this.toastService.showError(err.error?.message || 'Failed to resend verification email.');
       },
     });
   }

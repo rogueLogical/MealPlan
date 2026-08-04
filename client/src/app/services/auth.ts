@@ -32,27 +32,23 @@ export class AuthService {
 
   private apiUrl = `${environment.apiUrl}/auth`;
 
-  // Create a reactive state stream to broadcast user profiles across the UI shell layers
   private currentUserSubject = new BehaviorSubject<UserProfile | null>(null);
   currentUser$ = this.currentUserSubject.asObservable();
 
   constructor() {
-    // On application boot up, check if a session payload cache already exists locally
     const savedUser = localStorage.getItem('user_profile');
     if (savedUser) {
       this.currentUserSubject.next(JSON.parse(savedUser));
     }
   }
 
-  // Active validation checker used by the Route Guard system
   isLoggedIn(): boolean {
     return localStorage.getItem('token') !== null;
   }
 
-  login(credentials: { username: string; password: Math | string }): Observable<AuthResponse> {
+  login(credentials: { username: string; password: string }): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
       tap((response) => {
-        // Intercept a successful transaction to store credentials securely
         localStorage.setItem('token', response.token);
         localStorage.setItem('user_profile', JSON.stringify(response.user));
         this.currentUserSubject.next(response.user);
@@ -64,6 +60,16 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/register`, userData);
   }
 
+  verifyEmail(token: string): Observable<{ message: string; user?: UserProfile }> {
+    return this.http.post<{ message: string; user?: UserProfile }>(`${this.apiUrl}/verify-email`, {
+      token,
+    });
+  }
+
+  resendVerification(email: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/resend-verification`, { email });
+  }
+
   logout(): void {
     this.clearSessionCache();
   }
@@ -73,7 +79,6 @@ export class AuthService {
     if (currentProfile) {
       const newProfile = { ...currentProfile, ...updatedProfile };
 
-      // Overwrite both local storage and the active state broadcast stream
       localStorage.setItem('user_profile', JSON.stringify(newProfile));
       this.currentUserSubject.next(newProfile);
     }

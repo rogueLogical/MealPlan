@@ -13,6 +13,9 @@ import { ToastService } from '../../services/toast';
 interface MockUserService {
   getUserProfile: Mock<() => Observable<{ user: unknown }>>;
   updateUserSettings: Mock<(payload: UserSettingsPayload) => Observable<unknown>>;
+  requestEmailChange: Mock<
+    (email: string) => Observable<{ message: string; pendingEmail: string }>
+  >;
 }
 
 interface MockAuthService {
@@ -35,6 +38,7 @@ describe('Settings Management', () => {
     userServiceMock = {
       getUserProfile: vi.fn(),
       updateUserSettings: vi.fn(),
+      requestEmailChange: vi.fn(),
     };
 
     authServiceMock = {
@@ -46,10 +50,10 @@ describe('Settings Management', () => {
       showError: vi.fn(),
     };
 
-    // Stubs initial fetch lifecycle response data structure
     userServiceMock.getUserProfile.mockReturnValue(
       of({
         user: {
+          email: 'user@test.com',
           profilePicture: 'avatar.png',
           settings: { measurementSystem: 'metric' },
           nutritionSettings: {
@@ -72,7 +76,7 @@ describe('Settings Management', () => {
 
     fixture = TestBed.createComponent(Settings);
     component = fixture.componentInstance;
-    fixture.detectChanges(); // Triggers ngOnInit() profile initialization load
+    fixture.detectChanges();
   });
 
   it('should save user preferences when they are set by the user (UT-8)', async () => {
@@ -274,10 +278,9 @@ describe('Settings Management', () => {
     component.onSettingsSave();
     expect(toastServiceMock.showError).toHaveBeenCalledWith('Save failed');
 
-    // Test the Partial Data Branch: Ensure we don't accidentally wipe out the user's email or avatar if they save with empty fields
+    // Test the Partial Data Branch: Ensure we don't accidentally wipe out the user's avatar if they save with empty fields
     userServiceMock.updateUserSettings.mockReturnValue(of({ success: true }));
     component.settingsData.profilePicture = '';
-    component.settingsData.email = '';
 
     component.onSettingsSave();
 
@@ -446,5 +449,21 @@ describe('Settings Management', () => {
     fixture.detectChanges();
     snacksInputDebug.triggerEventHandler('ngModelChange', null);
     snacksInputDebug.triggerEventHandler('blur', null);
+  });
+
+  it('should dispatch email change request via dedicated modal view', () => {
+    userServiceMock.requestEmailChange.mockReturnValue(
+      of({ message: 'Verification link dispatched!', pendingEmail: 'new@test.com' }),
+    );
+
+    component.openEmailModal();
+    expect(component.showEmailModal).toBe(true);
+
+    component.newEmailInput = 'new@test.com';
+    component.submitEmailChangeRequest();
+
+    expect(userServiceMock.requestEmailChange).toHaveBeenCalledWith('new@test.com');
+    expect(component.emailChangeRequested).toBe(true);
+    expect(toastServiceMock.showSuccess).toHaveBeenCalledWith('Verification link dispatched!');
   });
 });

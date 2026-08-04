@@ -11,7 +11,6 @@
         <p class="section-desc"></p>
 
         <div class="profile-settings-row">
-          <!-- Live Preview Avatar Round Frame Box -->
           <div class="avatar-preview-frame">
             <img
               [src]="settingsData.profilePicture || 'https://dicebear.com'"
@@ -41,19 +40,22 @@
             </p>
           </div>
         </div>
+
+        <!-- Read-Only Email Display + Change Email Modal Trigger -->
         <div class="form-group-row expand-field" style="margin-top: 24px; max-width: 100%">
-          <label for="settingsEmail">Account Email Address</label>
-          <input
-            type="email"
-            id="settingsEmail"
-            name="settingsEmail"
-            [(ngModel)]="settingsData.email"
-            placeholder="your.email@example.com"
-            class="form-control-input-text"
-            aria-label="Account Email Address"
-            required
-            pattern="^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
-          />
+          <label for="currentEmailInput">Account Email Address</label>
+          <div class="email-display-row">
+            <input
+              type="email"
+              id="currentEmailInput"
+              [value]="currentEmail"
+              class="form-control-input-text read-only-email"
+              readonly
+            />
+            <button type="button" class="btn-change-email" (click)="openEmailModal()">
+              ✏️ Change Email
+            </button>
+          </div>
         </div>
       </section>
 
@@ -65,7 +67,6 @@
         </p>
 
         <div class="macros-grid">
-          <!-- Protein input field element -->
           <div class="form-group">
             <label for="protein">Protein (g)</label>
             <input
@@ -86,7 +87,6 @@
             </span>
           </div>
 
-          <!-- Carbohydrates input field element -->
           <div class="form-group">
             <label for="netCarbs">Net Carbs (g)</label>
             <input
@@ -107,7 +107,6 @@
             </span>
           </div>
 
-          <!-- Fat input field element -->
           <div class="form-group">
             <label for="fat">Fat (g)</label>
             <input
@@ -126,7 +125,6 @@
             </span>
           </div>
 
-          <!-- Total Energy Output box element -->
           <div class="form-group">
             <span class="display-box-label">Total Calories</span>
             <div class="calories-value-display">
@@ -190,6 +188,7 @@
           </div>
           <input
             type="range"
+            id="proteinSplit"
             name="proteinSplit"
             min="0"
             max="100"
@@ -211,6 +210,7 @@
           </div>
           <input
             type="range"
+            id="netCarbsSplit"
             name="netCarbsSplit"
             min="0"
             max="100"
@@ -231,6 +231,7 @@
           </div>
           <input
             type="range"
+            id="fatSplit"
             name="fatSplit"
             min="0"
             max="100"
@@ -326,10 +327,93 @@
         </div>
       </section>
 
-      <!-- Bottom Form Submit Drawer Action Control Bar -->
       <footer class="form-action-footer">
         <button type="submit" class="settings-save-btn">Save Settings</button>
       </footer>
     </form>
+  }
+
+  <!-- DEDICATED EMAIL CHANGE MODAL -->
+  @if (showEmailModal) {
+    <div class="dialog-overlay" style="z-index: 1100">
+      <button
+        class="dialog-backdrop"
+        (click)="closeEmailModal()"
+        aria-label="Cancel email change"
+      ></button>
+      <div class="dialog-box" appFocusTrap>
+        <header class="dialog-header">
+          <h3>Change Account Email</h3>
+          <button class="dialog-close-btn" (click)="closeEmailModal()">✕</button>
+        </header>
+
+        <div class="dialog-body">
+          @if (!emailChangeRequested) {
+            <p>
+              Current Email: <strong>{{ currentEmail }}</strong>
+            </p>
+            <form
+              (ngSubmit)="emailForm.form.valid && submitEmailChangeRequest()"
+              #emailForm="ngForm"
+            >
+              <div class="form-group" style="margin-top: 1rem">
+                <label for="newEmail">New Email Address</label>
+                <input
+                  type="email"
+                  id="newEmail"
+                  name="newEmail"
+                  [(ngModel)]="newEmailInput"
+                  required
+                  pattern="^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
+                  placeholder="Enter new email address"
+                  class="form-control-input"
+                  [disabled]="isRequestingEmailChange"
+                  #newEmailRef="ngModel"
+                />
+                @if (emailForm.submitted && newEmailRef.invalid) {
+                  <div style="color: red; margin-top: 4px">
+                    <small>Please enter a valid email address.</small>
+                  </div>
+                }
+              </div>
+              <footer class="dialog-footer" style="margin-top: 20px; padding: 0; border: none">
+                <button type="button" class="btn btn-secondary" (click)="closeEmailModal()">
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  [disabled]="isRequestingEmailChange || !newEmailInput.trim()"
+                >
+                  @if (isRequestingEmailChange) {
+                    Sending...
+                  } @else {
+                    Send Verification Link
+                  }
+                </button>
+              </footer>
+            </form>
+          } @else {
+            <div class="email-reminder-card">
+              <span class="card-icon">✉️</span>
+              <h4>Verification Link Sent!</h4>
+              <p>
+                We've sent a confirmation link to <strong>{{ newEmailInput }}</strong
+                >. Your current email address will remain <strong>{{ currentEmail }}</strong> until
+                you click the link in that email to confirm the change.
+              </p>
+              <footer
+                class="dialog-footer"
+                style="margin-top: 20px; padding: 0; border: none; justify-content: center"
+              >
+                <button type="button" class="btn btn-primary" (click)="closeEmailModal()">
+                  Close Window
+                </button>
+              </footer>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
   }
 </div>

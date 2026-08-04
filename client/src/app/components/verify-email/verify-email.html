@@ -1,0 +1,66 @@
+<div class="login-wrapper">
+  <div class="login-container">
+    <main class="login-card">
+      <h1 class="brand-title">
+        <span class="brand-logo">🥗</span>
+        <span class="title-text">MealPlan</span>
+      </h1>
+
+      @if (isLoading) {
+        <div class="status-box">
+          <div class="spinner"></div>
+          <h2>Verifying your email...</h2>
+          <p>Please wait while we confirm your email address.</p>
+        </div>
+      } @else if (isSuccess) {
+        <div class="status-box success">
+          <span class="status-icon">✅</span>
+          <h2>Email Verified!</h2>
+          <p>
+            Your email address has been successfully verified. You now have full access to your
+            account.
+          </p>
+          <a routerLink="/login" class="login-submit-btn link-btn">Proceed to Log In</a>
+        </div>
+      } @else {
+        <div class="status-box error">
+          <span class="status-icon">❌</span>
+          <h2>Verification Failed</h2>
+          <p>{{ errorMessage }}</p>
+
+          <hr class="card-divider" />
+
+          <h3>Request New Link</h3>
+          <form (ngSubmit)="onResendSubmit()" class="auth-form">
+            <div class="form-group">
+              <input
+                type="email"
+                [(ngModel)]="resendEmail"
+                name="resendEmail"
+                required
+                placeholder="Enter your account email"
+                class="form-control"
+                [disabled]="isResending"
+              />
+            </div>
+            <button
+              type="submit"
+              class="login-submit-btn"
+              [disabled]="isResending || !resendEmail.trim()"
+            >
+              @if (isResending) {
+                <span class="btn-spinner"></span> Sending...
+              } @else {
+                Resend Verification Link
+              }
+            </button>
+          </form>
+        </div>
+      }
+    </main>
+
+    <footer class="login-footer-links">
+      <a class="utility-link" routerLink="/login">Return to Log In</a>
+    </footer>
+  </div>
+</div>
