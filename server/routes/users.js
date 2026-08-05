@@ -6,6 +6,42 @@ const Recipe = require('../models/Recipe');
 const checkAuth = require('../middleware/auth');
 const PortionStorage = require('../models/PortionStorage');
 const { sendEmail } = require('../services/emailService');
+const ShoppingList = require('../models/ShoppingList');
+const MealPrepPlan = require('../models/MealPrepPlan');
+
+// DELETE /api/users/me - Delete user account and associated data
+router.delete('/me', checkAuth, async (req, res) => {
+  try {
+    const userId = req.userData.userId;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User account not found.' });
+    }
+
+    // Delete Meal Prep Plans created by user
+    await MealPrepPlan.deleteMany({ userId });
+
+    // Delete Shopping List
+    await ShoppingList.deleteMany({ userId });
+
+    // Delete Portion Storage entries
+    await PortionStorage.deleteMany({ userId });
+
+    // Soft-delete user recipes (preserves saved/favorited recipes for others)
+    await Recipe.updateMany({ createdBy: userId }, { $set: { isDeleted: true, isPublic: false } });
+
+    // Delete User document
+    await user.deleteOne();
+
+    res.status(200).json({
+      message: 'Your account and associated data have been deleted successfully.'
+    });
+  } catch (err) {
+    console.error('Delete Account Error:', err);
+    res.status(500).json({ message: 'Failed to delete user account.' });
+  }
+});
 
 // PUT /api/users/settings - Updates settings
 router.put('/settings', checkAuth, async (req, res) => {

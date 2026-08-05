@@ -144,6 +144,29 @@
   }
 }
 
+.danger-zone-card {
+  border-color: rgba(239, 68, 68, 0.4);
+  background-color: rgba(239, 68, 68, 0.02);
+
+  .btn-danger-account {
+    padding: 12px 20px;
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: #ef4444;
+      color: #ffffff;
+      border-color: #ef4444;
+    }
+  }
+}
+
 .form-group-row {
   display: flex;
   flex-direction: column;

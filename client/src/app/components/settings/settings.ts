@@ -40,6 +40,10 @@ export class Settings implements OnInit {
   isRequestingEmailChange = false;
   emailChangeRequested = false;
 
+  // Account Deletion Modal State
+  showDeleteModal = false;
+  isDeletingAccount = false;
+
   settingsData: UserSettingsPayload = {
     measurementSystem: 'imperial',
     nutritionSettings: {
@@ -125,6 +129,32 @@ export class Settings implements OnInit {
         this.isRequestingEmailChange = false;
         this.toastService.showError(err.error?.message || 'Failed to request email change.');
         this.cdr.markForCheck();
+      },
+    });
+  }
+
+  openDeleteModal(): void {
+    this.showDeleteModal = true;
+  }
+
+  closeDeleteModal(): void {
+    this.showDeleteModal = false;
+  }
+
+  confirmDeleteAccount(): void {
+    this.isDeletingAccount = true;
+    this.userService.deleteAccount().subscribe({
+      next: (res) => {
+        this.isDeletingAccount = false;
+        this.showDeleteModal = false;
+        this.toastService.showSuccess(res.message || 'Account deleted successfully.');
+        this.authService.logout();
+      },
+      error: (err) => {
+        console.error('Failed to delete account:', err);
+        this.isDeletingAccount = false;
+        this.toastService.showError(err.error?.message || 'Failed to delete account.');
+        this.closeDeleteModal();
       },
     });
   }

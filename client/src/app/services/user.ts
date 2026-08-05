@@ -59,6 +59,10 @@ export class UserService {
     return this.http.put<unknown>(`${this.apiUrl}/settings`, payload);
   }
 
+  deleteAccount(): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.apiUrl}/me`);
+  }
+
   requestEmailChange(newEmail: string): Observable<{ message: string; pendingEmail: string }> {
     return this.http.post<{ message: string; pendingEmail: string }>(
       `${this.apiUrl}/request-email-change`,

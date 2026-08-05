@@ -4,6 +4,9 @@ const jwt = require('jsonwebtoken');
 const app = require('../server');
 const User = require('../models/User');
 const Recipe = require('../models/Recipe');
+const MealPrepPlan = require('../models/MealPrepPlan');
+const ShoppingList = require('../models/ShoppingList');
+const PortionStorage = require('../models/PortionStorage');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 
 jest.mock('../services/emailService', () => ({
@@ -71,6 +74,9 @@ describe('User Settings & Email Change API Operations', () => {
   afterAll(async () => {
     await User.deleteMany({});
     await Recipe.deleteMany({});
+    await MealPrepPlan.deleteMany({});
+    await ShoppingList.deleteMany({});
+    await PortionStorage.deleteMany({});
     await mongoose.connection.close();
     await mongoServer.stop();
   });
@@ -202,14 +208,14 @@ describe('User Settings & Email Change API Operations', () => {
       .put('/api/users/settings')
       .set('Authorization', `Bearer ${mockToken}`)
       .send({
-        email: 'attempted_override@test.com', // Should be ignored by PUT /settings
+        email: 'attempted_override@test.com',
         measurementSystem: 'metric'
       });
 
     expect(res.statusCode).toEqual(200);
 
     const userInDb = await User.findById(mockUserId);
-    expect(userInDb.email).toEqual('settings@test.com'); // Email unchanged!
+    expect(userInDb.email).toEqual('settings@test.com');
   });
 
   it('should dispatch verification link for email change via POST /api/users/request-email-change', async () => {
@@ -226,5 +232,89 @@ describe('User Settings & Email Change API Operations', () => {
 
     const userInDb = await User.findById(mockUserId);
     expect(userInDb.pendingEmail).toEqual('brandnewemail@test.com');
+  });
+
+  it('should delete user account and associated data via DELETE /api/users/me (UAT-41)', async () => {
+    // Create a temporary user to delete
+    const tempUser = new User({
+      username: 'deletemeuser',
+      email: 'delete@test.com',
+      password: 'password123',
+      isEmailVerified: true
+    });
+    await tempUser.save();
+    const tempUserId = tempUser._id;
+
+    const tempToken = jwt.sign(
+      { userId: tempUserId },
+      process.env.JWT_SECRET || 'local_docker_development_only_secret_key_12345'
+    );
+
+    // Create associated data
+    await MealPrepPlan.create({
+      userId: tempUserId,
+      name: 'Temp Plan',
+      recipes: []
+    });
+
+    await ShoppingList.create({
+      userId: tempUserId,
+      items: []
+    });
+
+    await PortionStorage.create({
+      userId: tempUserId,
+      recipeId: mockRecipeId,
+      recipeTitle: 'Test Recipe',
+      portionsInStorage: 2
+    });
+
+    const tempRecipe = await Recipe.create({
+      title: 'Temp Recipe',
+      recipeType: 'Meal',
+      createdBy: tempUserId,
+      portions: 1,
+      ingredients: [
+        {
+          name: 'Flour',
+          weightInGrams: 100,
+          nutrition: {
+            calories: 100,
+            protein: 10,
+            totalCarbs: 20,
+            fiber: 2,
+            sugarAlcohols: 0,
+            netCarbs: 18,
+            fat: 1
+          }
+        }
+      ]
+    });
+
+    const res = await request(app)
+      .delete('/api/users/me')
+      .set('Authorization', `Bearer ${tempToken}`);
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body.message).toContain('deleted successfully');
+
+    // Verify User document deleted
+    const userCheck = await User.findById(tempUserId);
+    expect(userCheck).toBeNull();
+
+    // Verify associated user records deleted
+    const plansCheck = await MealPrepPlan.find({ userId: tempUserId });
+    expect(plansCheck.length).toBe(0);
+
+    const listCheck = await ShoppingList.find({ userId: tempUserId });
+    expect(listCheck.length).toBe(0);
+
+    const storageCheck = await PortionStorage.find({ userId: tempUserId });
+    expect(storageCheck.length).toBe(0);
+
+    // Verify Recipe is soft-deleted per ADR 002
+    const recipeCheck = await Recipe.findById(tempRecipe._id);
+    expect(recipeCheck.isDeleted).toBe(true);
+    expect(recipeCheck.isPublic).toBe(false);
   });
 });
