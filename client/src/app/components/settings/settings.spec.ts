@@ -16,10 +16,12 @@ interface MockUserService {
   requestEmailChange: Mock<
     (email: string) => Observable<{ message: string; pendingEmail: string }>
   >;
+  deleteAccount: Mock<() => Observable<{ message: string }>>;
 }
 
 interface MockAuthService {
   updateCurrentUser: Mock<(profile: unknown) => void>;
+  logout: Mock<() => void>;
 }
 
 interface MockToastService {
@@ -39,10 +41,12 @@ describe('Settings Management', () => {
       getUserProfile: vi.fn(),
       updateUserSettings: vi.fn(),
       requestEmailChange: vi.fn(),
+      deleteAccount: vi.fn(),
     };
 
     authServiceMock = {
       updateCurrentUser: vi.fn(),
+      logout: vi.fn(),
     };
 
     toastServiceMock = {
@@ -465,5 +469,34 @@ describe('Settings Management', () => {
     expect(userServiceMock.requestEmailChange).toHaveBeenCalledWith('new@test.com');
     expect(component.emailChangeRequested).toBe(true);
     expect(toastServiceMock.showSuccess).toHaveBeenCalledWith('Verification link dispatched!');
+  });
+
+  it('should dispatch email change request via dedicated modal view', () => {
+    userServiceMock.requestEmailChange.mockReturnValue(
+      of({ message: 'Verification link dispatched!', pendingEmail: 'new@test.com' }),
+    );
+
+    component.openEmailModal();
+    expect(component.showEmailModal).toBe(true);
+
+    component.newEmailInput = 'new@test.com';
+    component.submitEmailChangeRequest();
+
+    expect(userServiceMock.requestEmailChange).toHaveBeenCalledWith('new@test.com');
+    expect(component.emailChangeRequested).toBe(true);
+    expect(toastServiceMock.showSuccess).toHaveBeenCalledWith('Verification link dispatched!');
+  });
+
+  it('should open delete account modal and call deleteAccount on confirmation', () => {
+    userServiceMock.deleteAccount.mockReturnValue(of({ message: 'Account deleted successfully.' }));
+
+    component.openDeleteModal();
+    expect(component.showDeleteModal).toBe(true);
+
+    component.confirmDeleteAccount();
+
+    expect(userServiceMock.deleteAccount).toHaveBeenCalled();
+    expect(toastServiceMock.showSuccess).toHaveBeenCalledWith('Account deleted successfully.');
+    expect(authServiceMock.logout).toHaveBeenCalled();
   });
 });

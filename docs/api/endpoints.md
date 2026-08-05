@@ -104,6 +104,14 @@ Retrieves the full profile and settings for the currently authenticated user.
 
 - Success Response (200): Returns the complete user document (excluding the password hash). The response object includes the `nutritionSettings`, the user's calculated macro targets, and the `favoriteRecipes` array containing the ObjectIds of saved recipes.
 
+`DELETE /users/me`
+
+Permanently deletes the currently authenticated user's account along with their associated meal prep plans, shopping list, and portion storage entries. Recipes created by the user are soft-deleted (`isDeleted: true`) in accordance with ADR 002 to preserve saved copies for other community members.
+
+- Auth Required: Yes
+- Body: None
+- Success Response (200): Returns a deletion confirmation message.
+
 `PUT /users/settings`
 
 Updates the authenticated user's account preferences and nutritional targets. Automatically sets `hasConfiguredSettings: true` upon completion.

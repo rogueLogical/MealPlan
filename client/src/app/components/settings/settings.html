@@ -327,6 +327,17 @@
         </div>
       </section>
 
+      <!-- Danger Zone Card -->
+      <section class="settings-card danger-zone-card">
+        <h2 style="color: #ef4444">Danger Zone</h2>
+        <p class="section-desc">Permanently delete your account and remove your personal data.</p>
+        <div class="danger-zone-content">
+          <button type="button" class="btn-danger-account" (click)="openDeleteModal()">
+            🗑️ Delete Account
+          </button>
+        </div>
+      </section>
+
       <footer class="form-action-footer">
         <button type="submit" class="settings-save-btn">Save Settings</button>
       </footer>
@@ -412,6 +423,63 @@
               </footer>
             </div>
           }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- DELETE ACCOUNT CONFIRMATION MODAL -->
+  @if (showDeleteModal) {
+    <div class="dialog-overlay" style="z-index: 1100">
+      <button
+        class="dialog-backdrop"
+        (click)="closeDeleteModal()"
+        aria-label="Cancel deletion"
+      ></button>
+      <div class="dialog-box" appFocusTrap>
+        <header class="dialog-header">
+          <h3 style="color: #ef4444">Delete Account?</h3>
+          <button class="dialog-close-btn" (click)="closeDeleteModal()">✕</button>
+        </header>
+
+        <div class="dialog-body">
+          <div class="delete-warning-box">
+            <span
+              class="card-icon"
+              style="font-size: 2.5rem; display: block; margin-bottom: 12px; text-align: center"
+              >⚠️</span
+            >
+            <p style="color: var(--text-main); font-weight: 500; text-align: center">
+              Are you sure you want to permanently delete your account?
+            </p>
+            <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5">
+              This action cannot be undone. All your meal prep plans, shopping list, portion storage
+              data, and custom settings will be permanently erased.
+            </p>
+          </div>
+          <footer class="dialog-footer" style="margin-top: 20px; padding: 0; border: none">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              (click)="closeDeleteModal()"
+              [disabled]="isDeletingAccount"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              style="background-color: #ef4444; border-color: #ef4444"
+              (click)="confirmDeleteAccount()"
+              [disabled]="isDeletingAccount"
+            >
+              @if (isDeletingAccount) {
+                Deleting...
+              } @else {
+                Yes, Delete Account
+              }
+            </button>
+          </footer>
         </div>
       </div>
     </div>
