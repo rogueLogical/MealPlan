@@ -1,0 +1,66 @@
+site_name: MealPlan User Guide
+site_description: User guide and documentation for MealPlan - Smart Meal Prepping & Macro Tracking Platform.
+site_url: https://rogueLogical.github.io/MealPlan/
+repo_url: https://github.com/rogueLogical/MealPlan
+repo_name: MealPlan
+
+theme:
+  name: material
+  language: en
+  palette:
+    - media: '(prefers-color-scheme: light)'
+      scheme: default
+      primary: blue
+      accent: emerald
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: '(prefers-color-scheme: dark)'
+      scheme: slate
+      primary: blue
+      accent: emerald
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - attr_list
+
+docs_dir: docs/user-guide
+
+nav:
+  - Overview: index.md
+  - Getting Started:
+      - Account & Verification: getting-started/account-setup.md
+      - Nutrition Goals & Settings: getting-started/nutrition-goals.md
+  - Recipes & AI:
+      - Recipe Builder: recipes/recipe-builder.md
+      - Macro Balancer Engine: recipes/macro-balancer.md
+      - AI Recipe Generator: recipes/ai-generator.md
+      - Community Discovery: recipes/community-search.md
+  - Meal Prepping:
+      - Meal Prep Plans: meal-prepping/meal-plans.md
+      - Shopping List: meal-prepping/shopping-list.md
+  - Portion Storage:
+      - Fridge & Freezer Tracking: portion-tracking/portion-storage.md
+  - Help & FAQ: troubleshooting/faq.md

@@ -34,6 +34,10 @@
             <p class="user-email-bold">{{ currentUser?.username }}</p>
           </div>
           <hr class="dropdown-divider" />
+          <a [href]="docsUrl" target="_blank" rel="noopener noreferrer" class="dropdown-item-btn">
+            <span class="dropdown-item-icon">📖</span> Help & Documentation
+          </a>
+          <hr class="dropdown-divider" />
           <button (click)="logout()" class="logout-btn">
             <span class="logout-icon">🚪</span> Log Out
           </button>
