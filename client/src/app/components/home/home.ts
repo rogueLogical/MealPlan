@@ -2,6 +2,7 @@ import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { PageHeader } from '../page-header/page-header';
+import { environment } from '../../../environments/environment';
 
 // this is the main component for the entire application
 @Component({
@@ -16,11 +17,12 @@ export class Home implements OnInit {
   activeTab = 'Home';
   isDarkMode = false;
   isMenuCollapsed = true;
+  docsUrl = environment.docsUrl;
 
   menuItems = [
     { name: 'Home', icon: '🏠', path: 'home' },
     { name: 'Recipes', icon: '🍳', path: 'recipes' },
-    { name: 'Meal Prep Planner', icon: '🗓️', path: 'meals' },
+    { name: 'Meal Prep Planner', icon: '📅', path: 'meals' },
     { name: 'Shopping List', icon: '🛒', path: 'groceries' },
     { name: 'Portion Storage', icon: '📦', path: 'storage' },
     { name: 'Settings', icon: '⚙️', path: 'settings' },
@@ -67,6 +69,6 @@ export class Home implements OnInit {
 
   selectTab(tabName: string): void {
     this.activeTab = tabName;
-    this.isMenuCollapsed = true; // Auto-hide menu tray after clicking an option on mobile
+    this.isMenuCollapsed = true;
   }
 }

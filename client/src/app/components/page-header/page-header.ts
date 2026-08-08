@@ -4,6 +4,7 @@ import { Router, NavigationEnd, Event } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { Title } from '@angular/platform-browser';
 import { AuthService, UserProfile } from '../../services/auth';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-page-header',
@@ -19,6 +20,7 @@ export class PageHeader implements OnInit {
   isProfileMenuOpen = false;
   isHidden = false;
   currentUser: UserProfile | null = null;
+  docsUrl = environment.docsUrl;
 
   // Mapping matrix translating URL routes to friendly text and icons
   private routeMap: Record<string, { title: string; icon: string }> = {
