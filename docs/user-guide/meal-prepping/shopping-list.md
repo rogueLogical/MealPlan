@@ -6,9 +6,10 @@ Generate and manage consolidated grocery lists for your meal prep plans.
 
 ## Appending Plans to Shopping List
 
-1. Open **Meal Prep Planner 📅** or **Shopping List 🛒**.
-2. Click **🛒 Add to Shopping List** on any meal plan.
-3. Ingredients across all planned recipes are consolidated into single line items.
+1. Open your **Shopping List 🛒** and make sure that you have only items that you want to get unchecked.
+2. Open **Meal Prep Planner 🗓️**
+3. Click **🛒 Add to Shopping List** on any meal plan.
+4. Ingredients across all planned recipes are consolidated into single line items, and added to your shopping list. (If any ingredients use different measures, then they will be listed twice in the shopping list.)
 
 ---
 

@@ -6,7 +6,7 @@ Plan and track weekly cooking cycles for your selected recipes.
 
 ## Creating a Meal Plan
 
-1. Go to **Meal Prep Planner 📅**.
+1. Go to **Meal Prep Planner 🗓️**.
 2. Click **+ Create New Plan**.
 3. Select the recipes you plan to cook and set the number of planned portions (scales in batches matching recipe yield).
 4. Check **Set as my Active Plan** and click **Save Plan**.
