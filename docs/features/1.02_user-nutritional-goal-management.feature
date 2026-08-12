@@ -26,8 +26,7 @@ Feature: 1.2.3. Dietary Restrictions
 
 Feature: 1.2.4. Dietary Preferences
   The system shall provide a way for users to specify 
-  their dietary preferences, including favorite cuisines, 
-  and disliked foods. 
+  their disliked foods. 
 
   Scenario: Successful Dietary Preference Entry (UAT-10)
     Given a logged in user navigates to the settings page

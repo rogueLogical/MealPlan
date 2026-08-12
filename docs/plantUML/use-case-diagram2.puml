@@ -1,0 +1,50 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "User" as user
+
+rectangle "MealPlan System - Ingredients, Meal Prepping & Portion Tracking" {
+    package "Ingredient Management" {
+        usecase "Search & Filter Ingredients" as UC_SearchIngredients
+        usecase "Create Custom Ingredient" as UC_CreateIngredient
+        usecase "Manage Custom Ingredients" as UC_ManageIngredients
+        usecase "Store Ingredient Information" as UC_StoreIngredients
+    }
+
+    package "Meal Prepping & Portion Tracking" {
+        usecase "Plan Meal Prep Activities" as UC_PlanPrep
+        usecase "View Scaled Planned Recipe" as UC_ViewPlannedRecipe
+        usecase "Consolidate & Append to Shopping List" as UC_GenShoppingList
+        usecase "Manage Shopping List" as UC_ManageShoppingList
+        usecase "Log Completed Meal Prep" as UC_CompletePrep
+        usecase "Track Portions in Storage" as UC_TrackStorage
+        usecase "Record Portion Consumed" as UC_EatMeal
+    }
+}
+
+' User - Ingredient Management
+user --> UC_SearchIngredients
+user --> UC_CreateIngredient
+user --> UC_ManageIngredients
+
+' User - Meal Prep & Portion Tracking
+user --> UC_PlanPrep
+user --> UC_ViewPlannedRecipe
+user --> UC_ManageShoppingList
+user --> UC_CompletePrep
+user --> UC_TrackStorage
+user --> UC_EatMeal
+
+' Includes & Extends - Ingredients
+UC_SearchIngredients ..> UC_StoreIngredients : <<include>>
+UC_CreateIngredient ..> UC_StoreIngredients : <<include>>
+UC_ManageIngredients ..> UC_StoreIngredients : <<include>>
+
+' Includes & Extends - Meal Prep & Portion Tracking
+UC_PlanPrep ..> UC_GenShoppingList : <<include>>
+UC_PlanPrep ..> UC_ViewPlannedRecipe : <<include>>
+UC_CompletePrep ..> UC_TrackStorage : <<extend>>
+UC_EatMeal ..> UC_TrackStorage : <<include>>
+
+@endluml

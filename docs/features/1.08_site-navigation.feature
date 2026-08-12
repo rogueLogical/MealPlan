@@ -1,6 +1,6 @@
 Feature: 1.8.1. Navigation Menu
   The system shall provide a navigation bar which provides 
-  the ability to nagigate to any of the main pages of the 
+  the ability to navigate to any of the main pages of the 
   site with a single click.
   
   Scenario: Use Navigation Menu (UAT-42)
@@ -24,7 +24,7 @@ Feature: 1.8.2. Welcome page
 Feature: 1.8.3. Home Page
   The system shall provide logged in users with a home page 
   that contains the most important information stored on the
-  site. This should include, active meal plan, shopping cart,
+  site. This should include active meal plan, shopping cart,
   and overall portion tracking statuses. As well as a list of 
   the user's favorite recipes, and their most recently viewed
   recipes.

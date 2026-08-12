@@ -1,0 +1,142 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class User {
+    + String userId
+    + String username
+    + String email
+    + String passwordHash
+    + String profilePicture
+    + String measurementSystem
+    + boolean isEmailVerified
+    + boolean hasConfiguredSettings
+    + boolean dismissedWelcomeBanner
+}
+
+class NutritionSettings {
+    + int dailyMealsCount
+    + int dailySnacksCount
+    + List<String> dietaryRestrictions
+    + List<String> likedFoods
+    + List<String> dislikedFoods
+}
+
+class MacroTargets {
+    + int calories
+    + double protein
+    + double netCarbs
+    + double fat
+}
+
+class MacroSplitPercentage {
+    + int calories
+    + int protein
+    + int netCarbs
+    + int fat
+}
+
+class NutritionMacros <<Value Object>> {
+    + int calories
+    + double protein
+    + double totalCarbs
+    + double fiber
+    + double sugarAlcohols
+    + double netCarbs
+    + double fat
+}
+
+class Recipe {
+    + String recipeId
+    + String title
+    + String recipeType
+    + String description
+    + String instructions
+    + int prepTimeMinutes
+    + int cookTimeMinutes
+    + int portions
+    + boolean isPublic
+    + boolean isDeleted
+    + List<String> tags
+    + String originalRecipeId
+}
+
+class RecipeIngredient {
+    + String name
+    + double weightInGrams
+    + double displayAmount
+    + String displayUnit
+}
+
+class Ingredient {
+    + String ingredientId
+    + String name
+    + double servingSize
+    + String servingUnit
+    + List<String> tags
+}
+
+class MealPrepPlan {
+    + String planId
+    + String name
+    + boolean isActive
+}
+
+class PlannedRecipe {
+    + int plannedPortions
+    + boolean isCompleted
+}
+
+class ShoppingList {
+    + String listId
+}
+
+class ShoppingListItem {
+    + String itemId
+    + String name
+    + double quantity
+    + String unit
+    + double weightInGrams
+    + boolean isChecked
+    + int orderIndex
+}
+
+class PortionStorage {
+    + String storageId
+    + String recipeTitle
+    + int portionsInStorage
+}
+
+' User Relationships
+User "1" *-- "1" NutritionSettings : configures >
+NutritionSettings "1" *-- "1" MacroTargets : dailyTargets >
+NutritionSettings "1" *-- "1" MacroSplitPercentage : mealMacroSplit >
+
+User "1" -- "0..*" Recipe : owns >
+User "1" -- "0..*" Recipe : favorites >
+User "1" -- "0..*" Ingredient : creates >
+User "1" -- "0..*" MealPrepPlan : schedules >
+User "1" -- "1" ShoppingList : owns >
+User "1" -- "0..*" PortionStorage : manages >
+
+' Recipe & Ingredient Relationships
+Recipe "1" *-- "1..*" RecipeIngredient : contains >
+RecipeIngredient "0..1" o-- "0..1" Ingredient : references >
+
+Recipe "1" *-- "1" NutritionMacros : totalNutrition >
+Recipe "1" *-- "1" NutritionMacros : nutritionPerPortion >
+Ingredient "1" *-- "1" NutritionMacros : nutritionPerServing >
+Ingredient "1" *-- "1" NutritionMacros : nutrition (100g) >
+RecipeIngredient "1" *-- "1" NutritionMacros : nutrition >
+
+' Meal Prep & Shopping Relationships
+MealPrepPlan "1" *-- "1..*" PlannedRecipe : includes >
+PlannedRecipe "0..*" -- "1" Recipe : prepares >
+MealPrepPlan "0..1" -- "0..1" ShoppingList : generates >
+
+ShoppingList "1" *-- "0..*" ShoppingListItem : contains >
+ShoppingListItem "0..1" o-- "0..1" Ingredient : references >
+
+' Portion Storage Relationships
+PortionStorage "0..*" -- "1" Recipe : tracks inventory for >
+
+@endluml

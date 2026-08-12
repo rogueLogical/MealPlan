@@ -1,0 +1,87 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+' Primary Actor (Positioned on the Left)
+actor "User" as user
+
+' Main System Boundary (Center)
+rectangle "MealPlan System - Account & Recipe Management" as systemBox {
+    package "User & Account Management" {
+        usecase "Create Account" as UC_CreateAccount
+        usecase "Verify Email Address" as UC_VerifyEmail
+        usecase "Recover Account Access" as UC_RecoverAccount
+        usecase "Log In" as UC_LogIn
+        usecase "Log Out" as UC_LogOut
+        usecase "Manage Profile & Preferences" as UC_ManageProfile
+        usecase "Manage Nutritional Goals" as UC_NutritionalGoals
+        usecase "Specify Dietary Restrictions" as UC_DietaryPrefs
+        usecase "Configure Meal Structure & Splits" as UC_MealPlanSettings
+        usecase "Delete Account" as UC_DeleteAccount
+    }
+
+    package "Recipe Management" {
+        usecase "Browse & Search Community Recipes" as UC_BrowseRecipes
+        usecase "Create & Save Custom Recipe" as UC_CreateRecipe
+        usecase "Modify or Soft-Delete Recipe" as UC_ModifyRecipe
+        usecase "Favorite & Copy Recipe" as UC_CopyRecipe
+        usecase "Balance Recipe Macros" as UC_RecipeBalance
+        usecase "Generate Recipe via AI Prompt" as UC_AIGenRecipe
+        usecase "Store Recipe Data" as UC_StoreRecipe
+    }
+}
+
+' External Services Boundary (Positioned on the Right)
+rectangle "External Services" as servicesBox {
+    actor "AI Engine" as ai <<Service>>
+    actor "USDA Database" as usda <<Service>>
+    actor "Email Service" as email <<Service>>
+
+    ' Stack service actors vertically inside the right container
+    ai -[hidden]down-> usda
+    usda -[hidden]down-> email
+}
+
+' Force system box to stay to the left of the services box
+systemBox -[hidden]right-> servicesBox
+
+' User - Account Management
+user --> UC_CreateAccount
+user --> UC_VerifyEmail
+user --> UC_RecoverAccount
+user --> UC_LogIn
+user --> UC_LogOut
+user --> UC_ManageProfile
+user --> UC_NutritionalGoals
+user --> UC_DietaryPrefs
+user --> UC_MealPlanSettings
+user --> UC_DeleteAccount
+
+' User - Recipe Management
+user --> UC_BrowseRecipes
+user --> UC_CreateRecipe
+user --> UC_ModifyRecipe
+user --> UC_CopyRecipe
+user --> UC_RecipeBalance
+user --> UC_AIGenRecipe
+
+' Includes & Extends - Account & Verification
+UC_CreateAccount ..> UC_VerifyEmail : <<include>>
+
+' Includes & Extends - Recipes
+UC_BrowseRecipes ..> UC_StoreRecipe : <<include>>
+UC_CreateRecipe ..> UC_StoreRecipe : <<include>>
+UC_ModifyRecipe ..> UC_StoreRecipe : <<include>>
+UC_CopyRecipe ..> UC_StoreRecipe : <<include>>
+UC_AIGenRecipe ..> UC_StoreRecipe : <<include>>
+UC_RecipeBalance ..> UC_NutritionalGoals : <<include>>
+
+' Service Actor Connections
+UC_VerifyEmail --> email : <<uses>>
+UC_RecoverAccount --> email : <<uses>>
+UC_AIGenRecipe --> ai : <<uses>>
+UC_AIGenRecipe --> usda : <<uses>>
+UC_RecipeBalance --> ai : <<uses>>
+UC_RecipeBalance --> usda : <<uses>>
+
+@endluml

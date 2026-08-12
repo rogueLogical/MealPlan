@@ -1,0 +1,57 @@
+@startuml
+!theme plain
+skinparam componentStyle rectangle
+skinparam roundcorner 8
+
+actor "User Browser" as Client
+
+package "Microsoft Azure Cloud" {
+
+    package "Content & Static Hosting Layer" {
+        node "Azure Static Web Apps" as SWA <<Global Edge Host>> {
+            artifact "Angular SPA Bundle\n(HTML / JS / CSS)" as SPA
+        }
+    }
+
+    package "App Service Compute Layer" {
+        node "Azure App Service (Linux)" as AppService <<Managed Web App>> {
+            component "Express.js REST API\n(Node.js 20 Runtime)" as API
+        }
+    }
+
+    package "Database Layer" {
+        database "Azure Cosmos DB\n(MongoDB API)" as DB <<Fully Managed NoSQL>>
+    }
+}
+
+package "Third-Party External Services" {
+    cloud "Google AI Studio" as GeminiCloud {
+        component "Gemini 3.1 Flash-Lite API" as GeminiAPI
+    }
+
+    cloud "Data.gov" as USDACloud {
+        component "USDA FoodData Central API" as USDAAPI
+    }
+
+    cloud "SMTP Email Service" as MailCloud {
+        component "Email Dispatch\n(TLS / SSL)" as MailAPI
+    }
+}
+
+package "GitHub Platform" {
+    node "GitHub Pages" as GHPages <<MkDocs Host>> {
+        artifact "User Documentation Site" as Docs
+    }
+}
+
+' Traffic & Data Flow Directions
+Client --> SWA : 1. Requests SPA Webpage (HTTPS)
+Client --> AppService : 2. Executes REST API Requests (/api/*)
+Client --> GHPages : Requests User Guide (HTTPS)
+
+API --> DB : 3. JSON Document Queries (Mongoose)
+API --> GeminiAPI : 4. Recipe Generation & Interventions (HTTPS REST)
+API --> USDAAPI : 5. Ingredient Macro Lookups (HTTPS REST)
+API --> MailAPI : 6. Email Dispatch (SMTP / TLS)
+
+@endluml
