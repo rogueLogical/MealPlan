@@ -1,0 +1,63 @@
+@startuml
+autonumber
+skinparam responseMessageBelowArrow true
+
+actor "User" as user
+participant "RecipeGenerator\n(Angular UI)" as UI
+participant "RecipeService\n(Angular Service)" as Service
+participant "Auth Middleware" as AuthMW
+participant "Recipe Controller\n(Express)" as Controller
+participant "User Model" as UserModel
+participant "GeminiClient" as Gemini
+participant "UsdaClient" as USDA
+participant "Ingredient Model" as IngModel
+database "MongoDB" as DB
+participant "Google Gemini API" as GeminiAPI
+participant "USDA FoodData API" as USDAAPI
+
+user -> UI : Enters Prompt, Category ('Meal'|'Snack'), Macro Target Toggle, Restrictions
+UI -> Service : generateRecipe(payload)
+Service -> AuthMW : POST /api/recipes/generate (HTTP REST + JWT)
+AuthMW -> Controller : Validates JWT & Passes User ID
+
+Controller -> UserModel : findById(userId)
+UserModel -> DB : Fetch User Profile & Preferences
+DB --> UserModel : User Document (Macro Goals, Meal Split %, Disliked Foods)
+
+alt useMacroTargets == true
+    Controller -> Controller : Calculate Per-Portion Target Macros (Protein, Net Carbs, Fat)
+end
+
+Controller -> Gemini : generateRecipeFromPrompt({ promptText, recipeType, targets, restrictions, dislikedFoods })
+Gemini -> GeminiAPI : POST /generateContent (Structured JSON Schema)
+GeminiAPI --> Gemini : Returns JSON Recipe Structure
+Gemini --> Controller : Parsed AI Recipe Payload
+
+loop For Each Ingredient in AI Recipe
+    alt Stage A: Local DB Match
+        Controller -> IngModel : findOne({ name: regex })
+        IngModel -> DB : Query Local Ingredient
+        DB --> IngModel : Found Local Ingredient Document
+        Controller -> Controller : Map Existing ingredientId & Scale Nutrition
+    else Stage B: USDA API Search
+        Controller -> USDA : fetchUsdaMacros(ingredientName)
+        USDA -> USDAAPI : GET /fdc/v1/foods/search
+        USDAAPI --> USDA : FoodNutrients Payload
+        USDA --> Controller : Verified Macros
+        
+        alt Valid Macros Found (> 0)
+            Controller -> IngModel : create({ name, servingSize: 100, nutritionPerServing })
+            IngModel -> DB : Save New Global Ingredient Document
+            DB --> IngModel : Created Ingredient Document
+            Controller -> Controller : Map New ingredientId & Scale Nutrition
+        else Stage C: AI Fallback Estimation
+            Controller -> Controller : Use AI fallbackNutrition\n(Set ingredientId = null)
+        end
+    end
+end
+
+Controller -> Controller : formatInstructions() (Enforces Double Newlines)
+Controller --> Service : 200 OK (RecipePayload Object)
+Service --> UI : RecipePayload Response
+UI -> UI : Close Generator Modal & Populate RecipeBuilder Form Array
+@endluml

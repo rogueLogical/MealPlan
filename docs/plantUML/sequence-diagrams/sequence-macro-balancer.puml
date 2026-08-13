@@ -1,0 +1,76 @@
+@startuml
+autonumber
+skinparam responseMessageBelowArrow true
+
+actor "User" as user
+participant "RecipeMacronutrientBalancer\n(Angular UI)" as UI
+participant "RecipeBalancer\n(Angular Service)" as Service
+participant "Auth Middleware" as AuthMW
+participant "Recipe Controller\n(Express)" as Controller
+participant "MacroBalancer\n(NNLS Engine)" as Engine
+participant "GeminiClient" as Gemini
+participant "UsdaClient" as USDA
+participant "Ingredient Model" as IngModel
+database "MongoDB" as DB
+participant "Google Gemini API" as GeminiAPI
+participant "USDA FoodData API" as USDAAPI
+
+user -> UI : Clicks "Run Balancer" (Targets, Ingredients, Restrictions)
+UI -> Service : balanceRecipe(payload)
+Service -> AuthMW : POST /api/recipes/balance (HTTP REST + JWT)
+AuthMW -> Controller : Validates JWT & Passes Request Context
+Controller -> Engine : solveMatrix(ingredients, targets)
+
+alt State 1: Recipe Balanced (+/- 10% Tolerance)
+    Engine --> Controller : { isFeasible: true, scaledIngredients }
+    Controller --> Service : 200 OK { status: 'success', ingredients }
+    Service --> UI : BalanceRecipeResponse
+    UI -> UI : Transition to 'REVIEW' State
+    user -> UI : Accepts & Saves Balanced Recipe
+else State 2: Mathematical Conflict (Intervention Needed)
+    Engine -> Engine : diagnoseFailure() (ADD / SWAP / REMOVE)
+    
+    alt Conflict Type = REMOVE (Strict Zero Macro)
+        Engine --> Controller : { isFeasible: false, failureType: 'REMOVE', offendingIngredient }
+    else Conflict Type = ADD or SWAP
+        Engine --> Controller : { isFeasible: false, failureType, targetMacro, zeroTargets }
+        Controller -> Gemini : getAiSuggestions(context, dislikedFoods)
+        Gemini -> GeminiAPI : POST /generateContent (JSON Schema)
+        GeminiAPI --> Gemini : Returns 3 Culinary Suggestions
+        Gemini --> Controller : Array of Suggestions
+
+        loop For Each AI Suggestion
+            Controller -> IngModel : findOne({ name: regex })
+            IngModel -> DB : Query Local Ingredient
+            DB --> IngModel : Result
+            
+            alt Found in Local Database
+                IngModel --> Controller : Local Ingredient Object
+            else Missing Locally -> Query USDA API
+                Controller -> USDA : fetchUsdaMacros(ingredientName)
+                USDA -> USDAAPI : GET /fdc/v1/foods/search
+                USDAAPI --> USDA : FoodNutrients Results
+                USDA --> Controller : Verified Macros
+                
+                alt Valid Macros Found (> 0)
+                    Controller -> IngModel : create(newIngredientData)
+                    IngModel -> DB : Insert Ingredient Document
+                    DB --> IngModel : Created Document
+                end
+            end
+        end
+    end
+
+    Controller --> Service : 200 OK { status: 'action_required', intervention }
+    Service --> UI : BalanceRecipeResponse
+    UI -> UI : Transition to 'INTERVENTION' State
+    user -> UI : Selects Intervention Option (SWAP / ADD / REMOVE)
+    UI -> UI : Applies Intervention, Increments interventionCount++
+    UI -> Service : Recursively re-run balanceRecipe(payload)
+else State 3: Circuit Breaker Tripped (interventionCount >= 4)
+    Engine --> Controller : { isFeasible: false, isApproximate: true, scaledIngredients }
+    Controller --> Service : 200 OK { status: 'approximate_success', ingredients }
+    Service --> UI : BalanceRecipeResponse
+    UI -> UI : Display 'REVIEW' State with Approximate Match Warning
+end
+@endluml

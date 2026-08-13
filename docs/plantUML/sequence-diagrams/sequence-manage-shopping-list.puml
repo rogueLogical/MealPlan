@@ -1,0 +1,66 @@
+@startuml
+autonumber
+skinparam responseMessageBelowArrow true
+
+actor "User" as user
+participant "MealsPlanner / GroceryList\n(Angular UI)" as UI
+participant "MealPrepService\n(Angular Service)" as Service
+participant "Auth Middleware" as AuthMW
+participant "ShoppingList Routes\n(Express)" as Routes
+participant "MealPrepPlan Model" as PlanModel
+participant "ShoppingList Model" as ListModel
+database "MongoDB" as DB
+
+== Scenario A: Consolidate & Append Meal Plan to Shopping List ==
+user -> UI : Clicks "🛒 Add to Shopping List" on Meal Plan
+UI -> Service : appendPlanToShoppingList(planId)
+Service -> AuthMW : POST /api/shopping-list/append-plan (JWT)
+AuthMW -> Routes : Validates JWT & User Context
+
+Routes -> PlanModel : findById(planId).populate('recipes.recipeId')
+PlanModel -> DB : Fetch Plan with Populated Recipes
+DB --> PlanModel : MealPrepPlan Document
+
+Routes -> ListModel : findOne({ userId })
+ListModel -> DB : Fetch User ShoppingList
+DB --> ListModel : ShoppingList Document
+
+loop For Each Recipe Ingredient in Plan
+    Routes -> Routes : Calculate Portion Multiplier (plannedPortions / basePortions)
+    Routes -> Routes : Find Existing Item Match by Name/ID + Unit
+    
+    alt Match Found & Item is Unchecked (isChecked == false)
+        Routes -> Routes : Sum Scaled Quantity and Weight onto Existing Item
+    else Match Found & Item is Checked (isChecked == true)
+        Routes -> Routes : Replace Quantity/Weight with New Scaled Value & Set isChecked = false
+    else No Match Found
+        Routes -> Routes : Append New ShoppingListItem at orderIndex++
+    end
+end
+
+Routes -> ListModel : save()
+ListModel -> DB : Persist Consolidated Shopping List
+DB --> ListModel : Updated List
+Routes --> Service : 200 OK { message, list }
+Service --> UI : Display Success Toast
+
+== Scenario B: Add Custom Manual Item ==
+user -> UI : Types "Paper Towels", Qty: 2, Unit: "packs" & Hits Enter
+UI -> Service : addManualItem("Paper Towels", 2, "packs")
+Service -> Routes : POST /api/shopping-list/item
+Routes -> ListModel : Push Manual Item & Save to DB
+ListModel -> DB : Update ShoppingList Document
+DB --> ListModel : Updated List Document
+Routes --> Service : 201 Created { list }
+Service --> UI : Refocus Name Input Field for Fast Consecutive Entry
+
+== Scenario C: Check / Uncheck Item & Reorder ==
+user -> UI : Checks Checkbox on "Broccoli"
+UI -> Service : toggleShoppingItem(itemId, isChecked = true)
+Service -> Routes : PATCH /api/shopping-list/item/:itemId { isChecked: true }
+Routes -> ListModel : Mark Subdocument Modified & Save
+ListModel -> DB : Update Item Checked State
+DB --> ListModel : Saved Document
+Routes --> Service : 200 OK { list }
+Service --> UI : Move Item to "Checked Off" Section
+@endluml

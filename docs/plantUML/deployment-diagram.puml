@@ -45,13 +45,13 @@ package "GitHub Platform" {
 }
 
 ' Traffic & Data Flow Directions
-Client --> SWA : 1. Requests SPA Webpage (HTTPS)
-Client --> AppService : 2. Executes REST API Requests (/api/*)
+Client --> SWA : Requests SPA Webpage (HTTPS)
+Client --> AppService : Executes REST API Requests (/api/*)
 Client --> GHPages : Requests User Guide (HTTPS)
 
-API --> DB : 3. JSON Document Queries (Mongoose)
-API --> GeminiAPI : 4. Recipe Generation & Interventions (HTTPS REST)
-API --> USDAAPI : 5. Ingredient Macro Lookups (HTTPS REST)
-API --> MailAPI : 6. Email Dispatch (SMTP / TLS)
+API --> DB : JSON Document Queries (Mongoose)
+API --> GeminiAPI : Recipe Generation & Interventions (HTTPS REST)
+API --> USDAAPI : Ingredient Macro Lookups (HTTPS REST)
+API --> MailAPI : Email Dispatch (SMTP / TLS)
 
 @endluml

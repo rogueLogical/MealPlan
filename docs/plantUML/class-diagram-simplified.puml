@@ -1,0 +1,76 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+top to bottom direction
+
+package "Client Tier - Angular Services & Interceptors" {
+    class AuthInterceptor
+    class AuthService
+    class UserService
+    class RecipeService
+    class RecipeBalancer
+    class MealPrepService
+    class IngredientService
+    class ToastService
+}
+
+package "Client Tier - Data Models" {
+    class NutritionMacros <<Value Object>>
+    class Ingredient
+    class RecipeIngredient
+    class Recipe
+    class MealPrepPlan
+    class ShoppingList
+    class PortionStorageItem
+}
+
+package "Server Tier - Middleware & Controllers" {
+    class AuthMiddleware
+    class RecipeController
+}
+
+package "Server Tier - Business Engines & Services" {
+    class MacroBalancer
+    class GeminiClient
+    class UsdaClient
+    class EmailService
+    class IngredientSeeder
+}
+
+package "Server Tier - Mongoose Database Models" {
+    class User
+    class IngredientModel
+    class RecipeModel
+    class MealPrepPlanModel
+    class ShoppingListModel
+    class PortionStorageModel
+}
+
+' Client Internal Relationships
+AuthInterceptor ..> AuthService
+AuthInterceptor ..> ToastService
+Recipe *-- RecipeIngredient
+Recipe *-- NutritionMacros
+Ingredient *-- NutritionMacros
+RecipeIngredient *-- NutritionMacros
+MealPrepPlan ..> Recipe
+ShoppingList ..> MealPrepPlan
+
+' Server Engine & Controller Dependencies
+RecipeController ..> MacroBalancer
+RecipeController ..> GeminiClient
+RecipeController ..> UsdaClient
+RecipeController ..> IngredientModel
+
+IngredientService ..> GeminiClient
+UserService ..> EmailService
+AuthService ..> EmailService
+IngredientSeeder ..> IngredientModel
+
+' Server Persistence Dependencies
+RecipeController ..> RecipeModel
+MealPrepService ..> MealPrepPlanModel
+MealPrepService ..> ShoppingListModel
+MealPrepService ..> PortionStorageModel
+UserService ..> User
+@endluml

@@ -1,0 +1,245 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+top to bottom direction
+
+package "Client Tier - Interceptors & Guards" as Guards {
+    class AuthInterceptor {
+        + intercept(req, next): Observable
+    }
+    class AuthGuard {
+        + canActivate(): boolean
+    }
+    class GuestGuard {
+        + canActivate(): boolean
+    }
+
+    AuthInterceptor -[hidden]down-> AuthGuard
+    AuthGuard -[hidden]down-> GuestGuard
+}
+
+package "Client Tier - Angular Services" as Services {
+    class AuthService {
+        - currentUserSubject: BehaviorSubject
+        + currentUser$: Observable
+        + isLoggedIn(): boolean
+        + login(credentials): Observable
+        + register(userData): Observable
+        + verifyEmail(token): Observable
+        + resendVerification(email): Observable
+        + logout(): void
+        + forgotPassword(email): Observable
+        + resetPassword(token, pass): Observable
+        + updateCurrentUser(profile): void
+    }
+
+    class UserService {
+        + getUserProfile(): Observable
+        + updateUserSettings(payload): Observable
+        + deleteAccount(): Observable
+        + requestEmailChange(email): Observable
+        + dismissWelcomeBanner(): Observable
+        + recordRecentlyViewed(id): Observable
+        + getRecentlyViewedRecipes(): Observable
+        + toggleFavoriteRecipe(id): Observable
+    }
+
+    class RecipeService {
+        + searchPublicRecipes(q, tags, p, l): Observable
+        + getMyRecipes(): Observable
+        + getFavoriteRecipes(): Observable
+        + getRecipeById(id): Observable
+        + createRecipe(payload): Observable
+        + updateRecipe(id, payload): Observable
+        + deleteRecipe(id): Observable
+        + forkRecipe(id): Observable
+        + generateRecipe(payload): Observable
+    }
+
+    class RecipeBalancer {
+        + balanceRecipe(payload): Observable
+    }
+
+    class MealPrepService {
+        + getPortionStorage(): Observable
+        + adjustPortionStorage(id, t, d): Observable
+        + getAllPlans(): Observable
+        + getActivePlan(): Observable
+        + createPlan(n, r, active): Observable
+        + updatePlan(id, n, r, active): Observable
+        + activatePlan(id): Observable
+        + deactivatePlan(id): Observable
+        + restartPlan(id): Observable
+        + deletePlan(id): Observable
+        + completePlannedRecipe(p, r, n): Observable
+        + getShoppingList(): Observable
+        + updateShoppingList(items, p): Observable
+        + appendPlanToShoppingList(p): Observable
+        + toggleShoppingItem(id, check): Observable
+        + addManualItem(n, q, u): Observable
+        + removeShoppingItem(id): Observable
+    }
+
+    class IngredientService {
+        + searchIngredients(q, tags, p, l): Observable
+        + getIngredientById(id): Observable
+        + createIngredient(payload): Observable
+        + updateIngredient(id, payload): Observable
+        + deleteIngredient(id): Observable
+    }
+
+    class ToastService {
+        - toastsSubject: BehaviorSubject
+        + toasts$: Observable
+        + show(text, type): void
+        + showSuccess(text): void
+        + showError(text): void
+        + showInfo(text): void
+        + clear(id): void
+    }
+
+    ' 2-Column Vertical Stacking
+    AuthService -[hidden]right-> UserService
+    RecipeService -[hidden]right-> RecipeBalancer
+    MealPrepService -[hidden]right-> IngredientService
+
+    AuthService -[hidden]down-> RecipeService
+    RecipeService -[hidden]down-> MealPrepService
+    MealPrepService -[hidden]down-> ToastService
+
+    UserService -[hidden]down-> RecipeBalancer
+    RecipeBalancer -[hidden]down-> IngredientService
+}
+
+package "Client Tier - Data Models & DTOs" as Models {
+    class UserProfile {
+        + String id
+        + String username
+        + String email
+        + String profilePicture
+        + String[] favoriteRecipes
+    }
+
+    class NutritionMacros <<Value Object>> {
+        + int calories
+        + double protein
+        + double totalCarbs
+        + double fiber
+        + double sugarAlcohols
+        + double netCarbs
+        + double fat
+    }
+
+    class Ingredient {
+        + String _id
+        + String name
+        + double servingSize
+        + String servingUnit
+        + String[] tags
+        + NutritionMacros nutritionPerServing
+        + NutritionMacros nutrition
+    }
+
+    class RecipeIngredient {
+        + String ingredientId
+        + String name
+        + double weightInGrams
+        + double displayAmount
+        + String displayUnit
+        + NutritionMacros nutrition
+        + NutritionMacros baselineNutrition
+    }
+
+    class Recipe {
+        + String _id
+        + String title
+        + String recipeType
+        + int portions
+        + boolean isPublic
+        + boolean isDeleted
+        + String[] tags
+        + RecipeIngredient[] ingredients
+        + NutritionMacros totalNutrition
+        + NutritionMacros nutritionPerPortion
+    }
+
+    class MealPrepPlan {
+        + String _id
+        + String name
+        + boolean isActive
+        + PlannedRecipe[] recipes
+    }
+
+    class PlannedRecipe {
+        + String recipeId
+        + int plannedPortions
+        + boolean isCompleted
+    }
+
+    class ShoppingList {
+        + String _id
+        + String planId
+        + ShoppingListItem[] items
+    }
+
+    class ShoppingListItem {
+        + String _id
+        + String ingredientId
+        + String name
+        + double quantity
+        + String unit
+        + double weightInGrams
+        + boolean isChecked
+        + int orderIndex
+    }
+
+    class PortionStorageItem {
+        + String _id
+        + String recipeId
+        + String recipeTitle
+        + int portionsInStorage
+    }
+
+    ' 2-Column Vertical Stacking
+    UserProfile -[hidden]right-> NutritionMacros
+    Ingredient -[hidden]right-> RecipeIngredient
+    Recipe -[hidden]right-> MealPrepPlan
+    PlannedRecipe -[hidden]right-> ShoppingList
+    ShoppingListItem -[hidden]right-> PortionStorageItem
+
+    UserProfile -[hidden]down-> Ingredient
+    Ingredient -[hidden]down-> Recipe
+    Recipe -[hidden]down-> PlannedRecipe
+    PlannedRecipe -[hidden]down-> ShoppingListItem
+
+    NutritionMacros -[hidden]down-> RecipeIngredient
+    RecipeIngredient -[hidden]down-> MealPrepPlan
+    MealPrepPlan -[hidden]down-> ShoppingList
+    ShoppingList -[hidden]down-> PortionStorageItem
+}
+
+' Outer Package Vertical Stacking
+Guards -[hidden]down-> Services
+Services -[hidden]down-> Models
+
+' Relationships
+AuthInterceptor ..> AuthService
+AuthInterceptor ..> ToastService
+AuthGuard ..> AuthService
+GuestGuard ..> AuthService
+
+Recipe *-- RecipeIngredient
+Recipe *-- NutritionMacros
+Ingredient *-- NutritionMacros
+RecipeIngredient *-- NutritionMacros
+MealPrepPlan *-- PlannedRecipe
+ShoppingList *-- ShoppingListItem
+
+RecipeService ..> Recipe
+IngredientService ..> Ingredient
+MealPrepService ..> MealPrepPlan
+MealPrepService ..> ShoppingList
+MealPrepService ..> PortionStorageItem
+UserService ..> UserProfile
+AuthService ..> UserProfile
+@endluml

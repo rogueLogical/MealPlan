@@ -1,81 +1,101 @@
 @startuml
 !theme plain
+top to bottom direction
 skinparam componentStyle rectangle
 
 package "Client Tier (Browser)" {
     component [Angular SPA] as UI
     component [Auth Interceptor] as AuthInterceptor
+
+    'UI -[hidden]down-> AuthInterceptor
 }
 
 package "Application Server Tier (Node.js / Express)" {
     component [API Router] as Router
     component [Auth Middleware\n(JWT & Sliding Session)] as AuthMW
 
-    package "API Routers & Controllers" {
+    'Router -[hidden]down-> AuthMW
+
+    package "API Routers & Controllers" as Controllers {
         component [Auth Router] as AuthRouter
         component [Users Router] as UsersRouter
         component [Ingredients Router] as IngRouter
-        component [Recipes Router &\nRecipe Controller] as RecipeCtrl
+        component [Recipes Router &\nController] as RecipeCtrl
         component [Meal Plans Router] as MealPlanRouter
         component [Shopping List Router] as ShoppingRouter
+
+        ' 1-Column Strict Vertical Layout
+        RecipeCtrl -[hidden]down-> IngRouter
+        IngRouter -[hidden]down-> AuthRouter
+        AuthRouter -[hidden]down-> UsersRouter
+        UsersRouter -[hidden]down-> MealPlanRouter
+        MealPlanRouter -[hidden]down-> ShoppingRouter
     }
 
-    package "Services & Utility Engines" {
-        component [NNLS Macro Balancer Engine\n(ml-matrix & nnls)] as Balancer
-        component [Gemini AI Client\n(@google/genai)] as GeminiClient
-        component [USDA API Client] as USDAClient
-        component [Email Dispatch Service\n(Nodemailer)] as EmailService
+    package "Services & Utility Engines" as Engines {
+        component [Macro Balancer] as Balancer
+        component [Gemini Client] as GeminiClient
+        component [Email Service] as EmailService
+        component [USDA Client] as USDAClient
         component [Ingredient Seeder] as Seeder
+
+        ' 1-Column Strict Vertical Layout
+        Balancer -[hidden]down-> GeminiClient
+        GeminiClient -[hidden]down-> USDAClient
+        USDAClient -[hidden]down-> EmailService
+        EmailService -[hidden]down-> Seeder
     }
 
     component [Mongoose ODM] as ODM
+
+    'Controllers -[hidden]right-> Engines
+    ShoppingRouter -[hidden]down-> ODM
+
+    ' Engines and Controllers to Data Layer
+    Controllers -down-> ODM : Mongoose Calls
+    Seeder -left-> ODM : Seeds Baseline Ingredients
+    'Engines --> ODM
 }
+
+package "External Services" {
+    component [Google Gemini API] as GeminiAPI
+    component [SMTP Mail Server] as SMTPServer
+    component [USDA FoodData API] as USDAAPI
+
+    ' 1-Column Strict Vertical Layout
+    GeminiAPI -[hidden]down-> USDAAPI
+    USDAAPI -[hidden]down-> SMTPServer
+}
+
 
 database "Data Tier" {
     component [MongoDB Database] as DB
 }
 
-package "External Services" {
-    component [Google Gemini AI API] as GeminiAPI
-    component [USDA FoodData Central API] as USDAAPI
-    component [SMTP Server\n/ Ethereal Sandbox] as SMTPServer
-}
+' Tier-to-Tier Vertical Flow
+UI -down-> AuthInterceptor : User Actions
+AuthInterceptor --> Router : HTTP REST (/api/*)
+Router -down-> AuthMW : Token Verification
+AuthMW --> Controllers : Route Dispatch
 
-' Client Requests
-UI --> AuthInterceptor : User Actions
-AuthInterceptor --> Router : HTTP REST Requests (/api/*)
+' Controller to Engine Links
+RecipeCtrl --> Balancer : Solve Recipe Matrix
+RecipeCtrl --> GeminiClient : AI Gen / Interventions
+IngRouter --> USDAClient : Macro Lookups
+IngRouter --> GeminiClient : Auto-Tag Ingredients
+UsersRouter --> EmailService : Email Verifications
+AuthRouter --> EmailService : Password Resets
 
-' Router & Middleware Routing
-Router --> AuthMW : Token Verification
-AuthMW --> AuthRouter : /api/auth
-AuthMW --> UsersRouter : /api/users
-AuthMW --> IngRouter : /api/ingredients
-AuthMW --> RecipeCtrl : /api/recipes
-AuthMW --> MealPlanRouter : /api/meal-plans
-AuthMW --> ShoppingRouter : /api/shopping-list
+' Engines and Controllers to Data Layer
+'Controllers --> ODM : Mongoose Calls
+'Seeder --> ODM : Seeds Baseline
+'Engines --> ODM
 
-' Controller to Services & Engines
-RecipeCtrl --> Balancer : Triggers Matrix Solver
-RecipeCtrl --> GeminiClient : Requests Recipe Gen / Interventions
-RecipeCtrl --> USDAClient : Verifies Ingredient Macros
-IngRouter --> GeminiClient : Auto-Tags New Ingredients
-UsersRouter --> EmailService : Requests Email Verification Link
-AuthRouter --> EmailService : Sends Account Verification & Password Resets
-Seeder --> ODM : Imports Baseline Ingredients on Boot
+' External Integrations
+GeminiClient --> GeminiAPI : HTTPS REST
+USDAClient --> USDAAPI : HTTPS REST
+EmailService --> SMTPServer : SMTP / TLS
 
-' Controllers to Data Tier
-AuthRouter --> ODM : Object Method Calls
-UsersRouter --> ODM : Object Method Calls
-IngRouter --> ODM : Object Method Calls
-RecipeCtrl --> ODM : Object Method Calls
-MealPlanRouter --> ODM : Object Method Calls
-ShoppingRouter --> ODM : Object Method Calls
-
-' External Integration Calls
-GeminiClient --> GeminiAPI : HTTPS REST Calls
-USDAClient --> USDAAPI : HTTPS REST Calls
-EmailService --> SMTPServer : SMTP / TLS Dispatch
-
-' Database Access
-ODM --> DB : Native Driver Queries
+' Database Connection
+ODM --> DB : Native Queries
 @endluml

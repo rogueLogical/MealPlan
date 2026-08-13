@@ -1,0 +1,250 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+top to bottom direction
+
+package "Server Tier - Express Middleware, Routers & Controllers" as Routers {
+    class AuthMiddleware {
+        + checkAuth(req, res, next): void
+    }
+
+    class AuthRoutes {
+        + register(req, res): Promise
+        + login(req, res): Promise
+        + verifyEmail(req, res): Promise
+        + resendVerification(req, res): Promise
+        + forgotPassword(req, res): Promise
+        + resetPassword(req, res): Promise
+    }
+
+    class UserRoutes {
+        + deleteAccount(req, res): Promise
+        + updateSettings(req, res): Promise
+        + requestEmailChange(req, res): Promise
+        + getUserProfile(req, res): Promise
+        + dismissWelcome(req, res): Promise
+        + recordRecentlyViewed(req, res): Promise
+        + getRecentlyViewed(req, res): Promise
+        + toggleFavorite(req, res): Promise
+        + getStorage(req, res): Promise
+        + adjustStorage(req, res): Promise
+    }
+
+    class IngredientRoutes {
+        + searchIngredients(req, res): Promise
+        + createIngredient(req, res): Promise
+        + getIngredientById(req, res): Promise
+        + updateIngredient(req, res): Promise
+        + deleteIngredient(req, res): Promise
+    }
+
+    class RecipeRoutes {
+        + searchRecipes(req, res): Promise
+        + getMyRecipes(req, res): Promise
+        + getFavoriteRecipes(req, res): Promise
+        + createRecipe(req, res): Promise
+        + getRecipeById(req, res): Promise
+        + updateRecipe(req, res): Promise
+        + deleteRecipe(req, res): Promise
+        + forkRecipe(req, res): Promise
+    }
+
+    class RecipeController {
+        + balanceRecipe(req, res): Promise
+        + generateRecipe(req, res): Promise
+    }
+
+    class MealPlanRoutes {
+        + getPlans(req, res): Promise
+        + getActivePlan(req, res): Promise
+        + createPlan(req, res): Promise
+        + updatePlan(req, res): Promise
+        + activatePlan(req, res): Promise
+        + deactivatePlan(req, res): Promise
+        + restartPlan(req, res): Promise
+        + deletePlan(req, res): Promise
+        + completeRecipe(req, res): Promise
+    }
+
+    class ShoppingListRoutes {
+        + getShoppingList(req, res): Promise
+        + updateShoppingList(req, res): Promise
+        + toggleItemCheck(req, res): Promise
+        + appendPlanIngredients(req, res): Promise
+        + addManualItem(req, res): Promise
+        + removeShoppingItem(req, res): Promise
+    }
+
+    ' Strict 1-Column Vertical Stacking
+    AuthMiddleware -[hidden]down-> AuthRoutes
+    AuthRoutes -[hidden]down-> UserRoutes
+    UserRoutes -[hidden]down-> IngredientRoutes
+    IngredientRoutes -[hidden]down-> RecipeRoutes
+    RecipeRoutes -[hidden]down-> RecipeController
+    RecipeController -[hidden]down-> MealPlanRoutes
+    MealPlanRoutes -[hidden]down-> ShoppingListRoutes
+}
+
+package "Server Tier - Business Engines & Services" as Engines {
+    class MacroBalancer {
+        + solveMatrix(ingredients, targets): Promise
+        + diagnoseFailure(activeIngs, targets, achieved): Object
+        - calculateDelivery(activeIngs, multipliers): Object
+        - isSeasoning(ingredient, recipeCalories): boolean
+    }
+
+    class GeminiClient {
+        + getAiSuggestions(context): Promise
+        + getDietaryTagsForIngredient(name): Promise
+        + generateRecipeFromPrompt(params): Promise
+    }
+
+    class UsdaClient {
+        + fetchUsdaMacros(query): Promise
+        - calculateMatchScore(query, food): double
+        - extractNutrient(foodItem, nutrientId): double
+    }
+
+    class EmailService {
+        + sendEmail(options): Promise
+        - getTransporter(): Promise
+    }
+
+    class IngredientSeeder {
+        + seedIngredients(): Promise
+    }
+
+    ' Strict 1-Column Vertical Stacking
+    MacroBalancer -[hidden]down-> GeminiClient
+    GeminiClient -[hidden]down-> UsdaClient
+    UsdaClient -[hidden]down-> EmailService
+    EmailService -[hidden]down-> IngredientSeeder
+}
+
+package "Server Tier - Mongoose Database Models" as Models {
+    class User {
+        + String username
+        + String email
+        + String password
+        + String profilePicture
+        + boolean isEmailVerified
+        + String emailVerificationToken
+        + Date emailVerificationExpires
+        + String pendingEmail
+        + Object settings
+        + Object nutritionSettings
+        + boolean hasConfiguredSettings
+        + boolean dismissedWelcomeBanner
+        + ObjectId[] favoriteRecipes
+        + ObjectId[] recentlyViewedRecipes
+        + comparePassword(candidate): Promise
+        + preSave(): void
+    }
+
+    class IngredientModel {
+        + String name
+        + ObjectId createdBy
+        + double servingSize
+        + String servingUnit
+        + Object nutritionPerServing
+        + Object nutrition
+        + String[] tags
+        + applyMacroTags(serving): String[]
+        + preSave(): Promise
+    }
+
+    class RecipeModel {
+        + String title
+        + String recipeType
+        + String description
+        + String instructions
+        + int prepTimeMinutes
+        + int cookTimeMinutes
+        + ObjectId createdBy
+        + boolean isPublic
+        + boolean isDeleted
+        + ObjectId originalRecipeId
+        + int portions
+        + String[] tags
+        + Object[] ingredients
+        + Object totalNutrition
+        + virtualPerPortion(): Object
+        + preSave(): void
+    }
+
+    class MealPrepPlanModel {
+        + ObjectId userId
+        + String name
+        + boolean isActive
+        + Object[] recipes
+    }
+
+    class ShoppingListModel {
+        + ObjectId userId
+        + ObjectId planId
+        + Object[] items
+    }
+
+    class PortionStorageModel {
+        + ObjectId userId
+        + ObjectId recipeId
+        + String recipeTitle
+        + int portionsInStorage
+    }
+
+    ' Strict 1-Column Vertical Stacking
+    User -[hidden]down-> IngredientModel
+    IngredientModel -[hidden]down-> RecipeModel
+    RecipeModel -[hidden]down-> MealPrepPlanModel
+    MealPrepPlanModel -[hidden]down-> ShoppingListModel
+    ShoppingListModel -[hidden]down-> PortionStorageModel
+}
+
+package "External Services (REST & Protocols)" as External {
+    class GoogleGeminiAPI <<External Cloud API>>
+    class USDAFoodDataAPI <<External Data.gov API>>
+    class SMTPServer <<External / Ethereal Mail>>
+
+    ' Strict 1-Column Vertical Stacking
+    GoogleGeminiAPI -[hidden]down-> USDAFoodDataAPI
+    USDAFoodDataAPI -[hidden]down-> SMTPServer
+}
+
+' Outer Package Vertical Stacking
+Routers -[hidden]down-> Engines
+Engines -[hidden]down-> Models
+Models -[hidden]down-> External
+
+' Router to Controller & Engine Dependencies
+RecipeRoutes ..> RecipeController : delegates /balance & /generate
+RecipeController ..> MacroBalancer : executes NNLS
+RecipeController ..> GeminiClient : generates recipes / AI interventions
+RecipeController ..> UsdaClient : verifies ingredient macros
+IngredientRoutes ..> GeminiClient : auto-tags custom ingredients
+AuthRoutes ..> EmailService : sends verification & password reset emails
+UserRoutes ..> EmailService : sends email change verification links
+
+' External Service Dependencies
+GeminiClient ..> GoogleGeminiAPI : HTTPS REST
+UsdaClient ..> USDAFoodDataAPI : HTTPS REST
+EmailService ..> SMTPServer : SMTP / TLS
+IngredientSeeder ..> IngredientModel : seeds baseline data on boot
+
+' Router & Middleware to Model Dependencies
+AuthMiddleware ..> User : verifies token / attaches user
+AuthRoutes ..> User : authenticates / registers
+UserRoutes ..> User : updates settings / profile
+UserRoutes ..> PortionStorageModel : manages storage
+IngredientRoutes ..> IngredientModel : queries / updates ingredients
+RecipeRoutes ..> RecipeModel : manages recipes
+MealPlanRoutes ..> MealPrepPlanModel : manages prep plans
+MealPlanRoutes ..> PortionStorageModel : logs cooked portions
+ShoppingListRoutes ..> ShoppingListModel : manages shopping list
+ShoppingListRoutes ..> MealPrepPlanModel : consolidates plan ingredients
+
+RecipeModel "1" *-- "1..*" IngredientModel : references
+MealPrepPlanModel "1" *-- "1..*" RecipeModel : references
+ShoppingListModel "0..1" -- "0..1" MealPrepPlanModel : references
+PortionStorageModel "0..*" -- "1" RecipeModel : tracks inventory for
+User "1" -- "0..*" RecipeModel : owns / favorites
+@endluml

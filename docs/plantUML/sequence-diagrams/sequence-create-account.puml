@@ -1,0 +1,53 @@
+@startuml
+autonumber
+skinparam responseMessageBelowArrow true
+
+actor "User" as user
+participant "Register / VerifyEmail\n(Angular UI)" as UI
+participant "AuthService\n(Angular Service)" as Service
+participant "Auth Routes\n(Express)" as AuthRoutes
+participant "User Model" as UserModel
+database "MongoDB" as DB
+participant "EmailService\n(Nodemailer)" as EmailService
+participant "SMTP / Ethereal\nMail Server" as SMTP
+
+== Account Registration Phase ==
+user -> UI : Submits Registration Form (Username, Email, Password)
+UI -> Service : register({ username, email, password })
+Service -> AuthRoutes : POST /api/auth/register
+AuthRoutes -> UserModel : findOne({ $or: [{ email }, { username }] })
+UserModel -> DB : Check Existing User
+DB --> UserModel : Null (Available)
+
+AuthRoutes -> AuthRoutes : Generate 32-byte Verification Token & Expiration (24h)
+AuthRoutes -> UserModel : new User({ ..., isEmailVerified: false, emailVerificationToken })
+UserModel -> UserModel : pre('save') -> Hash Password (bcrypt)
+UserModel -> DB : Save New User Document
+DB --> UserModel : Saved User Document
+
+AuthRoutes -> EmailService : sendEmail({ to, subject, verificationUrl })
+EmailService -> SMTP : sendMail() (SMTP / Ethereal Sandbox)
+SMTP --> EmailService : Dispatch Confirmation
+EmailService --> AuthRoutes : Mail Dispatched
+AuthRoutes --> Service : 201 Created { message: 'Account created... verify email' }
+Service --> UI : Registration Success
+UI -> UI : Display Verification Reminder Card
+
+== Email Verification Phase ==
+user -> user : Opens Email Inbox & Clicks Verification Link
+user -> UI : Redirects to /verify-email?token=xyz123
+UI -> Service : verifyEmail("xyz123")
+Service -> AuthRoutes : POST /api/auth/verify-email { token: "xyz123" }
+
+AuthRoutes -> UserModel : findOne({ emailVerificationToken, emailVerificationExpires: { $gt: now } })
+UserModel -> DB : Query Unexpired Verification Token
+DB --> UserModel : User Document Found
+
+AuthRoutes -> UserModel : Set isEmailVerified = true, Clear Tokens
+UserModel -> DB : Save Updated User Document
+DB --> UserModel : Updated User Document
+
+AuthRoutes --> Service : 200 OK { message: 'Email address verified successfully' }
+Service --> UI : Verification Success
+UI -> UI : Render "Email Verified!" Banner & Proceed to Login Button
+@endluml
