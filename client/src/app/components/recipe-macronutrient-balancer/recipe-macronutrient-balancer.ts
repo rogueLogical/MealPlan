@@ -73,8 +73,25 @@ export class RecipeMacronutrientBalancer implements OnInit {
   private toastService = inject(ToastService);
 
   ngOnInit(): void {
-    // Deep clone the ingredients so we don't mutate the parent's data until explicitly saved
-    this.currentIngredients = JSON.parse(JSON.stringify(this.originalRecipe.ingredients));
+    const portions = this.originalRecipe.portions || 1;
+    this.currentIngredients = this.originalRecipe.ingredients.map((ing) => {
+      const multiplier = 1 / portions;
+      const base = ing.baselineNutrition || ing.nutrition;
+      return {
+        ...ing,
+        weightInGrams: parseFloat(((ing.weightInGrams || 0) * multiplier).toFixed(1)),
+        baselineNutrition: base,
+        nutrition: {
+          calories: Math.round((ing.nutrition?.calories || 0) * multiplier),
+          protein: parseFloat(((ing.nutrition?.protein || 0) * multiplier).toFixed(1)),
+          fat: parseFloat(((ing.nutrition?.fat || 0) * multiplier).toFixed(1)),
+          netCarbs: parseFloat(((ing.nutrition?.netCarbs || 0) * multiplier).toFixed(1)),
+          totalCarbs: parseFloat(((ing.nutrition?.totalCarbs || 0) * multiplier).toFixed(1)),
+          fiber: parseFloat(((ing.nutrition?.fiber || 0) * multiplier).toFixed(1)),
+          sugarAlcohols: parseFloat(((ing.nutrition?.sugarAlcohols || 0) * multiplier).toFixed(1)),
+        },
+      };
+    });
 
     // Pre-select restrictions if the recipe already has them
     if (this.originalRecipe.tags) {
@@ -213,7 +230,6 @@ export class RecipeMacronutrientBalancer implements OnInit {
   // --- UI Helpers for Config State ---
 
   get currentMacrosPerPortion() {
-    const portions = this.originalRecipe.portions || 1;
     let p = 0,
       f = 0,
       c = 0,
@@ -227,10 +243,10 @@ export class RecipeMacronutrientBalancer implements OnInit {
     });
 
     return {
-      protein: Math.round((p / portions) * 10) / 10,
-      fat: Math.round((f / portions) * 10) / 10,
-      netCarbs: Math.round((c / portions) * 10) / 10,
-      calories: Math.round(cal / portions),
+      protein: Math.round(p * 10) / 10,
+      fat: Math.round(f * 10) / 10,
+      netCarbs: Math.round(c * 10) / 10,
+      calories: Math.round(cal),
     };
   }
 

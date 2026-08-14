@@ -48,7 +48,7 @@
             <div class="ingredient-grid" style="margin-bottom: 2rem">
               <div class="grid-header">
                 <span>Current Ingredients</span>
-                <span>Total Weight</span>
+                <span>Weight (Per Portion)</span>
               </div>
               @for (ing of currentIngredients; track ing.name) {
                 <div class="grid-row">
@@ -149,7 +149,7 @@
               <div class="ingredient-grid" style="margin-bottom: 2rem">
                 <div class="grid-header">
                   <span>Ingredient</span>
-                  <span>Weight</span>
+                  <span>Weight (Per Portion)</span>
                   <span>Macro Contributions</span>
                 </div>
                 @for (ing of currentIngredients; track ing.ingredientId) {
