@@ -76,6 +76,7 @@ const calculateMatchScore = (query, food) => {
     'burger',
     'pizza',
     'soup',
+    'broth',
     'restaurant',
     'fast food',
     'prepared',
