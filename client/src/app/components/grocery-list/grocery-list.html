@@ -73,8 +73,12 @@
             (dragover)="onDragOver($event, i)"
             (dragleave)="onDragLeave()"
             (drop)="onDrop(i)"
+            (touchstart)="onTouchStart(i)"
+            (touchmove)="onTouchMove($event)"
+            (touchend)="onTouchEnd()"
             class="item-row"
             [class.drag-over]="dragOverIndex === i"
+            [attr.data-index]="i"
           >
             <label
               class="item-checkbox-label"

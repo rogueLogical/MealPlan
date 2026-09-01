@@ -86,9 +86,15 @@
   border-radius: 8px;
   cursor: grab;
   transition: all 0.15s ease;
+  touch-action: none;
 
   &:active {
     cursor: grabbing;
+  }
+
+  &:focus {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
   }
 
   /* Active visual state when dragged over another item */

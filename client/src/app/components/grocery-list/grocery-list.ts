@@ -176,6 +176,42 @@ export class GroceryList implements OnInit {
     });
   }
 
+  onTouchStart(index: number): void {
+    this.draggedIndex = index;
+  }
+
+  onTouchMove(event: TouchEvent): void {
+    if (this.draggedIndex === null) return;
+
+    if (event.cancelable) {
+      event.preventDefault();
+    }
+
+    const touch = event.touches[0];
+    const target = document.elementFromPoint(touch.clientX, touch.clientY);
+
+    if (target) {
+      const itemRow = (target as HTMLElement).closest('.item-row');
+      if (itemRow) {
+        const indexStr = itemRow.getAttribute('data-index');
+        if (indexStr !== null) {
+          const index = parseInt(indexStr, 10);
+          if (!isNaN(index) && index !== this.draggedIndex) {
+            this.dragOverIndex = index;
+          }
+        }
+      }
+    }
+  }
+
+  onTouchEnd(): void {
+    if (this.draggedIndex !== null && this.dragOverIndex !== null) {
+      this.onDrop(this.dragOverIndex);
+    }
+    this.draggedIndex = null;
+    this.dragOverIndex = null;
+  }
+
   addItem(): void {
     if (!this.newItemName.trim()) return;
 
