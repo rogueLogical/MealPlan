@@ -76,23 +76,30 @@
             (touchstart)="onTouchStart(i)"
             (touchmove)="onTouchMove($event)"
             (touchend)="onTouchEnd()"
+            (click)="openEditDialog(item)"
+            (keydown.enter)="openEditDialog(item)"
+            (keydown.space)="$event.preventDefault(); openEditDialog(item)"
             class="item-row"
+            role="button"
+            tabindex="0"
             [class.drag-over]="dragOverIndex === i"
             [attr.data-index]="i"
           >
-            <label
+            <div
               class="item-checkbox-label"
               (dragstart)="$event.preventDefault()"
               draggable="false"
             >
               <input
                 type="checkbox"
+                aria-label="Mark item as checked"
                 [(ngModel)]="item.isChecked"
                 (ngModelChange)="toggleItemCheck(item, $event)"
+                (click)="$event.stopPropagation()"
                 (keydown.enter)="$event.preventDefault(); $event.target.click()"
               />
               <span class="item-name">{{ item.name | titlecase }}</span>
-            </label>
+            </div>
             <div class="item-meta-actions">
               <span class="item-quantity">
                 @if (item.unit === 'g') {
@@ -104,7 +111,6 @@
                   }
                 }
               </span>
-              <button class="btn-remove" (click)="removeItem(item)" title="Delete Item">✕</button>
             </div>
           </div>
         }
@@ -117,16 +123,25 @@
         <h3 class="section-title">Checked Off</h3>
         <div class="items-static-list">
           @for (item of checkedItems; track item._id) {
-            <div class="item-row checked-row">
-              <label class="item-checkbox-label">
+            <div
+              class="item-row checked-row"
+              (click)="openEditDialog(item)"
+              (keydown.enter)="openEditDialog(item)"
+              (keydown.space)="$event.preventDefault(); openEditDialog(item)"
+              role="button"
+              tabindex="0"
+            >
+              <div class="item-checkbox-label">
                 <input
                   type="checkbox"
+                  aria-label="Mark item as unchecked"
                   [(ngModel)]="item.isChecked"
                   (ngModelChange)="toggleItemCheck(item, $event)"
+                  (click)="$event.stopPropagation()"
                   (keydown.enter)="$event.preventDefault(); $event.target.click()"
                 />
                 <span class="item-name strikethrough">{{ item.name | titlecase }}</span>
-              </label>
+              </div>
               <div class="item-meta-actions">
                 <span class="item-quantity">
                   @if (item.unit === 'g') {
@@ -138,13 +153,79 @@
                     }
                   }
                 </span>
-                <button class="btn-remove" (click)="removeItem(item)" title="Delete Item">✕</button>
               </div>
             </div>
           }
         </div>
       </div>
     }
+  }
+  <!-- Edit Item Modal Overlay -->
+  @if (showEditDialog && editingItem) {
+    <div class="dialog-overlay" style="z-index: 1100">
+      <button
+        class="dialog-backdrop"
+        (click)="closeEditDialog()"
+        aria-label="Close edit item"
+      ></button>
+      <div class="dialog-box" appFocusTrap>
+        <header class="dialog-header">
+          <h3>
+            {{ showDeleteConfirmDialog ? 'Delete Shopping List Item?' : 'Edit Shopping List Item' }}
+          </h3>
+          <button class="dialog-close-btn" (click)="closeEditDialog()" aria-label="Close">✕</button>
+        </header>
+        @if (showDeleteConfirmDialog) {
+          <div class="dialog-body">
+            <p>Are you sure you want to permanently delete {{ editingItem.name }}?</p>
+          </div>
+          <footer class="dialog-footer">
+            <button class="btn btn-secondary" (click)="closeDeleteConfirmDialog()">Cancel</button>
+            <button class="btn btn-danger" (click)="confirmDeleteItem()">Delete Item</button>
+          </footer>
+        } @else {
+          <form class="dialog-body edit-item-form" (ngSubmit)="saveEditedItem()">
+            <label for="editItemName">Item name</label>
+            <input
+              id="editItemName"
+              type="text"
+              name="editItemName"
+              [(ngModel)]="editItemName"
+              class="form-control-input"
+              required
+            />
+            <label for="editItemQty">Quantity</label>
+            <input
+              id="editItemQty"
+              type="number"
+              name="editItemQty"
+              [(ngModel)]="editItemQty"
+              class="form-control-input"
+              min="0.01"
+              step="any"
+              required
+            />
+            <label for="editItemUnit">Quantity label</label>
+            <input
+              id="editItemUnit"
+              type="text"
+              name="editItemUnit"
+              [(ngModel)]="editItemUnit"
+              class="form-control-input"
+            />
+            <footer class="dialog-footer">
+              <button type="button" class="btn btn-danger" (click)="openDeleteConfirmDialog()">
+                Delete Item
+              </button>
+              <button type="button" class="btn btn-secondary" (click)="closeEditDialog()">
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary">Save</button>
+            </footer>
+          </form>
+        }
+      </div>
+    </div>
   }
   <!-- Clear List Confirmation Modal Overlay -->
   @if (showClearConfirmDialog) {

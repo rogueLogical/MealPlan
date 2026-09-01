@@ -32,6 +32,12 @@ export class GroceryList implements OnInit {
 
   // Dialog confirmation state
   showClearConfirmDialog = false;
+  showEditDialog = false;
+  showDeleteConfirmDialog = false;
+  editingItem: ShoppingListItem | null = null;
+  editItemName = '';
+  editItemQty = 1;
+  editItemUnit = '';
 
   ngOnInit(): void {
     this.loadList();
@@ -84,6 +90,71 @@ export class GroceryList implements OnInit {
         this.cdr.markForCheck();
       },
     });
+  }
+
+  openEditDialog(item: ShoppingListItem): void {
+    this.editingItem = item;
+    this.editItemName = item.name;
+    this.editItemQty = item.quantity;
+    this.editItemUnit = item.unit;
+    this.showEditDialog = true;
+    this.showDeleteConfirmDialog = false;
+    this.cdr.markForCheck();
+  }
+
+  closeEditDialog(): void {
+    this.showEditDialog = false;
+    this.showDeleteConfirmDialog = false;
+    this.editingItem = null;
+  }
+
+  saveEditedItem(): void {
+    const name = this.editItemName.trim();
+    if (!this.editingItem || !name || !Number.isFinite(this.editItemQty) || this.editItemQty <= 0) {
+      this.toastService.showError('Enter a name and a quantity greater than zero.');
+      return;
+    }
+
+    const updatedItem: ShoppingListItem = {
+      ...this.editingItem,
+      name,
+      quantity: this.editItemQty,
+      unit: this.editItemUnit.trim(),
+    };
+    const itemIndex = this.allItems.findIndex((item) => item._id === this.editingItem?._id);
+    if (itemIndex === -1) return;
+
+    const updatedItems = [...this.allItems];
+    updatedItems[itemIndex] = updatedItem;
+
+    this.prepService.updateShoppingList(updatedItems, this.shoppingListId).subscribe({
+      next: (res) => {
+        this.allItems = (res.list.items || []).sort(
+          (a, b) => (a.orderIndex || 0) - (b.orderIndex || 0),
+        );
+        this.toastService.showSuccess('Shopping list item updated successfully.');
+        this.closeEditDialog();
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        console.error('Edit Item Error', err);
+        this.toastService.showError('Failed to update shopping list item.');
+      },
+    });
+  }
+
+  openDeleteConfirmDialog(): void {
+    if (!this.editingItem) return;
+    this.showDeleteConfirmDialog = true;
+  }
+
+  closeDeleteConfirmDialog(): void {
+    this.showDeleteConfirmDialog = false;
+  }
+
+  confirmDeleteItem(): void {
+    if (!this.editingItem) return;
+    this.removeItem(this.editingItem);
   }
 
   get uncheckedItems(): ShoppingListItem[] {
@@ -239,6 +310,9 @@ export class GroceryList implements OnInit {
     this.prepService.removeShoppingItem(item._id).subscribe({
       next: () => {
         this.allItems = this.allItems.filter((i) => i._id !== item._id);
+        if (this.editingItem?._id === item._id) {
+          this.closeEditDialog();
+        }
         this.cdr.markForCheck();
       },
       error: (err) => {

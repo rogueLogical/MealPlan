@@ -198,6 +198,64 @@ describe('GroceryList Component In-Depth Coverage', () => {
     expect(mockToastService.showError).toHaveBeenCalled();
   });
 
+  it('should edit an item through the shopping list update operation', () => {
+    fixture.detectChanges();
+    component.openEditDialog(component.allItems[0]);
+    component.editItemName = 'Fresh Broccoli';
+    component.editItemQty = 2;
+    component.editItemUnit = 'heads';
+
+    component.saveEditedItem();
+
+    expect(mockPrepService.updateShoppingList).toHaveBeenCalledWith(
+      [
+        expect.objectContaining({ name: 'Fresh Broccoli', quantity: 2, unit: 'heads' }),
+        component.allItems[1],
+      ],
+      'list_123',
+    );
+    expect(component.showEditDialog).toBe(false);
+  });
+
+  it('should require valid name and positive quantity before saving an edit', () => {
+    fixture.detectChanges();
+    component.openEditDialog(component.allItems[0]);
+    component.editItemName = '  ';
+    component.editItemQty = 0;
+
+    component.saveEditedItem();
+
+    expect(mockPrepService.updateShoppingList).not.toHaveBeenCalled();
+    expect(mockToastService.showError).toHaveBeenCalledWith(
+      'Enter a name and a quantity greater than zero.',
+    );
+  });
+
+  it('should require confirmation before deleting an edited item', () => {
+    fixture.detectChanges();
+    component.openEditDialog(component.allItems[0]);
+    component.openDeleteConfirmDialog();
+
+    expect(component.showDeleteConfirmDialog).toBe(true);
+    expect(mockPrepService.removeShoppingItem).not.toHaveBeenCalled();
+
+    component.confirmDeleteItem();
+
+    expect(mockPrepService.removeShoppingItem).toHaveBeenCalledWith('item1');
+    expect(component.showEditDialog).toBe(false);
+  });
+
+  it('should open editing without toggling an item when its text is clicked', () => {
+    fixture.detectChanges();
+    const itemName = fixture.nativeElement.querySelector('.item-name') as HTMLElement;
+
+    itemName.click();
+    fixture.detectChanges();
+
+    expect(component.showEditDialog).toBe(true);
+    expect(component.allItems[0].isChecked).toBe(false);
+  });
+
   // Native HTML5 Drag and Drop Handlers
   it('should track and update native drag-and-drop state lifecycle events', () => {
     fixture.detectChanges();
