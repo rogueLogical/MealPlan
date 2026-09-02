@@ -27,6 +27,11 @@ if (process.env.NODE_ENV !== 'test') {
     .connect(mongoURI)
     .then(async () => {
       console.log('Database connected successfully');
+
+      // Initialize roles on startup
+      const migrateRoles = require('./scripts/migrateRoles');
+      await migrateRoles().catch((err) => console.error('[Roles Init]', err.message));
+
       seedIngredients().catch((err) => console.error('Seeding error:', err));
     })
     .catch((err) => {

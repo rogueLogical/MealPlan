@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const Roles = require('./Roles');
 
 const UserSchema = new mongoose.Schema(
   {
@@ -97,6 +98,14 @@ const UserSchema = new mongoose.Schema(
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Recipe'
       }
+    ],
+    roles: [
+      {
+        roleType: {
+          type: String,
+          enum: ['user', 'admin', 'super-admin']
+        }
+      }
     ]
   },
   {
@@ -114,6 +123,42 @@ UserSchema.pre('save', async function () {
 // function to check if password matches the stored password
 UserSchema.methods.comparePassword = async function (candidate) {
   return bcrypt.compare(candidate, this.password);
+};
+
+// helper to check current highest role from Roles collection (denormalized field is for display only)
+UserSchema.methods.getCurrentRole = async function () {
+  const roles = await Roles.findOne({ userId: this._id }).sort({ grantedAt: -1 });
+  return roles ? roles.roleType : 'user';
+};
+
+// helper to get all role types for display
+UserSchema.methods.getRoleTypes = function () {
+  if (!this.roles || !Array.isArray(this.roles)) return ['user'];
+  const uniqueRoles = [...new Set(this.roles.map((r) => r.roleType))];
+  return uniqueRoles.length === 0 ? ['user'] : uniqueRoles;
+};
+
+// function to check if user has a specific role
+UserSchema.methods.hasRole = function (roleType) {
+  if (!this.roles || !Array.isArray(this.roles)) {
+    return roleType === 'user'; // default role
+  }
+  return this.roles.some((r) => r.roleType === roleType);
+};
+
+// function to check admin roles (admin OR super-admin)
+UserSchema.methods.isAdmin = async function () {
+  const highestRole = await Roles.findOne({ userId: this._id })
+    .where('roleType')
+    .in(['admin', 'super-admin'])
+    .sort({ grantedAt: -1 });
+  return !!highestRole;
+};
+
+// function to check if user is super-admin
+UserSchema.methods.isSuperAdmin = async function () {
+  const role = await Roles.findOne({ userId: this._id, roleType: 'super-admin' });
+  return !!role;
 };
 
 module.exports = mongoose.model('User', UserSchema);
