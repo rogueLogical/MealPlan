@@ -2,6 +2,7 @@
   "chat.tools.terminal.autoApprove": {
     "git remote": true,
     "true": true,
-    "npm test": true
+    "npm test": true,
+    "git rev-parse": true
   }
 }
