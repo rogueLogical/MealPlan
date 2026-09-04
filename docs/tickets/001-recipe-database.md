@@ -40,6 +40,7 @@ wayfinder:research
 ### 3. Cleaning Operations
 
 **Types of cleaning needed**:
+
 - Bulk update recipes with macro changes from ingredient updates
 - Remove orphaned recipes (referencing non-existent ingredients)
 - Archive stale/unused recipes
@@ -48,6 +49,7 @@ wayfinder:research
 ### 4. Implementation Plan
 
 #### Admin Delete Endpoints
+
 ```typescript
 // server/routes/admin/recipeManagement.ts
 POST /admin/recipes/:id/delete
@@ -56,7 +58,7 @@ POST /admin/recipes/:id/delete
 - Sends email to affected users (author, favoriters if tracked)
 - Returns success/error response
 
-// server/routes/admin/ingredientManagement.ts  
+// server/routes/admin/ingredientManagement.ts
 POST /admin/ingredients/:id/delete
 POST /admin/recipes/bulk-update-macros
 GET  /admin/recipes/orphans/find
@@ -64,12 +66,13 @@ DELETE /admin/recipes/bulk-delete-orphaned
 ```
 
 #### Email Templates
+
 ```typescript
 // server/services/adminEmailTemplates.ts
 const recipeDeletedTemplate = `
 Subject: [MealPlan] Your recipe has been archived by admin
 
-Body: Hello, your recipe "{recipeTitle}" by {authorName} on {date} 
+Body: Hello, your recipe "{recipeTitle}" by {authorName} on {date}
 has been archived due to: {reason}. View details at: {link}
 `;
 
@@ -87,6 +90,7 @@ Body: An admin operation completed at {timestamp}: {action}
 - **Data preservation**: User data persists during/after deletion (soft delete or archive)
 
 ### Sources Consulted
+
 1. MealPlan codebase at `/home/chris/Projects/MealPlan/`
 2. Existing route implementations in `server/routes/recipes.js`, `server/routes/ingredients.js`
 3. Email service at `server/services/emailService.js`
@@ -96,7 +100,8 @@ Body: An admin operation completed at {timestamp}: {action}
 This research ticket is complete. The findings above should be appended to the wayfinder map's Decisions-so-far section, and this ticket closed with labels updated accordingly.
 
 ---
-*Research completed by background agent*
+
+_Research completed by background agent_
 
 **Status**: Resolved
 

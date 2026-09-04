@@ -48,7 +48,7 @@ router.delete('/users/:userId/ban', checkAuth, withAuditLogging(async (req, res)
     { new: true }
   );
   logOperation(req, 'ADMIN_USER_BAN', [user._id], {});
-  
+
   // Send email notification
   const template = `User {userName} ({userEmail}) has been banned permanently.`;
   sendEmail({ to: user.email, subject: 'Your account has been banned...', text: template });
@@ -69,10 +69,10 @@ router.post('/recipes/bulk-delete-orphaned', checkAuth, async (req, res) => {
   if (!orphanedRecipes || orphanedRecipes.length === 0) {
     return res.json({ message: 'No orphaned recipes to delete' });
   }
-  
+
   // Log bulk operation after completion
   await AuditLog.insertMany(
-    orphanedRecipes.map(recipe => ({
+    orphanedRecipes.map((recipe) => ({
       action: 'BULK_DELETE',
       actorId: req.userData.userId,
       targetType: 'Recipe',
@@ -84,21 +84,22 @@ router.post('/recipes/bulk-delete-orphaned', checkAuth, async (req, res) => {
 
 ### Routes Integration Plan
 
-| Route File | Admin Endpoints to Add Logging | Method |
-|------------|--------------------------------|--------|
-| `recipes.js` | DELETE /admin/recipes/:id/delete, bulk-update endpoints | Option 2 (endpoint wrapper) |
-| `ingredients.js` | DELETE /admin/ingredients/:id/delete, bulk operations | Option 2 (endpoint wrapper) |
-| `users.js` | DELETE /admin/users/:userId/ban, DELETE /admin/users/:userId/promote, etc. | Option 2 + 3 (wrapper + manual logging) |
-| `shoppingList.js` | Bulk delete/cleanup operations | Option 3 (manual logging for bulk) |
-| `mealPlans.js` | Bulk update/delete operations | Option 3 (manual logging for bulk) |
-| `auth.js` | Admin user management endpoints | Option 2 (endpoint wrapper) |
+| Route File        | Admin Endpoints to Add Logging                                             | Method                                  |
+| ----------------- | -------------------------------------------------------------------------- | --------------------------------------- |
+| `recipes.js`      | DELETE /admin/recipes/:id/delete, bulk-update endpoints                    | Option 2 (endpoint wrapper)             |
+| `ingredients.js`  | DELETE /admin/ingredients/:id/delete, bulk operations                      | Option 2 (endpoint wrapper)             |
+| `users.js`        | DELETE /admin/users/:userId/ban, DELETE /admin/users/:userId/promote, etc. | Option 2 + 3 (wrapper + manual logging) |
+| `shoppingList.js` | Bulk delete/cleanup operations                                             | Option 3 (manual logging for bulk)      |
+| `mealPlans.js`    | Bulk update/delete operations                                              | Option 3 (manual logging for bulk)      |
+| `auth.js`         | Admin user management endpoints                                            | Option 2 (endpoint wrapper)             |
 
 ## Resolution
 
 This task ticket is complete. The auditLogger middleware from ticket 005 has been documented with three integration approaches for existing routes, each suitable for different operation types: global middleware hook for admin paths, endpoint wrappers for specific operations, and manual logging for complex/bulk operations. Implementation can proceed by selecting the appropriate approach per route file based on operation type and required granularity.
 
 ---
-*Task completed by agent*
+
+_Task completed by agent_
 
 **Status**: Resolved
 

@@ -1,147 +1,171 @@
 const AuditLog = require('../models/AuditLog');
 
 /**
- * Audit Logging Middleware Hook
- * Automatically creates audit log entries for all database-modifying operations
- * in API routes. Only captures actions that impact data in the database (GET excluded).
+ * Extracts operation context from a request for audit logging.
+ * Centralized extraction logic eliminates duplicated code across interceptors.
+ */
+function extractOperationContext(req) {
+  const opTypeMap = {
+    GET: 'READ',
+    POST: req.body?.type === 'BULK' ? 'BULK_CREATE' : 'CREATE',
+    PUT: 'UPDATE',
+    PATCH: 'UPDATE',
+    DELETE: 'DELETE',
+    BULK_DELETE: 'BULK_DELETE'
+  };
+
+  const targetTypeMap = {
+    user: 'User',
+    recipe: 'Recipe',
+    ingredient: 'Ingredient',
+    shoppingList: 'ShoppingList',
+    mealPrepPlan: 'MealPrepPlan',
+    portionStorage: 'PortionStorage',
+    role: 'Role'
+  };
+
+  const targetName = extractTargetNameFromPath(req);
+  const opType = opTypeMap[req.method] || 'UNKNOWN';
+  const targetIds = extractTargetIdsFromRequest(req, targetTypeMap[targetName]);
+
+  return { opType, targetName, targetIds };
+}
+
+/**
+ * Extracts the target name from the URL path (e.g., /recipes/:id → Recipe).
+ */
+function extractTargetNameFromPath(req) {
+  const urlParts = req.originalUrl.split('/');
+  for (const part of urlParts) {
+    if (!part.startsWith(':')) continue;
+    const name = part.slice(1);
+
+    switch (name) {
+      case 'userId':
+        return 'User';
+      case 'recipeId': {
+        if ('id' === name && req.originalUrl.includes('/recipes')) {
+          return 'Recipe';
+        }
+        break;
+      }
+      case 'ingredientId': {
+        if ('id' === name && req.originalUrl.includes('/ingredients')) {
+          return 'Ingredient';
+        }
+        break;
+      }
+      case 'shoppingListId': {
+        if ('id' === name && req.originalUrl.includes('/shopping-list')) {
+          return 'ShoppingList';
+        }
+        break;
+      }
+      default:
+        return 'Unknown';
+    }
+  }
+  return 'Unknown';
+}
+
+/**
+ * Extracts target IDs from request body or params.
+ */
+function extractTargetIdsFromRequest(req, targetType) {
+  const urlParts = req.originalUrl.split('/');
+  let foundParamId = false;
+
+  for (const part of urlParts) {
+    if (!part.startsWith(':')) continue;
+    const name = part.slice(1);
+    if (name === 'userId' || name === 'recipeId' || name === 'ingredientId') {
+      foundParamId = true;
+      break;
+    }
+  }
+
+  if (foundParamId) {
+    const idValue = req.params.id;
+    if (idValue) {
+      return [idValue];
+    }
+  }
+
+  // Extract from body for bulk operations or POST/PUT with embedded IDs
+  if (!Array.isArray(req.body)) {
+    const body = req.body || {};
+    if (body._id) return [body._id];
+    if (Array.isArray(body) && body.length > 0 && body[0]._id) {
+      return body.slice(0, 10).map((s) => s._id);
+    }
+  }
+
+  return [];
+}
+
+/**
+ * Creates an audit log entry silently (fails gracefully if MongoDB is unavailable).
+ */
+function createAuditLog(req, targetName, opType, targetIds) {
+  const logEntry = new AuditLog({
+    action: opType || 'UNKNOWN',
+    actorId: req.userData?.userId || null,
+    targetType: targetName || 'Unknown',
+    targetId: targetIds || [],
+    ipAddress: req.ip || 'unknown',
+    userAgent: req.get('user-agent') || 'unknown'
+  });
+
+  logEntry.save().catch((err) => {
+    // Silent fail — don't let logging errors break the response
+    console.error('[AuditLog] Failed to write entry:', err.message);
+  });
+}
+
+/**
+ * Main audit logger middleware.
  */
 function auditLogger() {
-  return async (req, res, next) => {
-    // Skip if not authenticated
+  return async function (req, res) {
     if (!req.userData) {
-      return next();
+      return;
     }
 
-    // Store original method to check later
-    req._originalMethod = req.method;
+    // Intercept all response methods for consistent logging
+    const originalJson = res.json.bind(res);
+    res.json = async function (...args) {
+      try {
+        // Wait for any pending DB writes to complete
+        await new Promise((resolve) => setTimeout(resolve, 50));
 
-    // Wrap response methods to intercept successful/wrapped operations
-    const originalRes = res;
-
-    res.json = function (statusCode, data) {
-      if (!req._originalMethod.startsWith('GET') && req.userData.isAdmin) {
-        logOperation(req, 'UPDATE', null, data);
-      }
-      return originalRes.json.call(originalRes, statusCode, data);
+        const context = extractOperationContext(req);
+        createAuditLog(req, context.targetName || 'Unknown', context.opType, context.targetIds);
+      } catch {} // eslint-disable-line no-empty -- silent failure on logging errors
+      return originalJson(...args);
     };
 
-    res.send = async function (data) {
-      if (!req._originalMethod.startsWith('GET') && req.userData.isAdmin) {
-        logOperation(req, 'UPDATE', null, data);
-      }
-      return originalRes.send.call(originalRes, data);
+    const originalSend = res.send.bind(res);
+    res.send = async function (body) {
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        const context = extractOperationContext(req);
+        createAuditLog(req, context.targetName || 'Unknown', context.opType, context.targetIds);
+      } catch {} // eslint-disable-line no-empty
+      return originalSend(body);
     };
 
+    const originalDelete = res.delete.bind(res);
     res.delete = async function (...args) {
-      const result = await originalRes.delete.apply(originalRes, args);
-      if (req._originalMethod === 'DELETE' && req.userData.isAdmin) {
-        // Log delete operations
-        logOperation(req, 'DELETE', req.params || req.body);
-      }
-      return result;
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        const context = extractOperationContext(req);
+        createAuditLog(req, context.targetName || 'Unknown', context.opType, context.targetIds);
+      } catch {} // eslint-disable-line no-empty
+      return originalDelete.apply(res, args);
     };
 
-    next();
+    return res;
   };
 }
 
-/**
- * Log an operation to the audit log
- */
-async function logOperation(req, action, targetData, responseData) {
-  try {
-    // Determine target type based on params or body
-    let targetType = req.targetType || 'Unknown';
-    let targetId = req.targetId || [];
-
-    // Handle bulk operations
-    if (req._bulkOp && Array.isArray(req._bulkOp)) {
-      targetId = req._bulkOp.map((op) => op.targetId);
-    } else if (Array.isArray(targetData) && targetData.length > 0) {
-      // Extract targetId from request data if available
-      const firstItem = targetData[0];
-      if (firstItem._id) {
-        targetId = [firstItem._id];
-      }
-    }
-
-    const logEntry = new AuditLog({
-      action,
-      actorId: req.userData.userId,
-      targetType,
-      targetId,
-      ipAddress: req.ip || 'unknown',
-      userAgent: req.get('user-agent') || 'unknown'
-    });
-
-    if (req.beforeSnapshot) {
-      logEntry.beforeSnapshot = req.beforeSnapshot;
-    }
-
-    if (req.afterSnapshot) {
-      logEntry.afterSnapshot = req.afterSnapshot;
-    }
-
-    await logEntry.save();
-  } catch (error) {
-    console.error('Failed to write audit log:', error.message);
-    // Don't fail the request if audit logging fails
-  }
-}
-
-/**
- * Wrapper for DELETE operations that logs them automatically
- */
-function withAuditLogging(deleteHandler) {
-  return async (req, res) => {
-    const beforeSnapshot = req.beforeSnapshot;
-
-    try {
-      await deleteHandler(req, res);
-
-      if (!res.headersSent && !res.writableEnded) {
-        // Check if operation succeeded and log after snapshot
-        if (req.afterSnapshot) {
-          auditLogger()(req, res, () => {});
-        }
-      }
-    } catch (error) {
-      console.error('Operation failed:', error.message);
-      throw error;
-    }
-  };
-}
-
-/**
- * Wrapper for bulk operations that logs them automatically
- */
-function withBulkAuditLogging(bulkHandler) {
-  return async (req, res) => {
-    req._bulkOp = [];
-
-    try {
-      await bulkHandler(req, res);
-
-      if (!res.headersSent && !res.writableEnded && Array.isArray(req._bulkOp)) {
-        // Log bulk operation after completion
-        const logs = req._bulkOp.map((op) => ({
-          action: op.action,
-          targetType: op.targetType,
-          targetId: [op.targetId]
-        }));
-
-        await AuditLog.insertMany(logs, { ordered: false });
-      }
-    } catch (error) {
-      console.error('Bulk operation failed:', error.message);
-      throw error;
-    }
-  };
-}
-
-module.exports = {
-  auditLogger,
-  withAuditLogging,
-  withBulkAuditLogging,
-  logOperation
-};
+module.exports = { auditLogger, extractOperationContext };

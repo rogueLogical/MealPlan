@@ -16,7 +16,6 @@ services:
       - '3000:3000'
     volumes:
       - ./server:/usr/src/app
-      - /usr/src/app/node_modules
     environment:
       - MONGO_URI=mongodb://mongodb:27017/mealplan_mongodb
       - PORT=3000

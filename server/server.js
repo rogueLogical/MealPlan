@@ -1,8 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const { seedIngredients } = require('./utils/ingredient-seeder');
-require('dotenv').config(); // Loads a local .env file if present
+require('dotenv').config();
 
 const app = express();
 
@@ -14,29 +13,25 @@ app.use(
     allowedHeaders: ['Content-Type', 'Authorization'],
     exposedHeaders: ['X-New-Token']
   })
-); // Allows Angular frontend to talk to this API
-app.use(express.json()); // Parses incoming JSON request bodies
+);
+app.use(express.json());
 
 // Database Connection
-// Falls back to the local Docker MongoDB container if process.env.MONGO_URI is not set
 const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/meandb';
 
-// Connect to the database (if not in test mode)
 if (process.env.NODE_ENV !== 'test') {
   mongoose
     .connect(mongoURI)
     .then(async () => {
       console.log('Database connected successfully');
 
-      // Initialize roles on startup
-      const migrateRoles = require('./scripts/migrateRoles');
-      await migrateRoles().catch((err) => console.error('[Roles Init]', err.message));
-
-      seedIngredients().catch((err) => console.error('Seeding error:', err));
+      // Register migrations via a dedicated module — not in server.js itself
+      const registerMigrations = require('./scripts/registerMigrations');
+      await registerMigrations();
     })
     .catch((err) => {
       console.error('Database connection error:', err);
-      process.exit(1); // Stop the server if the database connection fails
+      process.exit(1);
     });
 }
 
@@ -45,7 +40,6 @@ app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'UP', message: 'Backend is running smoothly' });
 });
 
-// Add /routes files to the API here
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const ingredientRoutes = require('./routes/ingredients');
@@ -60,10 +54,12 @@ app.use('/api/recipes', recipeRoutes);
 app.use('/api/meal-plans', mealPlanRoutes);
 app.use('/api/shopping-list', shoppingListRoutes);
 
-// Export the app for supertest
+// Admin routes — mounted at /admin/*
+const adminRoutes = require('./routes/admin');
+app.use('/api/admin', adminRoutes);
+
 module.exports = app;
 
-// Start the Server (if not in test mode)
 if (process.env.NODE_ENV !== 'test') {
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {

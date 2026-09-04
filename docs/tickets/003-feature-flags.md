@@ -21,6 +21,7 @@ wayfinder:research
 **Type**: Commercial SaaS platform
 
 **Pros**:
+
 - Enterprise-grade reliability and support
 - Real-time feature toggling via API or SDK updates
 - Advanced targeting rules and A/B testing
@@ -28,16 +29,18 @@ wayfinder:research
 - Comprehensive analytics dashboard
 
 **Cons**:
+
 - **Cost**: Starts at $59/month for basic plan (LaunchDarkit Free tier available but limited)
 - **Vendor lock-in**: Proprietary format, dependent on third-party service
 - **Setup**: Requires account creation and project setup
 - **Offline mode**: Limited functionality without connectivity
 
 **Integration with Express.js**:
+
 ```javascript
 // Using LaunchDarkin SDK
-const client = require('launchdarkin-node-server-sdk')
-const ldClient = launchdarkin({ url: 'https://your-app.launchdarkly.com' })
+const client = require('launchdarkin-node-server-sdk');
+const ldClient = launchdarkin({ url: 'https://your-app.launchdarkly.com' });
 
 await ldClient.initialize(process.env.LAUNCHDARKLY_KEY);
 ```
@@ -51,6 +54,7 @@ await ldClient.initialize(process.env.LAUNCHDARKLY_KEY);
 **Type**: Open-source SaaS/self-hosted options
 
 **Pros**:
+
 - **Free tier available** (Unleash Hosted Community Edition)
 - Self-hosting option (Docker/Kubernetes) for full control and zero cost
 - Real-time updates via API (no restarts needed)
@@ -58,22 +62,24 @@ await ldClient.initialize(process.env.LAUNCHDARKLY_KEY);
 - Good documentation and community support
 
 **Cons**:
+
 - **Self-hosted**: Requires managing infrastructure
 - **Free tier limits**: 10K active users max on hosted free plan
 - Less feature-rich than LaunchDarkit (no A/B testing, limited targeting)
 
 **Integration with Express.js**:
+
 ```javascript
-const unleash = require('unleash-sdk')
+const unleash = require('unleash-sdk');
 
 const client = new Unleash({
   url: 'http://your-self-hosted-unleash',
   appName: 'mealplan-api'
-})
-await client.start()
+});
+await client.start();
 
 // Check feature flag
-isFeatureEnabled = await client.isEnabled('admin-panel-recipe-management')
+isFeatureEnabled = await client.isEnabled('admin-panel-recipe-management');
 ```
 
 **Best for**: Teams wanting balance between cost and features, self-hosting capability.
@@ -85,6 +91,7 @@ isFeatureEnabled = await client.isEnabled('admin-panel-recipe-management')
 **Type**: Custom-built solution using existing infrastructure
 
 **Pros**:
+
 - **Zero additional cost** (uses existing MongoDB instance)
 - **Full control** over schema and logic
 - **No external dependencies** (no vendor lock-in)
@@ -92,6 +99,7 @@ isFeatureEnabled = await client.isEnabled('admin-panel-recipe-management')
 - Complete customization of behavior
 
 **Cons**:
+
 - **Maintenance overhead**: Need to build and maintain service
 - **Manual updates**: Admin panel needs restart or hot-code loading for changes
 - **Rollback**: Requires manual database operations or custom scripts
@@ -99,9 +107,10 @@ isFeatureEnabled = await client.isEnabled('admin-panel-recipe-management')
 - **Security**: Must implement own access controls
 
 **Integration with Express.js**:
+
 ```javascript
 // Simple in-memory cache + MongoDB storage
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
 const FeatureFlagSchema = new mongoose.Schema({
   key: String,
@@ -111,14 +120,14 @@ const FeatureFlagSchema = new mongoose.Schema({
   createdAt: Date,
   updatedAt: Date,
   metadata: Object
-})
+});
 
-FeatureFlagModel = FeatureFlagSchema.load()
+FeatureFlagModel = FeatureFlagSchema.load();
 await FeatureFlagModel.create({
   key: 'admin-panel-user-banning',
   enabled: false,
   description: 'Enable admin user banning feature'
-})
+});
 ```
 
 **Best for**: Teams with existing MongoDB, small scale features, zero budget.
@@ -130,6 +139,7 @@ await FeatureFlagModel.create({
 **Type**: Open-source SaaS/self-hosted option (UK-based)
 
 **Pros**:
+
 - **Free tier available** (self-hosted is free forever)
 - Self-hosting option (Docker, easy setup)
 - Real-time updates via API
@@ -137,19 +147,21 @@ await FeatureFlagModel.create({
 - GDPR-compliant by default (European origin)
 
 **Cons**:
+
 - Smaller community than Unleash/LaunchDarkit
 - Limited advanced features compared to commercial options
 
 **Integration with Express.js**:
+
 ```javascript
-const flagsmith = require('@flagsmith/node-sdk')
+const flagsmith = require('@flagsmith/node-sdk');
 const client = await flagsmith.init({
   apiKey: process.env.FLAGSMITH_API_KEY,
   environmentID: process.env.FLAGSMITH_ENVIRONMENT_ID,
   enableBatchEvaluation: true
-})
+});
 
-client.on('evaluation', console.log)
+client.on('evaluation', console.log);
 ```
 
 **Best for**: Teams wanting GDPR compliance, European data residency.
@@ -161,26 +173,29 @@ client.on('evaluation', console.log)
 **Type**: Google's managed platform
 
 **Pros**:
+
 - **Real-time updates** via Firestore
 - Pay-as-you-go pricing (can be cheap for small projects)
 - No infrastructure to manage
 - Firebase Authentication integration
 
 **Cons**:
+
 - **Vendor lock-in**: Dependence on Google services
 - **Pricing can escalate**: Based on reads/writes, can exceed budget
 - **Limited targeting**: Basic audience segmentation only
 
 **Integration with Express.js**:
+
 ```javascript
-const admin = require('firebase-admin')
-admin.initializeApp({ projectId: 'your-project-id' })
+const admin = require('firebase-admin');
+admin.initializeApp({ projectId: 'your-project-id' });
 
 // Write feature flag to Firestore
 await admin.firestore().collection('featureFlags').doc('admin-panel').set({
   enabled: false,
   timestamp: new Date()
-})
+});
 ```
 
 **Best for**: Teams already using Firebase ecosystem.
@@ -192,6 +207,7 @@ await admin.firestore().collection('featureFlags').doc('admin-panel').set({
 ### Recommended Choice: Unleash (Self-Hosted Community Edition)
 
 **Rationale**:
+
 1. **Cost-effective**: Free on self-hosted Docker with no per-user licensing fees
 2. **Real-time updates**: API-driven, no restarts needed for toggles
 3. **Easy integration**: Simple SDK works well with Express.js
@@ -211,7 +227,7 @@ services:
   unleash-server:
     image: app.unleashhost.com/unleash/server:latest
     ports:
-      - "4242:4242"
+      - '4242:4242'
     environment:
       - UNLEASH__DATABASE__TYPE=postgresql
       - UNLEASH__DATABASE__HOST=localhost
@@ -222,7 +238,7 @@ services:
 
 ```javascript
 // server/services/featureFlags.js (simplified custom solution)
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
 const FeatureFlagSchema = new mongoose.Schema({
   key: { type: String, required: true, unique: true },
@@ -232,24 +248,24 @@ const FeatureFlagSchema = new mongoose.Schema({
   variants: [{ name: String, rollup: String, payload: Object }],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
-})
+});
 
 // Cache with TTL
-let flagCache = new Map()
-const CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes
+let flagCache = new Map();
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 function getFeatureFlag(key) {
-  const cached = flagCache.get(key)
+  const cached = flagCache.get(key);
   if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
-    return cached.enabled
+    return cached.enabled;
   }
-  
-  const doc = FeatureFlagModel.findOne({ key })
+
+  const doc = FeatureFlagModel.findOne({ key });
   if (doc) {
-    flagCache.set(key, { enabled: doc.enabled, timestamp: Date.now() })
+    flagCache.set(key, { enabled: doc.enabled, timestamp: Date.now() });
   }
-  
-  return false // default disabled
+
+  return false; // default disabled
 }
 
 async function setFeatureFlag(key, enabled) {
@@ -257,7 +273,7 @@ async function setFeatureFlag(key, enabled) {
     { key },
     { key, enabled, updatedAt: new Date() },
     { upsert: true }
-  )
+  );
 }
 ```
 
@@ -273,7 +289,8 @@ async function setFeatureFlag(key, enabled) {
 After evaluating all feature flag systems, **Unleash (self-hosted)** is recommended as the primary choice due to its balance of cost-effectiveness, real-time updates, and ease of integration with Express.js. A simplified MongoDB-based solution is also provided for teams that prefer zero external dependencies or want to start simple and migrate later.
 
 ---
-*Research completed by background agent*
+
+_Research completed by background agent_
 
 **Status**: Resolved
 

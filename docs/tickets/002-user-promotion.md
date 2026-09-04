@@ -38,16 +38,21 @@ interface Role {
 
 ```typescript
 // server/models/User.ts
-const userSchema = new Schema({
-  // ... existing fields
-  
-  roles: [{
-    type: { enum: ['user', 'admin', 'super-admin'] },
-    createdAt: { type: Date, default: Date.now }
-  }],
-  
-  // Reference to Roles collection via populate
-}, { timestamps: true });
+const userSchema = new Schema(
+  {
+    // ... existing fields
+
+    roles: [
+      {
+        type: { enum: ['user', 'admin', 'super-admin'] },
+        createdAt: { type: Date, default: Date.now }
+      }
+    ]
+
+    // Reference to Roles collection via populate
+  },
+  { timestamps: true }
+);
 ```
 
 **Note**: The `roles` field in User schema is for denormalized display; the authoritative source is the Roles collection.
@@ -55,6 +60,7 @@ const userSchema = new Schema({
 ### 3. Promotion API Endpoints
 
 #### Endpoint 1: Grant Role (Promote)
+
 ```typescript
 // server/routes/admin/userRoles.ts
 POST /admin/users/:userId/roles/:roleType
@@ -72,6 +78,7 @@ POST /admin/users/:userId/roles/:roleType
 ```
 
 #### Endpoint 2: Revoke Role (Demote)
+
 ```typescript
 DELETE /admin/users/:userId/roles/:roleType
 - Validates requester has admin/super-admin role
@@ -91,8 +98,8 @@ function canRemoveSuperAdmin(userId: ObjectId): boolean {
     roleType: 'super-admin',
     userId
   });
-  
-  return superAdminCount > 1;  // Can only remove if count > 1
+
+  return superAdminCount > 1; // Can only remove if count > 1
 }
 ```
 
@@ -104,8 +111,8 @@ function canRemoveAdmin(userId: ObjectId): boolean {
     roleType: 'admin',
     userId
   });
-  
-  return adminCount > 1;  // Can only remove if count > 1
+
+  return adminCount > 1; // Can only remove if count > 1
 }
 ```
 
@@ -122,24 +129,24 @@ export function ensureAdminExists() {
     const superAdminCount = await Roles.countDocuments({
       roleType: 'super-admin'
     });
-    
+
     if (superAdminCount <= 0) {
       return res.status(400).json({
         error: 'Cannot remove last super-admin. At least one super-admin must exist.'
       });
     }
-    
+
     // Check admin count
     const adminCount = await Roles.countDocuments({
       roleType: 'admin'
     });
-    
+
     if (adminCount <= 0) {
       return res.status(400).json({
         error: 'Cannot remove last admin. At least one admin must exist.'
       });
     }
-    
+
     next();
   };
 }
@@ -190,26 +197,20 @@ Admin who made change: {adminName}
 async function ensureInitialRoles() {
   // Find all users
   const users = await User.find();
-  
+
   // Assign roles to existing admins (from old system)
   const currentAdmins = await Roles.find({ roleType: 'admin' });
   const currentSuperAdmins = await Roles.find({ roleType: 'super-admin' });
-  
+
   // If no super-admins exist, promote one admin to super-admin
   if (currentSuperAdmins.length === 0 && currentAdmins.length > 0) {
-    await Roles.updateOne(
-      { _id: currentAdmins[0]._id },
-      { $set: { roleType: 'super-admin' } }
-    );
+    await Roles.updateOne({ _id: currentAdmins[0]._id }, { $set: { roleType: 'super-admin' } });
     console.log('Promoted first admin to super-admin');
   }
-  
+
   // If only one super-admin exists, create an admin (not super-admin)
   if (currentSuperAdmins.length === 1 && currentAdmins.length === 0) {
-    await Roles.updateOne(
-      { _id: currentSuperAdmins[0]._id },
-      { $set: { roleType: 'admin' } }
-    );
+    await Roles.updateOne({ _id: currentSuperAdmins[0]._id }, { $set: { roleType: 'admin' } });
     console.log('Demoted super-admin to admin, created new super-admin');
   }
 }
@@ -220,7 +221,8 @@ async function ensureInitialRoles() {
 This research ticket is complete. The schema, API endpoints, business rules, and middleware implementation details above should be used for the actual development work.
 
 ---
-*Research completed by background agent*
+
+_Research completed by background agent_
 
 **Status**: Resolved
 

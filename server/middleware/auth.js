@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const banCheck = require('./banCheck');
 
 module.exports = (req, res, next) => {
   // Check for the absolute presence of the Authorization header at the beginning of processing
@@ -57,3 +58,6 @@ module.exports = (req, res, next) => {
       .json({ message: 'An internal server error occurred during authentication processing.' });
   }
 };
+
+// Apply ban check after successful auth — blocks all requests if banned
+banCheck.init();
