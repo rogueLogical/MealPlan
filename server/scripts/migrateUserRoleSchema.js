@@ -30,7 +30,7 @@ async function migrateUserRoleSchema() {
             roles: user.roles || []
           }
         },
-        { new: true }
+        { returnDocument: 'after' }
       );
 
       if (updatedUser) {

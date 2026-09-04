@@ -133,40 +133,55 @@ UserSchema.methods.comparePassword = async function (candidate) {
   return bcrypt.compare(candidate, this.password);
 };
 
-// helper to check current highest role from Roles collection (denormalized field is for display only)
+// helper to fetch all roles from Roles collection, sorted by priority (most recent first)
+UserSchema.methods.getRoles = async function () {
+  return await Roles.find({ userId: this._id }).sort({ grantedAt: -1 });
+};
+
+// convenience method to get the highest-priority role
+UserSchema.methods.getHighestRole = async function () {
+  const roles = await this.getRoles();
+  const priority = { 'super-admin': 3, admin: 2, user: 1 };
+  return [...roles]
+    .reverse()
+    .find((r) => priority[r.roleType] === Math.max(...Object.values(priority))).roleType;
+};
+
+// convenience method to check if user has any of the specified roles
+UserSchema.methods.hasAnyRole = async function (roleArray) {
+  const roles = await this.getRoles();
+  return roles.some((r) => roleArray.includes(r.roleType));
+};
+
+// deprecated: getCurrentRole() - use getHighestRole() instead
 UserSchema.methods.getCurrentRole = async function () {
-  const roles = await Roles.findOne({ userId: this._id }).sort({ grantedAt: -1 });
-  return roles ? roles.roleType : 'user';
+  console.warn('[User] getCurrentRole() is deprecated, use getHighestRole() instead');
+  return await this.getHighestRole();
 };
 
-// helper to get all role types for display
-UserSchema.methods.getRoleTypes = function () {
-  if (!this.roles || !Array.isArray(this.roles)) return ['user'];
-  const uniqueRoles = [...new Set(this.roles.map((r) => r.roleType))];
-  return uniqueRoles.length === 0 ? ['user'] : uniqueRoles;
+// deprecated: hasRole() - use hasAnyRole() with specific role or getHighestRole() for priority check
+UserSchema.methods.hasRole = async function (roleType) {
+  console.warn('[User] hasRole() is deprecated, use hasAnyRole([role]) instead');
+  return await this.hasAnyRole([roleType]);
 };
 
-// function to check if user has a specific role
-UserSchema.methods.hasRole = function (roleType) {
-  if (!this.roles || !Array.isArray(this.roles)) {
-    return roleType === 'user'; // default role
-  }
-  return this.roles.some((r) => r.roleType === roleType);
+// deprecated: getRoleTypes() - use getRoles() directly or hasAnyRole() for checks
+UserSchema.methods.getRoleTypes = async function () {
+  console.warn('[User] getRoleTypes() is deprecated, use getRoles() instead');
+  const roles = await this.getRoles();
+  return [...new Set(roles.map((r) => r.roleType))];
 };
 
-// function to check admin roles (admin OR super-admin)
+// deprecated: isAdmin() - use hasAnyRole(['admin', 'super-admin']) or check getHighestRole()
 UserSchema.methods.isAdmin = async function () {
-  const highestRole = await Roles.findOne({ userId: this._id })
-    .where('roleType')
-    .in(['admin', 'super-admin'])
-    .sort({ grantedAt: -1 });
-  return !!highestRole;
+  console.warn('[User] isAdmin() is deprecated, use hasAnyRole(["admin", "super-admin"]) instead');
+  return await this.hasAnyRole(['admin', 'super-admin']);
 };
 
-// function to check if user is super-admin
+// deprecated: isSuperAdmin() - use hasAnyRole(['super-admin']) or check getHighestRole()
 UserSchema.methods.isSuperAdmin = async function () {
-  const role = await Roles.findOne({ userId: this._id, roleType: 'super-admin' });
-  return !!role;
+  console.warn('[User] isSuperAdmin() is deprecated, use hasAnyRole(["super-admin"]) instead');
+  return await this.hasAnyRole(['super-admin']);
 };
 
 module.exports = mongoose.model('User', UserSchema);

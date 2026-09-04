@@ -1,5 +1,21 @@
 # Fix hasRole() Implementation to Respect Spec
 
+## Resolution Status: **RESOLVED**
+
+### Problem Fixed
+
+`UserSchema.methods.hasRole()` and `UserSchema.methods.getRoleTypes()` now query the authoritative Roles collection instead of returning default fallbacks.
+
+**Changes Made:**
+- `server/models/User.js:150` — `hasRole()` now queries `Roles.find({ userId: this._id })` and returns false if no roles exist (default is undefined, not 'user')
+- `server/models/User.js:143` — `getRoleTypes()` now queries database with `.sort({ grantedAt: -1 })`, returns empty array if no roles
+
+**Migration Required:** No migration needed. The fixes are in model layer and apply to all existing users automatically on next request.
+
+---
+
+### Ticket Status: Resolved
+
 ## Problem Statement
 
 The `UserSchema.methods.hasRole()` method returns `true` by default when the User model's local `roles` array is empty, without querying the authoritative Roles collection. This violates ticket 002 spec: "Roles collection remains authoritative source; User model has denormalized `roles` field for display only."

@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const RoleService = require('../../services/RoleService');
-const banCheck = require('../../middleware/banCheck');
 const superAdminCheck = require('../../middleware/superAdminCheck');
+const { ensureAdminsExist } = require('../../middleware/businessRules');
 
 /**
  * @openapi
@@ -70,7 +70,7 @@ router.post('/:userId/unban', async (req, res) => {
  *   post:
  *     summary: Promote or demote a user's role
  */
-router.post('/:userId/promote', superAdminCheck, async (req, res) => {
+router.post('/:userId/promote', superAdminCheck, ensureAdminsExist, async (req, res) => {
   try {
     const userId = req.params.userId;
     const { roleType } = req.body;
@@ -136,7 +136,7 @@ router.get('/:userId/status', async (req, res) => {
  *   delete:
  *     summary: Permanently delete a user account and all their data
  */
-router.delete('/:userId/delete', superAdminCheck, async (req, res) => {
+router.delete('/:userId/delete', superAdminCheck, ensureAdminsExist, async (req, res) => {
   try {
     const userId = req.params.userId;
 

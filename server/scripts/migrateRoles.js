@@ -32,7 +32,7 @@ async function migrateRoles() {
             roles: user.roles || []
           }
         },
-        { new: true }
+        { returnDocument: 'after' }
       );
     }
 

@@ -60,7 +60,7 @@ async function setFeatureFlag(key, options) {
     result = await FeatureFlagModel.findOneAndUpdate(
       { key },
       { ...options, updatedAt: new Date() },
-      { upsert: true }
+      { upsert: true, returnDocument: 'after' }
     );
   }
 

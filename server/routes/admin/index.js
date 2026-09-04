@@ -2,8 +2,11 @@ const express = require('express');
 const router = express.Router();
 
 // Apply audit logger middleware to all admin routes
-const { auditLogger } = require('../../middleware/auditLogger');
-router.use(auditLogger);
+const AuditLogger = require('../../middleware/auditLogger');
+router.use(function (req, res, next) {
+  if (!req.userData) return next();
+  AuditLogger()(req, res, next);
+});
 
 const usersRoute = require('./users');
 const contentRoute = require('./content');

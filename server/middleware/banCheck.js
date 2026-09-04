@@ -1,5 +1,4 @@
-const mongoose = require('mongoose');
-const User = require('../models/User').default || require('../models/User');
+const User = require('../models/User');
 
 /**
  * Ban Check Middleware — validates user's banned status on every request.
@@ -33,18 +32,16 @@ module.exports = function banCheck(req, res, next) {
           console.log('[BanCheck] Ban expired, lifting restriction for:', user.email);
           user.isBanned = false;
           user.banExpiresAt = null;
-          return User.findByIdAndUpdate(req.userData.userId, user.getChanges(), { new: true }).then(
-            (updated) => next()
-          );
+          return User.findByIdAndUpdate(req.userData.userId, user.getChanges(), {
+            returnDocument: 'after'
+          }).then(() => next());
         } else {
           // Still within ban period
           const remaining = Math.ceil((user.banExpiresAt - now) / (1000 * 60 * 60));
           console.log(`[BanCheck] Banned user blocked (expires in ${remaining}h):`, user.email);
-          return res
-            .status(403)
-            .json({
-              message: `This account is temporarily banned. Access restored in ~${remaining} hours.`
-            });
+          return res.status(403).json({
+            message: `This account is temporarily banned. Access restored in ~${remaining} hours.`
+          });
         }
       }
 

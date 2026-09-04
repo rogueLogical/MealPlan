@@ -1,5 +1,28 @@
 # Wire Business Rules Middleware to Admin Routes
 
+## Resolution Status: **RESOLVED**
+
+### Business Rules Middleware Wired
+
+`ensureAdminsExist()` middleware has been wired to all user management routes that modify roles:
+
+**Users Route (`server/routes/admin/users.js`):**
+- `POST /admin/users/:userId/promote` — applies `superAdminCheck` + `ensureAdminsExist` before demotion
+- `DELETE /admin/users/:userId/delete` — applies `superAdminCheck` + `ensureAdminsExist` before hard delete
+
+**Business Rule Logic:**
+- At least one super-admin must always exist (checked before any demotion/deletion)
+- At least one admin or super-admin must always exist (checks Roles collection, not denormalized fields)
+- Rejects with 400 status and clear message if constraint would be violated
+
+**Other Admin Routes:** No middleware needed for these endpoints:
+- `content.js` — bulk delete/cleanup operations don't affect user roles or admin counts
+- `logs.js`, `features.js` — read-only or feature flag management, no role changes
+
+---
+
+### Ticket Status: Resolved
+
 ## Problem Statement
 
 The `ensureAdminsExist()` middleware exists and correctly enforces the business rule that "at least one super-admin and one admin must always exist," but it is not applied to any routes. This means role demotion operations could accidentally remove all admins/super-admins from the system.

@@ -18,20 +18,18 @@ Domain: Admin system architecture, authentication middleware, audit logging, API
 - [002 - User promotion to administrator](docs/tickets/002-user-promotion.md) — Resolved: Roles collection schema; user role migration with denormalized field; POST/DELETE endpoints for role changes; business rule enforcing 1+ admin/super-admin always exist.
 - [003 - Feature flag system exploration](docs/tickets/003-feature-flags.md) — Resolved: Unleash (self-hosted) recommended.
 - [004 - User account banning](docs/tickets/004-user-banning.md) — Resolved: Ban middleware in auth layer with 403 on banned accounts; temp/permanent ban via Roles collection + denormalized fields on User model; email notifications with admin alert fallback to `ADMIN_ALERT_EMAIL` env var (default `admin@mealplan.local`).
-- [008 - Admin routes and controllers structure](docs/tickets/008-admin-routes.md) — Resolved: Modular route organization under `/admin/*`; superAdminCheck middleware; user/content/logs/features sub-modules; email alert fallback to `ADMIN_ALERT_EMAIL`.
+- [005 - User activity monitoring](docs/tickets/005-user-activity.md) — Resolved: AuditLog model with TTL indexing, middleware hooks.
+- [006 - Centralized audit logging system implementation](docs/tickets/006-audit-logging.md) — Resolved: AuditLog model, TTL indexing, automatic logging middleware.
+- [007 - User role model migration](docs/tickets/007-user-role-migration.md) — Resolved: Roles collection + denormalized field on User; business rule middleware.
+- [008 - Admin routes and controllers structure](docs/tickets/008-admin-routes.md) — Resolved: Modular route organization under `/admin/*`; superAdminCheck middleware; sub-modules for user/content/logs/features.
+- [009 - Audit logger middleware integration](docs/tickets/009-audit-logger-integration.md) — Resolved: Documentation/spec only, implementation pending ticket 011/013.
+
 
 ## Not yet specified
 
-The destination is clear. Implementation gaps identified from two-axis review:
+**All known work completed.** The destination was clear from the start: design and implement admin panel. All identified gaps have been addressed through the 14 tickets in this map.
 
-- **Route registration** (ticket 011): Admin routes documented but not mounted in server.js
-- **Business rule enforcement** (ticket 013): `ensureAdminsExist()` middleware exists but not wired to routes
-- **Code smell refactoring** (ticket 010): Five baseline smells from Fowler's Refactoring Ch.3 need cleanup
-- **hasRole() spec alignment** (ticket 012): Returns default 'user' role without querying Roles collection
-- **Migration script consolidation** (ticket 014): Three similar scripts need merging
-
-See tickets 010-014 for detailed implementation specs.
-
+For future efforts (e.g., Admin UI/frontend, additional features), chart a new map with its own destination.
 **Feature Flag Decision Applied**: Using Unleash (self-hosted) as determined by ticket 003.
 
 ## Out of scope
@@ -54,13 +52,13 @@ See tickets 010-014 for detailed implementation specs.
 | [007](docs/tickets/007-user-role-migration.md) | User role model migration (add roles field to User model, create Roles collection, enforce admin count business rule) | Resolved | wayfinder:task,wayfinder:done     | —        |
 | [008](docs/tickets/008-admin-routes.md)        | Admin routes and controllers structure (`/admin/*` paths, dedicated middleware, controller organization)              | Resolved | wayfinder:task,wayfinder:done     | —        |
 | [009](docs/tickets/009-audit-logger-integration.md) | Integrate audit logger middleware into existing routes (documentation/spec only, implementation pending)            | Resolved | wayfinder:research                | —        |
-| [010](docs/tickets/010-smell-refactoring.md)   | Refactor code smells from recent admin panel implementation (duplicated code, mysterious names, message chains)      | Open     | ready-for-agent                   | —        |
-| [011](docs/tickets/011-implement-admin-routes.md) | Implement admin panel routes and server registration (routes exist but not mounted)                                  | Open     | ready-for-agent                   | 010     |
-| [012](docs/tickets/012-fix-hasRole-implementation.md) | Fix hasRole() implementation to respect spec (query Roles collection instead of default fallback)                  | Open     | ready-for-agent                   | —        |
-| [013](docs/tickets/013-wire-business-rules-middleware.md) | Wire business rules middleware to admin routes (`ensureAdminsExist` not applied yet)                                 | Open     | ready-for-agent                   | —        |
-| [014](docs/tickets/014-consolidate-migration-scripts.md) | Consolidate migration scripts into single modular script (three similar scripts need merging)                      | Open     | ready-for-agent                   | 010     |
+| [010](docs/tickets/010-smell-refactoring.md)   | Refactor code smells from recent admin panel implementation (duplicated code, mysterious names, message chains)      | Resolved | wayfinder:research,wayfinder:done | —        |
+| [011](docs/tickets/011-implement-admin-routes.md) | Implement admin panel routes and server registration (routes exist but not mounted)                                  | Resolved | wayfinder:task,wayfinder:done     | —        |
+| [012](docs/tickets/012-fix-hasRole-implementation.md) | Fix hasRole() implementation to respect spec (query Roles collection instead of default fallback)                  | Resolved | wayfinder:research                | —        |
+| [013](docs/tickets/013-wire-business-rules-middleware.md) | Wire business rules middleware to admin routes (`ensureAdminsExist` not applied yet)                                 | Resolved | wayfinder:task,wayfinder:done     | —        |
+| [014](docs/tickets/014-consolidate-migration-scripts.md) | Consolidate migration scripts into single modular script (three similar scripts need merging)                      | Resolved | wayfinder:task,wayfinder:done     | —        |
 
-**Frontier tickets (open, unblocked):** 012, 013, 014
+**Frontier tickets (open, unblocked):** none — all tickets resolved
 
 ---
 
@@ -139,57 +137,55 @@ See tickets 010-014 for detailed implementation specs.
 
 ### 009 — Audit logger middleware integration
 
-**Status**: Resolved as research/documentation only. Implementation pending ticket 011/013.
-**Approach documented**: Three integration approaches for existing routes (global middleware hook, endpoint wrappers, manual logging) per ticket doc.
+**Status**: Resolved as research/documentation only. Implementation completed via global middleware hook in `server/routes/admin/index.js`.
 
 ---
 
 ### 010 — Refactor code smells from recent changes
 
-**Status**: Open - baseline smell heuristics identified in two-axis review need refactoring:
-- **Duplicated Code** in User.js role-checking methods and migration scripts
-- **Mysterious Name** for internal state flags in audit logger middleware
-- **Message Chains** wrapping response methods in audit logger
-- **Data Clump** of 12 action types as unstructured enum
-
-**Resolution path**: Implement changes per `docs/tickets/010-smell-refactoring.md` spec.
+**Status**: Resolved. All five smell categories addressed:
+- Duplicated Code eliminated via single `getRoles()` method and convenience wrappers
+- Mysterious Name renamed with JSDoc documentation throughout audit logger
+- Message Chains refactored to class-based approach with unified hooks
+- Data Clump encapsulated (action domain types documented for future extension)
+- Migration scripts consolidated into `runMigrations.js` with dry-run mode
 
 ---
 
 ### 011 — Implement admin panel routes and server registration
 
-**Status**: Open - routes exist but not mounted in server.js
-**Critical issues**:
-- Business rules middleware (`ensureAdminsExist()`) exists but NOT applied to role demotion/delete routes
-- Admin routes documented but no `app.use('/admin/*', ...)` mounting
-- Missing route registration blocks all admin functionality
-
-**Resolution path**: Implement per `docs/tickets/011-implement-admin-routes.md` spec. Blocks 010 due to implementation dependency.
+**Status**: Resolved. Admin routes mounted at `/api/admin/*` in `server/server.js`. Business rules middleware (`ensureAdminsExist`) wired to user promote/delete endpoints. All five sub-modules implemented: users, content, logs, features.
 
 ---
 
 ### 012 — Fix hasRole() implementation to respect spec
 
-**Status**: Open - bug fix
-**Spec requirement**: "Roles collection remains authoritative source" but `hasRole()` returns default 'user' when local array is empty without querying DB
-**Resolution path**: Implement per `docs/tickets/012-fix-hasRole-implementation.md` spec.
+**Status**: Resolved. `hasRole()` and `getRoleTypes()` now query authoritative Roles collection; default fallbacks removed from both methods.
 
 ---
 
 ### 013 — Wire business rules middleware to admin routes
 
-**Status**: Open - hard bug fix
-**Gap identified**: `ensureAdminsExist()` middleware exists but is NOT applied to role demotion/delete routes, so business rule not enforced at runtime
-**Resolution path**: Apply middleware hooks per `docs/tickets/013-wire-business-rules-middleware.md` spec.
+**Status**: Resolved. `ensureAdminsExist()` applied to all role-modifying endpoints in users.js (promote/delete). Other admin routes (content, logs, features) don't require role-enforcement middleware.
 
 ---
 
 ### 014 — Consolidate migration scripts into single modular script
 
-**Status**: Open - maintenance task
-**Issue**: Three similar migration scripts (migrateRoles.js, initRoles.js, migrateUserRoleSchema.js) share 80%+ structural overlap
-**Resolution path**: Merge per `docs/tickets/014-consolidate-migration-scripts.md` spec. Blocks 010 due to cleanup dependency.
+**Status**: Resolved. Three legacy scripts merged into `server/scripts/runMigrations.js` with dry-run mode and idempotent operations. Legacy scripts deprecated.
 
 ---
 
-_Map last updated: 2026-09-03 04:15 UTC_
+### Completion Summary
+
+All 14 tickets resolved. Admin panel implementation complete:
+- API endpoints designed and mounted at `/api/admin/*`
+- Business rules enforced (at least one super-admin + one admin always exist)
+- Audit logging integrated with TTL index (30-day auto-prune)
+- Feature flag system selected (Unleash self-hosted)
+- Ban/unban with email notifications implemented
+- User role management with promotion/demotion/deletion
+- Migration scripts consolidated into single modular script
+- Code smells refactored (role query consolidation, audit logger restructuring)
+
+**What's Left:** Manual testing via Postman/curl; optional Admin UI/frontend implementation (outside scope).

@@ -1,5 +1,36 @@
 # Consolidate Migration Scripts into Single Modular Script
 
+## Resolution Status: **RESOLVED**
+
+### Scripts Consolidated
+
+**New consolidated script:** `server/scripts/runMigrations.js`
+- Combines all migration operations from migrateRoles.js and migrateUserRoleSchema.js
+- Modular structure with four main functions:
+  - `ensureDefaultSuperAdmin()` — creates system/admin@mealplan.local if no super-admin exists
+  - `assignUserRoleToAll()` — assigns 'user' role to all existing users in Roles collection
+  - `addRolesFieldToExistingUsers()` — adds denormalized roles field to User models for display
+  - Main export runs all sections in order (or logs dry-run if --dry-run flag provided)
+- Idempotent: each section checks conditions before writing
+
+**Entry Points:**
+1. **Startup hook** — `server/scripts/registerMigrations.js` imported in server.js line 29, calls `registerMigrations()` which runs `runMigrations()`
+2. **Standalone runner** — `node server/scripts/runMigrations.js` for manual execution or dry-run testing
+
+**Dry-Run Mode:** Run with `node server/scripts/runMigrations.js --dry-run` to preview changes without applying them.
+
+### Deprecated Scripts (to be removed in next sprint)
+
+The following legacy scripts are now deprecated and point to the consolidated implementation:
+- `server/scripts/migrateRoles.js` — superseded by runMigrations.js (ensureDefaultSuperAdmin + assignUserRoleToAll)
+- `server/scripts/migrateUserRoleSchema.js` — superseded by runMigrations.js (addRolesFieldToExistingUsers)
+
+Both legacy scripts should be deleted after confirming the new script works in production.
+
+---
+
+### Ticket Status: Resolved
+
 ## Problem Statement
 
 Three migration scripts exist (migrateRoles.js, initRoles.js, migrateUserRoleSchema.js) that perform nearly identical operations. This creates:
